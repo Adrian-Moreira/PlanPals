@@ -188,6 +188,8 @@ Then the completed task should appear dimmed / darkened to make it less visible*
 
 ![image info](./ArchitectureDiagram.png)
 
+We believe this architecture will work well as it is one that is familiar to us all. The seperation of the logic, presentation and data layer creates simple, yet very effective, seams between the three; allowing our workflow to be more felxible and efficient. While one frontend will use React and another Flutter, both of which can scale and adapt to real time updates effectively and allow us to create a clean user interface on top of it. Our backend will be powered by Node.js and Express to manage our APIs. Node can handle many simultaneous requests while express is lightweight and flexible which are both great for building a fast, responsive and scalable API layer. Additionally we have decided to use AWS Lambda paired with SNS (Simple Notification Service) for notifications and live updates. Lambda can run code without provisioning or managing servers, which means we can easily scale as more users start using the app; while SNS will handle all things notifications. Finally, we will be using PostgreSQL and MongoDB to handle our data on the backend, as it can work seemlessly with the services we have chosen.
+
 
 ## Work Division
 
