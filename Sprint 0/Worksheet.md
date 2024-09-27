@@ -33,7 +33,7 @@ PlanPals is a planning platform that helps you and your friends, family, or coll
 
 #### Non-Functional Feature
 
-Can update all users working on a shared plan in real time with edits and changes, up to at least 100 users concurrently.
+Can update all cooperating users working on a shared plan in *near* real time with edits and changes, up to at least 100 users concurrently working on different planers.
 
 ### User Stories
 
