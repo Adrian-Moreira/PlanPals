@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main, express-planner ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run PP-Server Tests
+        run: | 
+          pushd planner-service
+          npm install
+          npm run build
+          npm run test -- --ci --reporters=jest-junit
+          popd
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Planner Express Test Results
+          path: planner-service/junit.xml
+      - name: Report Planner Express Test Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Planner Express Jest Tests
+          path: planner-service/junit.xml
+          reporter: jest-junit
