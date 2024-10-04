@@ -3,7 +3,6 @@
 ## Prerequisites
 
 - [Node v18.20.4](https://nodejs.org/en/download/package-manager)
-- [Yarn](https://yarnpkg.com/getting-started/install)
 
 ## Development
 
