@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main, express-planner ]
+    branches: [ main, Travel-planner ]
 
 jobs:
   build-and-test:
