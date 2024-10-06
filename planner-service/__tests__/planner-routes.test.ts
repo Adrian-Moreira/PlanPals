@@ -3,7 +3,6 @@ import request from 'supertest'
 import PlanPals from '../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { User, UserModel } from '../src/models/User'
-import exp from 'constants'
 
 describe('Planner API', () => {
   let app: PlanPals

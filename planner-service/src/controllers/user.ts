@@ -67,8 +67,8 @@ export async function deleteUser({ userId }: UserParams) {
   return { data: deletedUser }
 }
 
-export async function getUsersByUserName({ userName }: UserParams) {
-  const user = await UserModel.find({ userName: { $regex: new RegExp(userName || '', 'i') } })
+export async function getUsersByUserName({ userName = 'null' }: UserParams) {
+  const user = await UserModel.find({ userName: { $regex: new RegExp(userName, 'i') } })
   if (!user) {
     throw new RecordNotFoundException({ recordType: 'User', recordId: userName })
   }
