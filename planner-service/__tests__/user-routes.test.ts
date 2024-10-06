@@ -14,8 +14,8 @@ describe('User API', () => {
     app.startServer()
   })
 
-  afterAll(async () => {
-    await app.stopServer()
+  afterAll(() => {
+    app.stopServer()
   })
 
   it('should return Created', async () => {

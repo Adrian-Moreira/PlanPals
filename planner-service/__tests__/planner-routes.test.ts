@@ -18,8 +18,8 @@ describe('Planner API', () => {
     })
   })
 
-  afterAll(async () => {
-    await app.stopServer()
+  afterAll(() => {
+    app.stopServer()
   })
 
   it('should return OK', async () => {
