@@ -13,10 +13,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run PP-Server Tests
         run: | 
-          cd planner-service
+          pushd planner-service
           npm install
           npm run build
           npm run test -- --ci --reporters=jest-junit
+          popd
       - uses: actions/upload-artifact@v4
         with:
           name: Planner Express Test Results
