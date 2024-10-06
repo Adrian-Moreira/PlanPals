@@ -36,7 +36,7 @@ userRouter.get(
 )
 
 userRouter.post(
-  '/create',
+  '/',
   async (req: Request, res: Response, next: NextFunction) => {
     const { userName } = req.body
     try {

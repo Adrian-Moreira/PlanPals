@@ -6,7 +6,7 @@ import config from './config'
 import { closeMongoConnection, connectToMongoDB } from './db/mongoose'
 import userRouter from './routes/user'
 import { StatusCodes } from 'http-status-codes'
-import plannerRouter from './routes/planner'
+import router from './routes/routers'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 
@@ -19,7 +19,7 @@ const errorHandler = (
   //   console.error(err)
   let statusCode = err.status || StatusCodes.INTERNAL_SERVER_ERROR
   if (err.name === 'BSONError') {
-	statusCode = StatusCodes.BAD_REQUEST
+    statusCode = StatusCodes.BAD_REQUEST
   }
   res.status(statusCode).json({
     success: false,
@@ -42,8 +42,8 @@ class PlanPals {
 
   private initRoutes(): void {
     this.app.use(express.json())
-    this.app.use('/api/user', userRouter)
-	this.app.use('/api/:userId/planner', plannerRouter)
+    this.app.use('/user', userRouter)
+    this.app.use(router)
     this.app.use(errorHandler)
   }
 

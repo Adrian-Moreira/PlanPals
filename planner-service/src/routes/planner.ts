@@ -1,6 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { createPlanner, getPlannersByUserId } from '../controllers/planner'
+import { destinationRouter } from './destination'
+import { transportationRouter } from './transportation'
 
 const plannerRouter = express.Router({ mergeParams: true })
 
@@ -8,7 +10,7 @@ plannerRouter.get(
   '/',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await getPlannersByUserId({ createdBy: req.params.userId })
+      const result = await getPlannersByUserId({ createdBy: req.body.createdBy })
       res.status(StatusCodes.OK).json({ success: true, ...result })
     } catch (error) {
       next(error)
@@ -17,7 +19,7 @@ plannerRouter.get(
 )
 
 plannerRouter.post(
-  '/create',
+  '/',
   async (req: Request, res: Response, next: NextFunction) => {
     const {
       createdBy,
@@ -48,5 +50,8 @@ plannerRouter.post(
     }
   },
 )
+
+plannerRouter.use('/:plannerId/transportation', transportationRouter)
+plannerRouter.use('/:plannerId/destination', destinationRouter)
 
 export default plannerRouter
