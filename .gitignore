@@ -3,3 +3,6 @@ out
 coverage
 node_modules
 junit.xml
+lambda
+.env
+.direnv

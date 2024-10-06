@@ -1,88 +1,84 @@
 #!/usr/bin/env node
 
-import express, { Express, Request, Response } from 'express';
-// import { Server } from 'socket.io';
-import { createServer, Server } from 'node:http';
-import config from './config';
-import CheapDB from './db/mongo';
-import PPUser from './objects/User';
+import express, { Express, NextFunction, Request, Response } from 'express'
+import { createServer, Server } from 'node:http'
+import config from './config'
+import { closeMongoConnection, connectToMongoDB } from './db/mongoose'
+import userRouter from './routes/user'
+import { StatusCodes } from 'http-status-codes'
+import plannerRouter from './routes/planner'
 
-const port: number = config.server.port ? parseInt(config.server.port) : 8080;
+const port: number = config.server.port ? parseInt(config.server.port) : 8080
+
+const errorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  //   console.error(err)
+  let statusCode = err.status || StatusCodes.INTERNAL_SERVER_ERROR
+  if (err.name === 'BSONError') {
+	statusCode = StatusCodes.BAD_REQUEST
+  }
+  res.status(statusCode).json({
+    success: false,
+    message: err.message || 'Internal Server Error',
+  })
+}
 
 class PlanPals {
-	public app: Express;
-	server: Server;
-	db: CheapDB;
+  public app: Express
+  server: Server
+  dbURI: string
 
-	constructor(db: CheapDB = new CheapDB()) {
-		this.app = express();
-		this.server = createServer(this.app);
-		this.db = db;
-		this.initRoutes();
-	}
+  constructor({ dbURI }: any) {
+    this.app = express()
+    this.server = createServer(this.app)
+    this.dbURI =
+      dbURI || config.database.connectionString || 'mongodb://localhost:27017'
+    this.initRoutes()
+  }
 
-	private initRoutes(): void {
-		this.app.post(
-			'/api/user/create',
-			express.json(),
-			async (req: Request<{}, {}, PPUser>, res: Response) => {
-				let user = req.body;
-				try {
-					await this.db.insertUser({
-						id: user.id,
-						userName: user.userName,
-					} as PPUser);
-					res.sendStatus(201);
-				} catch (err) {
-					res.sendStatus(500);
-				}
-			}
-		);
-		this.app.get('/api/user/:id', async (req: Request, res: Response) => {
-			try {
-				let user = await this.db.findUserById(req.params.id);
-				if (user) {
-					res.sendStatus(200);
-				} else {
-					res.sendStatus(404);
-				}
-			} catch (err) {
-				res.sendStatus(500);
-			}
-		});
-	}
+  private initRoutes(): void {
+    this.app.use(express.json())
+    this.app.use('/api/user', userRouter)
+	this.app.use('/api/:userId/planner', plannerRouter)
+    this.app.use(errorHandler)
+  }
 
-	public startServer(): void {
-		this.server.listen(port, () => {
-			console.log(`PP erected on port ${port}`);
-		});
-	}
+  public startServer(): void {
+    connectToMongoDB(this.dbURI)
+    this.server.listen(port, () => {
+      console.log(`PP erected on port ${port}`)
+    })
+  }
 
-	public async stopServer(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			this.db.closeMongoConnection();
-			if (!this.server) {
-				resolve();
-				return;
-			}
-			this.server.close((err: any) => {
-				if (err) {
-					reject(err);
-					return;
-				}
-				resolve();
-			});
-		});
-	}
+  public async stopServer(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      closeMongoConnection()
+      if (!this.server) {
+        resolve()
+        return
+      }
+      this.server.close((err: any) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve()
+      })
+    })
+  }
 }
 
 if (require.main === module) {
-	const pp = new PlanPals();
+  const pp = new PlanPals({})
 
-	process.on('SIGINT', () => pp.stopServer());
-	process.on('SIGTERM', () => pp.stopServer());
+  process.on('SIGINT', () => pp.stopServer())
+  process.on('SIGTERM', () => pp.stopServer())
 
-	pp.startServer();
+  pp.startServer()
 }
 
-export default PlanPals;
+export default PlanPals

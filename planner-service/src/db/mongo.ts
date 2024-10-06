@@ -1,6 +1,6 @@
 import { MongoClient, Db } from 'mongodb';
 import config from '../config';
-import PPUser from '../objects/User';
+import { User, UserSchema } from '../models/User';
 
 const mongoURI = config.database.connectionString
 	? config.database.connectionString
@@ -13,6 +13,7 @@ class CheapDB {
 	constructor(uri: string = mongoURI) {
 		this.mongoURI = uri;
 	}
+
 
 	public async connectToMongoDB(): Promise<MongoClient> {
 		if (!this.mongoClient) {
@@ -42,7 +43,7 @@ class CheapDB {
 		}
 	}
 
-	public async insertUser(user: PPUser): Promise<void> {
+	public async insertUser(user: User): Promise<void> {
 		try {
 			const db = await this.getDB('planner');
 			const collection = db.collection('users');
@@ -53,7 +54,7 @@ class CheapDB {
 		}
 	}
 
-	public async findUserById(id: string): Promise<PPUser | null> {
+	public async findUserById(id: string): Promise<User | null> {
 		try {
 			const db = await this.getDB('planner');
 			const collection = db.collection('users');
@@ -62,7 +63,7 @@ class CheapDB {
 
 			if (user) {
 				console.log('User found:', user);
-				return user as unknown as PPUser;
+				return UserSchema.parse(user);
 			} else {
 				console.log('User not found with id:', id);
 				return null;
