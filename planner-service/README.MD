@@ -54,11 +54,7 @@ The server will be accessible at `http://localhost:xxxx`.
 
 ## API Documentation
 
-[API](./docs/API.md)
-
-
-## Contributing
-
+[API](./docs/README.md)
 
 ## License
 
