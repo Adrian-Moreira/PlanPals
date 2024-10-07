@@ -12,6 +12,9 @@ class Urls {
   
   // To-do list URLs
   static const String todoList = '$baseUrl/todolist';
+
+  // Users
+  static const String users = '$baseUrl/users';
 }
 
 
@@ -19,5 +22,9 @@ class ErrorMessage {
 
   // Travel planner Error Messages
   static const String nullTravelPlanner = "No Travel Planner Available.";
-  
+
+}
+
+class EndPoints {
+  static const travelPlanner = '/planner';
 }

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/core/components/error_message_screen.dart';
+import 'package:planpals/shared/components/error_message_screen.dart';
 import 'package:planpals/features/travel_planner/models/travel_planner_model.dart';
-import 'package:planpals/core/constants.dart';
+import 'package:planpals/shared/constants/constants.dart';
 import 'components/listviews/accommodation_list_view.dart';
 import 'components/listviews/activity_list_view.dart';
 import 'components/listviews/flight_list_view.dart';
 
 
-class TravelPlannerView extends StatelessWidget {
+class TravelPlannerDetailsView extends StatelessWidget {
   final TravelPlanner travelPlanner;
-  const TravelPlannerView({super.key, required this.travelPlanner});
+  const TravelPlannerDetailsView({super.key, required this.travelPlanner});
 
   @override
   Widget build(BuildContext context) {

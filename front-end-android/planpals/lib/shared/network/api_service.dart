@@ -1,6 +1,6 @@
 import 'dart:convert'; // Import for JSON encoding/decoding
 import 'package:http/http.dart' as http;
-import '../constants.dart';
+import '../constants/constants.dart';
 
 class ApiService {
   final String baseUrl = Urls.baseUrl;

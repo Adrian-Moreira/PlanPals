@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/features/travel_planner/models/travel_planner_list_model.dart';
+import 'package:planpals/features/travel_planner/models/lists/travel_planner_list_model.dart';
 import 'package:planpals/features/travel_planner/models/travel_planner_model.dart';
 import 'package:planpals/features/travel_planner/services/travel_planner_service.dart';
 
@@ -44,4 +44,25 @@ class TravelPlannerViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> addTravelPlanner(TravelPlanner planner) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await _travelPlannerService.addTravelPlanner(planner);
+
+      travelPlanners = await _travelPlannerService.fetchTravelPlannersByUserId(planner.userId);
+      errorMessage = null;
+    }
+    catch (e) {
+      errorMessage = "Failed to add travel planner or load planners";
+      travelPlanners = null;
+    }
+    finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }
+
