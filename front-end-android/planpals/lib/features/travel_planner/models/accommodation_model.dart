@@ -4,7 +4,7 @@ class Accommodation {
   final String address;
   final DateTime checkIn;
   final DateTime checkOut;
-  final double pricePerNight;
+  final String pricePerNight;
   final String travelPlanId;
 
   Accommodation({

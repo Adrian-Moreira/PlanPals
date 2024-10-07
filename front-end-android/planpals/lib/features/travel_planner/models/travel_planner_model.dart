@@ -9,6 +9,7 @@ class TravelPlanner {
   final DateTime startDate;
   final DateTime endDate;
   final DateTime createdAt;
+  final String userId;
   final List<Flight> flights;
   final List<Accommodation> accommodations;
   final List<Activity> activities;
@@ -20,6 +21,7 @@ class TravelPlanner {
     required this.startDate,
     required this.endDate,
     required this.createdAt,
+    required this.userId,
     required this.flights,
     required this.accommodations,
     required this.activities,
@@ -34,6 +36,7 @@ class TravelPlanner {
       'startDate': startDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
+      'userId': userId, 
       'flights': flights.map((flight) => flight.toJson()).toList(),
       'accommodations': accommodations.map((acc) => acc.toJson()).toList(),
       'activities': activities.map((activity) => activity.toJson()).toList(),
@@ -49,6 +52,7 @@ class TravelPlanner {
       startDate: DateTime.parse(json['startDate']),
       endDate: DateTime.parse(json['endDate']),
       createdAt: DateTime.parse(json['createdAt']),
+      userId: json['userId'],
       flights: (json['flights'] as List)
           .map((flight) => Flight.fromJson(flight))
           .toList(),

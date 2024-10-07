@@ -2,18 +2,15 @@ import 'package:planpals/features/travel_planner/models/travel_planner_model.dar
 
 class TravelPlannerList {
   final List<TravelPlanner> travelPlanners;
-  final String userId;
 
   TravelPlannerList({
     required this.travelPlanners, 
-    required this.userId, 
   });
 
   // Convert the TravelPlannerList to JSON format
   Map<String, dynamic> toJson() {
     return {
       'travelPlanners': travelPlanners.map((planner) => planner.toJson()).toList(),
-      'userId': userId,
     };
   }
 
@@ -25,7 +22,6 @@ class TravelPlannerList {
 
     return TravelPlannerList(
       travelPlanners: planners,
-      userId: json['userId'] as String, // Parse the userId from JSON
     );
   }
 
@@ -34,7 +30,6 @@ class TravelPlannerList {
   void addPlanner(TravelPlanner planner) {
     travelPlanners.add(planner);
   }
-
 
   // GETTERS
   get length => null;
