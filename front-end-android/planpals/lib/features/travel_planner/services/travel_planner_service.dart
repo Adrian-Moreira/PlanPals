@@ -1,7 +1,7 @@
 import 'dart:convert';  // Import for JSON encoding/decoding
-import 'package:planpals/core/network/api_service.dart';  // api_service handles HTTP requests
-import 'package:planpals/core/constants.dart';
-import 'package:planpals/features/travel_planner/models/travel_planner_list_model.dart';
+import 'package:planpals/shared/network/api_service.dart';  // api_service handles HTTP requests
+import 'package:planpals/shared/constants/constants.dart';
+import 'package:planpals/features/travel_planner/models/lists/travel_planner_list_model.dart';
 import '../models/travel_planner_model.dart';
 
 class TravelPlannerService {
@@ -28,6 +28,16 @@ class TravelPlannerService {
     }
     catch (e){
       throw Exception("Failed to fetch travel planner by userID=$userId");
+    }
+  }
+
+  Future<void> addTravelPlanner(TravelPlanner planner) async {
+
+    try {
+      _apiService.post(EndPoints.travelPlanner, planner.toJson());
+    }
+    catch (e) {
+      throw Exception('Failed to create the travel planner.');
     }
   }
 
