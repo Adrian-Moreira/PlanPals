@@ -1,0 +1,51 @@
+import { Planner } from '../models/Planner';
+import { PlannerModel, PlannerSchema } from '../models/Planner';  // Import the Mongoose model and Zod schema
+
+
+export class VotingService {
+
+    // Vote on a place
+    public async voteOnPlace(planId: string, placeName: string, upvote: boolean): Promise<void> {
+        const plan = await PlannerModel.findById(planId);
+        if (!plan) throw new Error('Plan not found');
+    
+        const place = plan.places.find(p => p.name === placeName);
+        if (place) {
+            place.votes += upvote ? 1 : -1;
+        } else {
+            throw new Error('Place not found');
+        }
+    
+        await plan.save();
+    }
+
+    // Vote on an accommodation
+    public async voteOnAccommodation(planId: string, accommodationName: string, upvote: boolean): Promise<void> {
+        const plan = await PlannerModel.findById(planId);
+        if (!plan) throw new Error('Plan not found');
+
+        const accommodation = plan.accommodations.find(a => a.name === accommodationName);
+        if (accommodation) {
+            accommodation.votes += upvote ? 1 : -1;
+        } else {
+            throw new Error('Accommodation not found');
+        }
+
+        await plan.save();
+    }
+    
+    // Vote on travel options
+    public async voteOnTravelOption(planId: string, optionType: string, upvote: boolean): Promise<void> {
+        const plan = await PlannerModel.findById(planId);
+        if (!plan) throw new Error('Plan not found');
+
+        const option = plan.transportations.find(o => o.name === optionType);
+        if (option) {
+            option.votes += upvote ? 1 : -1;
+        } else {
+            throw new Error('Travel option not found');
+        }
+
+        await plan.save();
+    }
+}

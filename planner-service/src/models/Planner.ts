@@ -1,9 +1,36 @@
 import { z } from 'zod'
-import mongoose, { Schema, Types } from 'mongoose'
+import mongoose, { Schema, Types, Document, ObjectId } from 'mongoose'
 
 export const ObjectIdSchema = z.instanceof(Types.ObjectId).refine(async (val) => Types.ObjectId.isValid(val || ''), {
   message: 'Invalid ObjectId',
 })
+
+export interface Planner extends Document {
+  _id: Types.ObjectId
+  createdAt: string
+  createdBy: Types.ObjectId
+  updatedAt: string
+  startDate: string
+  endDate: string
+  comments: Types.ObjectId[]
+  roUsers: Types.ObjectId[]
+  rwUsers: Types.ObjectId[]
+  name: string
+  describtion?: string
+  destinations: Types.ObjectId[]
+  accommodations: {
+    name: string;
+    votes: number;
+  }[]
+  transportations: {
+    name: string;
+    votes: number;
+  }[]
+  places: {
+    name: string
+    votes: number
+  }[]
+}
 
 const PlannerMongoSchema = new Schema<Planner>(
   {
@@ -75,9 +102,45 @@ const PlannerMongoSchema = new Schema<Planner>(
     },
 
     transportations: {
-      type: [Schema.Types.ObjectId],
+      type: [{
+        name: {
+          type: String,
+          required: true,
+        },
+        votes: {
+          type: Number,
+          required: true,
+        },
+      }],
       required: true,
-      ref: 'Transport',
+    },
+
+    accommodations: {
+      type: [{
+        name: {
+          type: String,
+          required: true,
+        },
+        votes: {
+          type: Number,
+          required: true,
+        },
+      }],
+      required: true,
+    },
+
+    places: {
+      type: [{
+        name: {
+          type: String,
+          required: true,
+        },
+        votes: {
+          type: Number,
+          required: true,
+        },
+      }],
+      required: true,
     },
   },
   {
@@ -85,12 +148,11 @@ const PlannerMongoSchema = new Schema<Planner>(
   }
 )
 
-
 export const PlannerSchema = z.object({
   _id: ObjectIdSchema,
 
   createdAt: z.string().datetime(),
-  createdBy:  ObjectIdSchema,
+  createdBy: ObjectIdSchema,
   updatedAt: z.string().datetime(),
 
   startDate: z.string().datetime(),
@@ -101,11 +163,24 @@ export const PlannerSchema = z.object({
   roUsers: z.array(ObjectIdSchema),
   rwUsers: z.array(ObjectIdSchema),
 
+  places: z.array(z.object({
+    name: z.string(),
+    votes: z.number(),
+  })),
+
+  accommodations: z.array(z.object({
+    name: z.string(), 
+    votes: z.number(),
+  })),
+
   name: z.string(),
   describtion: z.string().optional(),
   destinations: z.array(ObjectIdSchema),
-  transportations: z.array(ObjectIdSchema),
+  transportations: z.array(z.object({
+    name: z.string(), 
+    votes: z.number(),
+  })),
 })
 
+
 export const PlannerModel = mongoose.model<Planner>('Planner', PlannerMongoSchema)
-export type Planner = z.infer<typeof PlannerSchema>

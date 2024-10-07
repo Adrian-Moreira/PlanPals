@@ -7,6 +7,8 @@ import { closeMongoConnection, connectToMongoDB } from './db/mongoose'
 import userRouter from './routes/user'
 import { StatusCodes } from 'http-status-codes'
 import router from './routes/routers'
+import { MalformedRequestException } from './exceptions/MalformedRequestException'
+import { RecordNotFoundException } from './exceptions/RecordNotFoundException'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 
@@ -16,8 +18,8 @@ const errorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  //   console.error(err)
-  let statusCode = err.status || StatusCodes.INTERNAL_SERVER_ERROR
+     console.error(err)
+  let statusCode = err.exceptionFault || StatusCodes.INTERNAL_SERVER_ERROR
   if (err.name === 'BSONError') {
     statusCode = StatusCodes.BAD_REQUEST
   }

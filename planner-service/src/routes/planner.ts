@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { createPlanner, getPlannersByUserId } from '../controllers/planner'
+import { createPlanner, getPlannersByUserId } from '../controllers/plannerController'
 import { destinationRouter } from './destination'
 import { transportationRouter } from './transportation'
 
@@ -11,6 +11,7 @@ plannerRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await getPlannersByUserId({ createdBy: req.body.createdBy })
+      console.log(result, 'LOOGGGGGGGGGGGED')
       res.status(StatusCodes.OK).json({ success: true, ...result })
     } catch (error) {
       next(error)
@@ -45,6 +46,7 @@ plannerRouter.post(
         transportations,
       })
       res.status(StatusCodes.CREATED).json({ success: true, ...result })
+      console.log(result, 'createddddddddddddd')
     } catch (error) {
       next(error)
     }

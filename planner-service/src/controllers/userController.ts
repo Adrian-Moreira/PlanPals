@@ -5,8 +5,8 @@ import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { MalformedRequestException } from '../exceptions/MalformedRequestException'
 
 interface UserParams {
-    userId?: string
-    userName?: string
+  userId?: string
+  userName?: string
 }
 
 export async function createUser({ userName }: UserParams) {
@@ -15,7 +15,7 @@ export async function createUser({ userName }: UserParams) {
   }
 
   UserSchema.pick({ userName: true }).parseAsync(newUser).catch(() => {
-    throw new MalformedRequestException({ requestType: 'createUser' })
+    throw new MalformedRequestException({ requestType: 'createUser', message: 'Invalid request data for creating a new user' })
   })
 
   const createdUser = await UserModel.create(
@@ -27,13 +27,14 @@ export async function createUser({ userName }: UserParams) {
 
 export async function getUserById({ userId }: UserParams) {
   ObjectIdSchema.parseAsync(new Types.ObjectId(userId)).catch(() => {
-      throw new MalformedRequestException({ requestType: 'getUserById' })
+    throw new MalformedRequestException({ requestType: 'getUserById', message: 'Invalid user ID provided' })
   })
   const user = await UserModel.findById(userId)
   if (!user) {
     throw new RecordNotFoundException({ recordType: 'User', recordId: userId })
+  } else {
+    return { data: user }
   }
-  return { data: user }
 }
 
 export async function getAllUsers() {
@@ -43,7 +44,7 @@ export async function getAllUsers() {
 
 export async function updateUser({ userId, userName }: UserParams) {
   ObjectIdSchema.parseAsync(new Types.ObjectId(userId)).catch(() => {
-    throw new MalformedRequestException({ requestType: 'updateUser' })
+    throw new MalformedRequestException({ requestType: 'updateUser', message: 'Invalid user ID provided for update' })
   })
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
@@ -51,26 +52,30 @@ export async function updateUser({ userId, userName }: UserParams) {
     { new: true },
   )
   if (!updatedUser) {
-    throw new RecordNotFoundException({ recordType: 'User', recordId: userId })
+    throw new RecordNotFoundException({ recordType: 'User', recordId: userId, message: `User with ID ${userId} not found for update` })
   }
   return { data: updatedUser }
 }
 
 export async function deleteUser({ userId }: UserParams) {
   ObjectIdSchema.parseAsync(new Types.ObjectId(userId)).catch(() => {
-    throw new MalformedRequestException({ requestType: 'deleteUser' })
+    throw new MalformedRequestException({ requestType: 'deleteUser', message: 'Invalid user ID provided for deletion' })
   })
   const deletedUser = await UserModel.findByIdAndDelete(userId)
   if (!deletedUser) {
-    throw new RecordNotFoundException({ recordType: 'User', recordId: userId })
+    throw new RecordNotFoundException({ recordType: 'User', recordId: userId, message: `User with ID ${userId} not found for deletion` })
   }
   return { data: deletedUser }
 }
 
 export async function getUsersByUserName({ userName = 'null' }: UserParams) {
-  const user = await UserModel.find({ userName: { $regex: new RegExp(userName, 'i') } })
-  if (!user) {
-    throw new RecordNotFoundException({ recordType: 'User', recordId: userName })
+  const users = await UserModel.find({ userName: { $regex: new RegExp(userName, 'i') } })
+  if (!users.length) {
+    throw new RecordNotFoundException({
+      recordType: 'User',
+      recordId: undefined, // or undefined, depending on your requirements
+      message: `No users found with username ${userName}`,
+    })
   }
-  return { data: user }
+  return { data: users }
 }

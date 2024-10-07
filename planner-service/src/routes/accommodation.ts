@@ -1,10 +1,9 @@
-// import {
-//   createAccommodation,
-//   getAccommodationsByDestinationId,
-//   getAccommodationById,
-//   updateAccommodationById,
-//   deleteAccommodationById,
-// } from '../controllers/accommodation';
+ import {
+   createAccommodation,
+   getAccommodationsByDestinationId,
+   getAccommodationById,
+   updateAccommodationById,
+   deleteAccommodationById, } from '../controllers/accommodationController';
 
 import express, { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -16,8 +15,8 @@ accommodationRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { destinationId } = req.params;
-    //   const result = await getAccommodationsByDestinationId(destinationId);
-    //   res.status(StatusCodes.OK).json({ success: true, data: result });
+       const result = await getAccommodationsByDestinationId(destinationId);
+       res.status(StatusCodes.OK).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -30,8 +29,8 @@ accommodationRouter.post(
     try {
       const { destinationId } = req.params;
       const accommodationData = req.body;
-    //   const result = await createAccommodation(destinationId, accommodationData);
-    //   res.status(StatusCodes.CREATED).json({ success: true, data: result });
+       const result = await createAccommodation(destinationId, accommodationData);
+       res.status(StatusCodes.CREATED).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -43,8 +42,8 @@ accommodationRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { destinationId, accommodationId } = req.params;
-    //   const result = await getAccommodationById(destinationId, accommodationId);
-    //   res.status(StatusCodes.OK).json({ success: true, data: result });
+       const result = await getAccommodationById(destinationId, accommodationId);
+       res.status(StatusCodes.OK).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -57,12 +56,12 @@ accommodationRouter.put(
     try {
       const { destinationId, accommodationId } = req.params;
       const accommodationData = req.body;
-    //   const result = await updateAccommodationById(
-    //     destinationId,
-    //     accommodationId,
-    //     accommodationData,
-    //   );
-    //   res.status(StatusCodes.OK).json({ success: true, data: result });
+       const result = await updateAccommodationById(
+         destinationId,
+         accommodationId,
+         accommodationData,
+       );
+       res.status(StatusCodes.OK).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -74,10 +73,10 @@ accommodationRouter.delete(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { destinationId, accommodationId } = req.params;
-    //   await deleteAccommodationById(destinationId, accommodationId);
-    //   res
-    //     .status(StatusCodes.OK)
-    //     .json({ success: true, message: 'Accommodation deleted successfully.' });
+       await deleteAccommodationById(destinationId, accommodationId);
+       res
+         .status(StatusCodes.OK)
+         .json({ success: true, message: 'Accommodation deleted successfully.' });
     } catch (error) {
       next(error);
     }
