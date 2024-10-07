@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/core/utils/date_utils.dart';
+import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:planpals/features/travel_planner/models/flight_model.dart';
 
 class FlightCard extends StatelessWidget {
@@ -30,8 +30,8 @@ class FlightCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Arrival: ${formatDateTime(flight.arrivalDateTime)}'),
-            Text('Departure: ${formatDateTime(flight.departureDateTime)}'),
+            Text('Arrival: ${DateTimeFormat.formatDateTime(flight.arrivalDateTime)}'),
+            Text('Departure: ${DateTimeFormat.formatDateTime(flight.departureDateTime)}'),
           ],
         ),
         trailing: Row(

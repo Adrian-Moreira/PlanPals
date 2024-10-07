@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/core/utils/date_utils.dart';
+import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
 
 class AccommodationCard extends StatelessWidget {
@@ -23,7 +23,7 @@ class AccommodationCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Addy: ${accommodation.address}'),
-            Text('${formatDateTime(accommodation.checkIn)} - ${formatDateTime(accommodation.checkOut)}'),
+            Text('${DateTimeFormat.formatDateTime(accommodation.checkIn)} - ${DateTimeFormat.formatDateTime(accommodation.checkOut)}'),
           ],
         ),
         trailing: Row(
