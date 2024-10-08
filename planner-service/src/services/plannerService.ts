@@ -4,7 +4,7 @@ import { MalformedRequestException } from '../exceptions/MalformedRequestExcepti
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 
-export async function createPlannerService({
+export const createPlannerService = async ({
   createdBy,
   startDate,
   endDate,
@@ -16,7 +16,7 @@ export async function createPlannerService({
   locations,
   accommodations,
   transportations,
-}: any) {
+}: any): Promise<any> => {
   const newPlanner = {
     createdBy: createdBy ? new Types.ObjectId(createdBy as string) : undefined,
     startDate,
@@ -58,15 +58,7 @@ export async function createPlannerService({
       })
     })
 
-  const createdPlanner = await PlannerModel.create(newPlanner)
-
-  return createdPlanner
-}
-
-export async function getPlannersService(): Promise<any> {
-  const planners = await PlannerModel.find().lean()
-  if (!planners) throw new RecordNotFoundException({ recordType: 'planner' })
-  return planners
+  return await PlannerModel.create(newPlanner)
 }
 
 export async function getPlannerByIdService({
@@ -113,25 +105,34 @@ export async function getPlannerByIdService({
   return planner
 }
 
-export async function getPlannersByUserIdService(userId: string): Promise<any> {
-  try {
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new Error('Invalid ObjectId for userId')
-    }
+export const getPlannersByUserIdService = async ({
+  userId,
+}: any): Promise<any> => {
+  const id = await ObjectIdSchema.parseAsync(userId as string).catch(() => {
+    throw new MalformedRequestException({
+      requestType: 'getPlannersByUserId',
+      requestBody: 'Invalid ObjectId format',
+    })
+  })
 
-    const planners = await PlannerModel.find({
-      createdBy: new Types.ObjectId(userId),
-    }).populate('createdBy')
-    return planners
-  } catch (error: any) {
-    if (
-      error.name === 'BSONError' ||
-      error.message.includes('Invalid ObjectId')
-    ) {
-      throw new Error(`Invalid userId: ${error.message}`)
-    }
-    throw new Error(`Failed to retrieve planners: ${error.message}`)
-  }
+  const planners = await PlannerModel.find({ createdBy: id }).populate([
+    'createdBy',
+    'roUsers',
+    'rwUsers',
+    'destinations',
+    'locations',
+    'accommodations',
+    'transportations',
+    'invites',
+  ])
+
+  if (!planners || planners.length === 0)
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: 'No planners found for the given user ID ' + userId,
+    })
+
+  return planners
 }
 
 export async function getPlannersByAccessService({

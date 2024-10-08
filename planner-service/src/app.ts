@@ -4,11 +4,10 @@ import express, { Express, NextFunction, Request, Response } from 'express'
 import { createServer, Server } from 'node:http'
 import config from './config'
 import { closeMongoConnection, connectToMongoDB } from './config/db'
-import userRouter from './routes/user'
 import { StatusCodes } from 'http-status-codes'
 import router from './routes/routers'
-import { MalformedRequestException } from './exceptions/MalformedRequestException'
-import { RecordNotFoundException } from './exceptions/RecordNotFoundException'
+import cors from 'cors';
+
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 
@@ -18,10 +17,8 @@ const errorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  // console.error(err)
   let statusCode = err.status || StatusCodes.INTERNAL_SERVER_ERROR
   if (err.name === 'BSONError') {
-    //console.error(typeof err)
     statusCode = StatusCodes.BAD_REQUEST
   }
   res.status(statusCode).json({
@@ -45,6 +42,8 @@ class PlanPals {
 
   private initRoutes(): void {
     this.app.use(express.json())
+    this.app.use(cors());
+    this.app.use(express.urlencoded({ extended: false }))
     this.app.use(router)
     this.app.use(errorHandler)
   }

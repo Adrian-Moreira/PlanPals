@@ -77,8 +77,8 @@ describe('User API', () => {
     })
   })
 
-  describe('POST /user', () => {
-    it('should return OK', async () => {
+  describe('perform POST /user', () => {
+    it('should return OK and create user', async () => {
       const response = await request(app.app)
         .post('/user')
         .send(postUser)
@@ -101,10 +101,20 @@ describe('User API', () => {
 
       expect(response.body.success).toBe(false)
     })
+
+    it('should return Bad Request', async () => {
+      const response = await request(app.app)
+        .post('/user')
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.BAD_REQUEST)
+
+      expect(response.body.success).toBe(false)
+    })
   })
 
-  describe('PATCH /user', () => {
-    it('should return OK', async () => {
+  describe('perform PATCH /user', () => {
+    it('should return OK and update user', async () => {
       const response = await request(app.app)
         .patch('/user/' + testUser._id.toString())
         .send({
@@ -132,10 +142,36 @@ describe('User API', () => {
 
       expect(response.body.success).toBe(false)
     })
+
+    it('should return Bad Request', async () => {
+      const response = await request(app.app)
+        .patch('/user/jane')
+        .send({
+          userName: 'FBar1',
+          preferredName: 'Foo Baz',
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.BAD_REQUEST)
+
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return Not Found', async () => {
+      const response = await request(app.app)
+        .patch('/user/6701a389fecd4f214c79183e')
+        .send({
+          userName: 'FBar2',
+          preferredName: 'Foo Baz',
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.NOT_FOUND)
+
+      expect(response.body.success).toBe(false)
+    })
   })
 
-  describe('DELETE /user', () => {
-    it('should return OK', async () => {
+  describe('perform DELETE /user', () => {
+    it('should return OK and delete user', async () => {
       const response = await request(app.app)
         .delete('/user/' + testUser._id.toString())
         .expect('Content-Type', /json/)
@@ -150,6 +186,15 @@ describe('User API', () => {
         .delete('/user/' + testUser._id.toString())
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
+
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return Bad Request', async () => {
+      const response = await request(app.app)
+        .delete('/user/jane')
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.BAD_REQUEST)
 
       expect(response.body.success).toBe(false)
     })

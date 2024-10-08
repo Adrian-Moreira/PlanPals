@@ -13,13 +13,19 @@ export const getPlanners = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { userId, access } = req.params
+  const { createdBy } = req.query
+  const { userId, access } = req.query
+  console.error(createdBy, userId, access)
   try {
-    if (!userId || !access) {
-      return await getPlannersByUserId(req, res, next)
-    }
-    if (access == 'ro' || access == 'rw') {
-      return await getPlannersByAccess(req, res, next)
+    if (createdBy) {
+      const result = await getPlannersByUserIdService(createdBy as string)
+      res.status(StatusCodes.OK).json({ success: true, data: result })
+    } else {
+      const result = await getPlannersByAccessService({
+        userId,
+        access,
+      })
+      res.status(StatusCodes.OK).json({ success: true, data: result })
     }
   } catch (error) {
     next(error)
@@ -35,37 +41,6 @@ export const getPlannerById = async (
   const { userId } = req.query
   try {
     const result = await getPlannerByIdService({ plannerId, userId })
-    res.status(StatusCodes.OK).json({ success: true, data: result })
-  } catch (error) {
-    next(error)
-  }
-}
-
-async function getPlannersByUserId(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> {
-  try {
-    const { createdBy } = req.query
-    const result = await getPlannersByUserIdService(createdBy as string)
-    res.status(StatusCodes.OK).json({ success: true, data: result })
-  } catch (error) {
-    next(error)
-  }
-}
-
-async function getPlannersByAccess(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> {
-  try {
-    const { userId, access } = req.query
-    const result = await getPlannersByAccessService({
-      userId,
-      access,
-    })
     res.status(StatusCodes.OK).json({ success: true, data: result })
   } catch (error) {
     next(error)

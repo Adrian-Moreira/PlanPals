@@ -9,11 +9,6 @@ export const ObjectIdSchema = z
 
 const PlannerMongoSchema = new Schema<Planner>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      auto: true,
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -51,17 +46,18 @@ const PlannerMongoSchema = new Schema<Planner>(
     invites: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
   {
+    _id: true,
     timestamps: true,
   },
 )
 
 export const PlannerSchema = z.object({
   _id: ObjectIdSchema,
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.string().datetime().or(z.date()),
+  updatedAt: z.string().datetime().or(z.date()),
   createdBy: ObjectIdSchema,
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+  startDate: z.string().datetime().or(z.date()),
+  endDate: z.string().datetime().or(z.date()),
   roUsers: z.array(ObjectIdSchema),
   rwUsers: z.array(ObjectIdSchema),
   name: z.string(),
