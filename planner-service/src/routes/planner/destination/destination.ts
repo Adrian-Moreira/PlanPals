@@ -1,5 +1,5 @@
 import express from 'express'
-import { activityRouter } from './activity'
+import { activityRouter } from './activity/activity'
 import { accommodationRouter } from './accommodation'
 import {
   createDestination,
@@ -7,7 +7,7 @@ import {
   getDestinationById,
   updateDestination,
   deleteDestination,
-} from '../controllers/destinationController'
+} from '../../../controllers/destinationController'
 
 export const destinationRouter = express.Router({ mergeParams: true })
 

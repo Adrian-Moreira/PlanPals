@@ -1,6 +1,6 @@
 import express from 'express'
-import { destinationRouter } from './destination'
-import { transportationRouter } from './transportation'
+import { destinationRouter } from './destination/destination'
+import { transportationRouter } from './transportation/transportation'
 import {
   createPlanner,
   deletePlanner,
@@ -8,7 +8,7 @@ import {
   getPlanners,
   inviteIntoPlanner,
   updatePlanner,
-} from '../controllers/plannerController'
+} from '../../controllers/plannerController'
 
 const plannerRouter = express.Router({ mergeParams: true })
 

@@ -1,6 +1,6 @@
 import express from 'express'
 
-import plannerRouter from './planner'
+import plannerRouter from './planner/planner'
 import userRouter from './user'
 
 const router = express.Router()

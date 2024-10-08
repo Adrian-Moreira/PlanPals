@@ -5,7 +5,7 @@ import {
   getTransportationById,
   updateTransportation,
   deleteTransportation,
-} from '../controllers/transportationController'
+} from '../../../controllers/transportationController'
 
 export const transportationRouter = express.Router({ mergeParams: true })
 

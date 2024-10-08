@@ -17,16 +17,16 @@ const UserMongoSchema = new Schema<User>(
       type: String,
       required: true,
     },
-    createdAt: {
-      type: String,
-      required: true,
-      default: () => new Date().toISOString(),
-    },
-    updatedAt: {
-      type: String,
-      required: true,
-      default: () => new Date().toISOString(),
-    },
+    // createdAt: {
+    //   type: String,
+    //   required: true,
+    //   default: () => new Date().toISOString(),
+    // },
+    // updatedAt: {
+    //   type: String,
+    //   required: true,
+    //   default: () => new Date().toISOString(),
+    // },
   },
   {
     timestamps: true,
