@@ -1,0 +1,51 @@
+/* src/components/TravelForm.css */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between form elements */
+    margin: 0 auto; /* Center the form */
+    max-width: 600px; /* Set a max width for the form */
+    background-color: #ffffff; /* White background for the form */
+    padding: 20px; /* Add padding for spacing */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+label {
+    font-weight: bold;
+    color: #5c6bc0; /* Match primary theme color */
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease; /* Transition for focus */
+}
+
+input:focus {
+    border-color: #5c6bc0; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+button {
+    background-color: #5c6bc0; /* Primary button color */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4f5b93; /* Darker shade for hover effect */
+}
+
+p {
+    font-size: 1em;
+    color: #333;
+}
