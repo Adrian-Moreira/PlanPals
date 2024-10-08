@@ -6,8 +6,7 @@ import config from './config'
 import { closeMongoConnection, connectToMongoDB } from './config/db'
 import { StatusCodes } from 'http-status-codes'
 import router from './routes/routers'
-import cors from 'cors';
-
+import cors from 'cors'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 
@@ -42,7 +41,12 @@ class PlanPals {
 
   private initRoutes(): void {
     this.app.use(express.json())
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: 'http://localhost:3000',
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+      }),
+    )
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(router)
     this.app.use(errorHandler)

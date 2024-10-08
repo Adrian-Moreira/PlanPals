@@ -108,23 +108,17 @@ export async function getPlannerByIdService({
 export const getPlannersByUserIdService = async ({
   userId,
 }: any): Promise<any> => {
-  const id = await ObjectIdSchema.parseAsync(userId as string).catch(() => {
+  console.error('userId', userId)
+  const id = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  ).catch((err) => {
     throw new MalformedRequestException({
       requestType: 'getPlannersByUserId',
-      requestBody: 'Invalid ObjectId format',
+      requestBody: 'Invalid ObjectId format ' + err.message,
     })
   })
 
-  const planners = await PlannerModel.find({ createdBy: id }).populate([
-    'createdBy',
-    'roUsers',
-    'rwUsers',
-    'destinations',
-    'locations',
-    'accommodations',
-    'transportations',
-    'invites',
-  ])
+  const planners = await PlannerModel.find({ createdBy: id })
 
   if (!planners || planners.length === 0)
     throw new RecordNotFoundException({
@@ -139,23 +133,35 @@ export async function getPlannersByAccessService({
   userId,
   access,
 }: any): Promise<any> {
-  const id = await ObjectIdSchema.parseAsync(userId).catch(() => {
+  const id = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  ).catch(() => {
     throw new MalformedRequestException({
       requestType: 'getPlannersByAccess',
       message: 'Invalid ObjectId format',
     })
   })
-  const planners = PlannerModel.find({ rwUsers: userId })
-    .then((planners) => {
-      console.log('Planners with RW access:', planners)
-    })
-    .catch(() => {
-      throw new RecordNotFoundException({
-        recordType: '[Planner]',
-        message: 'Planner not found',
+
+  if (access == 'ro') {
+    return await PlannerModel.find({ roUsers: id }).catch(() => {
+      throw new MalformedRequestException({
+        requestType: 'getPlannersByAccess',
+        requestBody: 'Invalid ObjectId format',
       })
     })
-  return planners
+  } else if (access == 'rw') {
+    return await PlannerModel.find({ rwUsers: id }).catch(() => {
+      throw new MalformedRequestException({
+        requestType: 'getPlannersByAccess',
+        requestBody: 'Invalid ObjectId format',
+      })
+    })
+  } else {
+    throw new MalformedRequestException({
+      requestType: 'getPlannersByAccess',
+      requestBody: 'Invalid access type',
+    })
+  }
 }
 
 interface PlannerInviteParams {

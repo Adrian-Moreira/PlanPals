@@ -13,12 +13,10 @@ export const getPlanners = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { createdBy } = req.query
   const { userId, access } = req.query
-  console.error(createdBy, userId, access)
   try {
-    if (createdBy) {
-      const result = await getPlannersByUserIdService(createdBy as string)
+    if (!access) {
+      const result = await getPlannersByUserIdService({ userId })
       res.status(StatusCodes.OK).json({ success: true, data: result })
     } else {
       const result = await getPlannersByAccessService({
