@@ -3,18 +3,20 @@ import request from 'supertest'
 import PlanPals from '../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { User, UserModel } from '../src/models/User'
+import { PlannerModel } from '../src/models/Planner'
 
 describe('Planner API', () => {
   let app: PlanPals
   let testUser: User
 
   beforeAll(async () => {
-    const mongoURI = process.env.MONGO_URL || 'mongodb://localhost:27017'
+    const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
     app.startServer()
 
     testUser = await UserModel.create({
-      userName: 'Jane Doe',
+      userName: 'JJoe',
+      preferredName: 'Jake Doe',
     })
   })
 
@@ -25,9 +27,9 @@ describe('Planner API', () => {
   it('should return OK', async () => {
     const response = await request(app.app)
       .get(`/planner?createdBy=${testUser._id}`)
-      //.send({ createdBy: testUser._id })
       .expect('Content-Type', /json/)
       .expect(StatusCodes.OK)
+
     expect(response.body.success).toBe(true)
     expect(response.body.data).toHaveLength(0)
   })
@@ -48,6 +50,7 @@ describe('Planner API', () => {
       })
       .expect('Content-Type', /json/)
       .expect(StatusCodes.CREATED)
+
     expect(response.body.success).toBe(true)
     expect(response.body.data).toBeDefined()
     console.log(response.body.data)
@@ -56,9 +59,9 @@ describe('Planner API', () => {
   it('should return OK', async () => {
     const response = await request(app.app)
       .get(`/planner?createdBy=${testUser._id}`)
-      //.send({ createdBy: testUser._id })
       .expect('Content-Type', /json/)
       .expect(StatusCodes.OK)
+
     expect(response.body.success).toBe(true)
     expect(response.body.data).toHaveLength(1)
   })
