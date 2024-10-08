@@ -1,0 +1,39 @@
+/* src/Global.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif; /* or any preferred font */
+    background-color: #f0f4ff; /* Light background color */
+    color: #333; /* Default text color */
+}
+
+h1, h2, h3 {
+    color: #5c6bc0; /* Primary color for headings */
+}
+
+a {
+    text-decoration: none; /* Remove underline from links */
+    color: #5c6bc0; /* Primary color for links */
+}
+
+a:hover {
+    color: #4f5b93; /* Darker shade for hover effect */
+}
+
+/* Common button styles */
+button {
+    background-color: #5c6bc0; /* Primary button color */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4f5b93; /* Darker shade for hover effect */
+}
+
+/* Add any additional global styles as needed */
