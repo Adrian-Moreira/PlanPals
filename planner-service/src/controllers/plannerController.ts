@@ -62,10 +62,10 @@ async function getPlannersByAccess(
 ): Promise<any> {
   try {
     const { userId, access } = req.query
-    const result = await getPlannersByAccessService(
-      userId as string,
-      access as 'ro' | 'rw',
-    )
+    const result = await getPlannersByAccessService({
+      userId,
+      access,
+    })
     res.status(StatusCodes.OK).json({ success: true, data: result })
   } catch (error) {
     next(error)

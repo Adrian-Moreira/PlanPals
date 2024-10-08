@@ -134,10 +134,10 @@ export async function getPlannersByUserIdService(userId: string): Promise<any> {
   }
 }
 
-export async function getPlannersByAccessService(
-  userId: string,
-  access: 'ro' | 'rw',
-): Promise<any> {
+export async function getPlannersByAccessService({
+  userId,
+  access
+}: any): Promise<any> {
   const id = await ObjectIdSchema.parseAsync(userId).catch(() => {
     throw new MalformedRequestException({
       requestType: 'getPlannersByAccess',
