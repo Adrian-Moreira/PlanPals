@@ -13,9 +13,9 @@ const userRouter = express.Router({ mergeParams: true })
 userRouter.get(
   '/search',
   async (req: Request, res: Response, next: NextFunction) => {
-    const { userName } = req.body || req.query
+    const { userName } =  req.query
     try {
-      const result = await getUsersByUserName({ userName: userName })
+      const result = await getUsersByUserName({ userName: userName as string })
       res.status(StatusCodes.OK).json({ success: true, ...result })
     } catch (error) {
       next(error)

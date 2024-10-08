@@ -58,24 +58,24 @@ describe('User API', () => {
     expect(response.body.data._id).toBe(testUserId)
   })
 
-  it('should return OK', async () => {
-    const response = await request(app.app)
-      .get('/user/search')
-      .send({ userName: 'john' })
-      .expect('Content-Type', /json/)
-      .expect(StatusCodes.OK)
-    expect(response.body.success).toBe(true)
-    expect(response.body.data).toHaveLength(1)
-  })
-
   // it('should return OK', async () => {
   //   const response = await request(app.app)
-  //     .get('/api/user/search?userName=john')
+  //     .get('/user/search')
+  //     .send({ userName: 'john' })
   //     .expect('Content-Type', /json/)
   //     .expect(StatusCodes.OK)
   //   expect(response.body.success).toBe(true)
   //   expect(response.body.data).toHaveLength(1)
   // })
+
+  it('should return OK', async () => {
+    const response = await request(app.app)
+      .get('/user/search?userName=john')
+      .expect('Content-Type', /json/)
+      .expect(StatusCodes.OK)
+    expect(response.body.success).toBe(true)
+    expect(response.body.data).toHaveLength(1)
+  })
 
   it('should return OK', async () => {
     const response = await request(app.app)
