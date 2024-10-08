@@ -1,5 +1,6 @@
 In the project directory, you can run:
 
+### `npm install axios`
 ### `npm start`
 
 Runs the app in the development mode.\
