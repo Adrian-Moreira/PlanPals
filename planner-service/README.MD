@@ -1,8 +1,32 @@
 # PP Express!
 
-## Prerequisites
+PlanPals Express!
 
-- [Node v18.20.4](https://nodejs.org/en/download/package-manager)
+---
+
+## Table of Contents
+
+- [PP Express!](#pp-express)
+  - [Table of Contents](#table-of-contents)
+  - [API](#api)
+  - [**Prerequisites**](#prerequisites)
+  - [Development](#development)
+    - [Setting up your Development Environment](#setting-up-your-development-environment)
+    - [Running](#running)
+    - [Building the Docker Image](#building-the-docker-image)
+  - [License](#license)
+
+---
+
+## [API](./docs/README.md)
+
+## **Prerequisites**
+
+- To build:
+  - [**Node v18.20.4**](https://nodejs.org/en/download/package-manager)
+- To run:
+  - Mongo
+  - Or Docker
 
 ## Development
 
@@ -25,6 +49,12 @@
    ```
 
 ### Running
+
+You'll need an instance of mongo running and supply the link with an environmental variable: `DATABASE_CONNECTIONSTRING`
+```bash
+export DATABASE_CONNECTIONSTRING="mongodb://somewhere:port" 
+```
+It defaults to `mongodb://localhost:27017` if nothing is supplied.
 
 To run the service:
 ```bash
@@ -50,11 +80,7 @@ To run the server using the built Docker image:
    docker compose -f docker-compose.yml up --build
    ```
 
-The server will be accessible at `http://localhost:xxxx`.
-
-## API Documentation
-
-[API](./docs/README.md)
+The server will be accessible at `http://localhost:8080`.
 
 ## License
 
