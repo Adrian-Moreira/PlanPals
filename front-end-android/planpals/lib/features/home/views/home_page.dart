@@ -1,26 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
+import 'package:planpals/features/travel_planner/models/activity_model.dart';
+import 'package:planpals/features/travel_planner/models/flight_model.dart';
+import 'package:planpals/features/travel_planner/models/travel_planner_model.dart';
+import 'package:planpals/features/travel_planner/views/components/cards/flight_card.dart';
+import 'package:planpals/features/travel_planner/views/travel_planners_view.dart';
+import 'package:planpals/shared/components/generic_list_view.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            // Add the logo image here
+            Image.asset(
+              'assets/images/logo.jpg', // Make sure the image path is correct
+              width: 150, // Adjust the width as needed
+              height: 150, // Adjust the height as needed
+            ),
+            const SizedBox(
+                height: 20), // Add spacing between the image and text
             const Text(
-              'Welcome to the Travel Planner App!',
+              'Welcome to PlanPals!',
               style: TextStyle(fontSize: 20),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TravelPlannersView()),  // navigate to travel planners
+                );
               },
               child: const Text('Go to Travel Planner'),
             ),

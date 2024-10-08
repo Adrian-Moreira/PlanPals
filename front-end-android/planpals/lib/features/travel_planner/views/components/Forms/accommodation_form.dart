@@ -25,7 +25,7 @@ class _AccommodationFormState extends State<AccommodationForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flight Form'),
+        title: const Text('Accommodation Form'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -139,7 +139,7 @@ class _AccommodationFormState extends State<AccommodationForm> {
                           'SomeId', // This could be passed or managed differently
                     );
 
-                    // Call the callback with the new flight
+                    // Call the callback with the new Accommodation
                     widget.onAccommodationAdd(accommodation);
 
                     // Close the form screen

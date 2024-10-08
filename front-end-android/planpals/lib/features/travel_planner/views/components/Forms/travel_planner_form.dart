@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/db/mock_db.dart';
 import 'package:planpals/features/travel_planner/validators/travel_planner_validator.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:planpals/shared/components/loading_screen.dart';
@@ -6,7 +7,6 @@ import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/travel_planner_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/travel_planner_viewmodel.dart';
-import 'package:planpals/features/travel_planner/views/components/listviews/travel_planner_list_view.dart';
 import 'package:planpals/features/travel_planner/views/travel_planner_details_view.dart';
 import 'package:provider/provider.dart';
 
@@ -29,12 +29,16 @@ class _TravelPlannerFormState extends State<TravelPlannerForm> {
   @override
   Widget build(BuildContext context) {
     // Use provider to access data of user currently logged in
-    final plannerViewModel = Provider.of<TravelPlannerViewModel>(context);
-    final user = Provider.of<UserViewModel>(context).currentUser;
+    // final plannerViewModel = Provider.of<TravelPlannerViewModel>(context);
+    // final user = Provider.of<UserViewModel>(context).currentUser;
+
+    TravelPlannerViewModel plannerViewModel = TravelPlannerViewModel();
+    User user = MockDatabase.user1;
+
 
     return plannerViewModel.isLoading
         ? const LoadingScreen()
-        : _buildTravelPlannerForm(context, plannerViewModel, user!);
+        : _buildTravelPlannerForm(context, plannerViewModel, user);
   }
 
   Widget _buildTravelPlannerForm(
@@ -87,7 +91,9 @@ class _TravelPlannerFormState extends State<TravelPlannerForm> {
                 },
               ),
 
-              const SizedBox(height: 20,), //margin
+              const SizedBox(
+                height: 20,
+              ), //margin
 
               // Start Date field
               DateTimeForm(
@@ -123,7 +129,6 @@ class _TravelPlannerFormState extends State<TravelPlannerForm> {
                     onPressed: () async {
                       // Validate and save the form
                       if (_formKey.currentState?.validate() == true) {
-
                         // Validate custom date logic
                         final dateError = TravelPlannerValidator.validateDates(
                             _startDate, _endDate);
@@ -146,21 +151,12 @@ class _TravelPlannerFormState extends State<TravelPlannerForm> {
                             accommodations: [],
                             activities: []);
 
-                        await plannerViewModel.addTravelPlanner(planner);
+                        // await plannerViewModel.addTravelPlanner(planner);
 
                         // Check if the travel planner is added successfully or not
                         if (plannerViewModel.errorMessage != null) {
                           // Failed to add
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const TravelPlannerListView()));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Failed to create the travel planner!')),
-                          );
+                          Navigator.pop(context);
                         } else {
                           Navigator.pushReplacement(
                             context,

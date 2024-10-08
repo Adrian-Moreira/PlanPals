@@ -45,24 +45,29 @@ class TravelPlannerViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addTravelPlanner(TravelPlanner planner) async {
-    isLoading = true;
-    notifyListeners();
+  // Future<void> addTravelPlanner(TravelPlanner planner) async {
+  //   isLoading = true;
+  //   notifyListeners();
 
-    try {
-      await _travelPlannerService.addTravelPlanner(planner);
+  //   try {
+  //     await _travelPlannerService.addTravelPlanner(planner);
 
-      travelPlanners = await _travelPlannerService.fetchTravelPlannersByUserId(planner.userId);
-      errorMessage = null;
+  //     travelPlanners = await _travelPlannerService.fetchTravelPlannersByUserId(planner.userId);
+  //     errorMessage = null;
+  //   }
+  //   catch (e) {
+  //     errorMessage = "Failed to add travel planner or load planners";
+  //     travelPlanners = null;
+  //   }
+  //   finally {
+  //     isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
+
+    Future<void> addTravelPlanner(TravelPlanner planner) async {
+      return;
     }
-    catch (e) {
-      errorMessage = "Failed to add travel planner or load planners";
-      travelPlanners = null;
-    }
-    finally {
-      isLoading = false;
-      notifyListeners();
-    }
-  }
+
 }
 

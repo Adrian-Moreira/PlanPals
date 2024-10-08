@@ -28,3 +28,14 @@ class ErrorMessage {
 class EndPoints {
   static const travelPlanner = '/planner';
 }
+
+class Routes {
+  // Home
+  static const home = '/';
+
+  // Travel Planner List
+  static const travelPlanner = '/travelPlanner';
+
+  //Profile
+  static const profile = '/profile';
+}

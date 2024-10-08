@@ -8,16 +8,23 @@ class TravelPlannerCard extends StatelessWidget {
   const TravelPlannerCard({
     super.key,
     required this.travelPlanner,
-    });
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
-        title: Text(travelPlanner.plannerName),
-        subtitle: Text(travelPlanner.destination),
-        
-      )
-    );
+        child: ListTile(
+      title: Text(travelPlanner.plannerName),
+      subtitle: Text(travelPlanner.destination),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => TravelPlannerDetailsView(
+                    travelPlanner: travelPlanner,
+                  )), // navigate to travel planners
+        );
+      },
+    ));
   }
 }

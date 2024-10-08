@@ -23,7 +23,7 @@ class _ActivityFormState extends State<ActivityForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flight Form'),
+        title: const Text('Activity Form'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
