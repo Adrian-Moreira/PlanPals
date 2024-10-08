@@ -13,37 +13,59 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Simulate checking for an existing username
-    const existingUsernames = ["user1", "user2", "admin"]; // Predefined usernames for testing
+  //   // Simulate checking for an existing username
+  //   const existingUsernames = ["user1", "user2", "admin"]; // Predefined usernames for testing
 
-    if (existingUsernames.includes(username)) {
-      // Simulate a successful login
-    login(username); // Call the login function
+  //   if (existingUsernames.includes(username)) {
+  //     // Simulate a successful login
+  //   login(username); // Call the login function
+  //     navigate("/home"); // Redirect to Home after login
+
+  //   } else {
+  //     // Simulate an error for invalid username
+  //     setError("User not found. Please check your username.");
+  //   }
+  // };
+try {
+    // Make a request to your backend to check if the user exists
+    const response = await axios.get(`http://localhost:8080/user/search`, {
+      params: { userName: username }  // Pass username in the request body
+      });
+    console.log(response.data);
+    if (response.data.success && response.data.data.length > 0) {
+      const user = response.data.data[0]; // Assuming the first result is the user
+      login(user.userName); // Call the login function with the username
       navigate("/home"); // Redirect to Home after login
-
     } else {
-      // Simulate an error for invalid username
-      setError("User not found. Please check your username.");
+      // User does not exist, prompt to create one
+      const createUser = window.confirm(`User "${username}" does not exist. Would you like to create a new account?`);
+      if (createUser) {
+        const createResponse = await axios.post(`http://localhost:8080/user`, {
+          userName: username,
+          preferredName: username, // Use username as preferred name for simplicity
+       
+       } ,{
+        headers: {
+          'Content-Type': 'application/json', // Explicitly set the content type
+        }
+      });
+        
+        if (createResponse.data.success) {
+          // If user creation is successful, log them in
+          login(username); 
+          navigate("/home"); // Redirect to Home after login
+        } else {
+          setError("Error creating user. Please try again.");
+        }
+      } else {
+        setError("User not found. Please enter a valid username.");
+      }
     }
-  };
-// try {
-//     // Make a request to your backend to check if the user exists
-//     const response = await axios.get(`http://localhost:8080/users`, {
-//       params: { userName: username } // Pass username as a query parameter
-//     });
-
-//     if (response.data.success && response.data.data.length > 0) {
-//       const user = response.data.data[0]; // Assuming the first result is the user
-//       login(user.userName); // Call the login function with the username
-//       navigate("/home"); // Redirect to Home after login
-//     } else {
-//       setError("User not found. Please check your username.");
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     setError("Error while trying to log in. Please try again later.");
-//   }
-// };
+  } catch (err) {
+    console.error(err);
+    setError("Error while trying to log in. Please try again later.");
+  }
+};
   return (
     <div className="login-container">
       <h1>Login</h1>
