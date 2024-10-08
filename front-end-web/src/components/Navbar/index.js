@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from '../../AuthContext'; // Import useAuth hook
 import {
     Nav,
     NavLink,
@@ -6,12 +7,19 @@ import {
 } from "./NavbarElements";
 
 const Navbar = () => {
+    const { isAuthenticated, logout} =useAuth();
     return (
         <>
             <Nav>
 
                 <NavMenu>
-                    <NavLink to="/" >
+                {!isAuthenticated && (
+                    <NavLink to="/">Login
+                    </NavLink>
+                )}
+                {isAuthenticated && (
+                    <>
+                    <NavLink to="/home" >
                         Home
                     </NavLink>
                     <NavLink to="/about" >
@@ -20,6 +28,9 @@ const Navbar = () => {
                     <NavLink to="/planners" >
                         Travel Planners
                     </NavLink>
+                    <button onClick={logout}>Logout</button>
+                    </>
+                )}
                 </NavMenu>
             </Nav>
         </>
