@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext"; // Import the Auth context
+import axios from 'axios'; // Import Axios
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -25,25 +26,24 @@ const Login = () => {
       setError("User not found. Please check your username.");
     }
   };
-  //     try {
-  //         const response = await fetch(`http://localhost:8080/users?userName=${username}`); // Update the port
-  //         const data = await response.json();
+// try {
+//     // Make a request to your backend to check if the user exists
+//     const response = await axios.get(`http://localhost:8080/users`, {
+//       params: { userName: username } // Pass username as a query parameter
+//     });
 
-  //         if (data.success && data.data.length > 0) {
-  //             const user = data.data[0]; // Assuming the first result is the user
-  //             localStorage.setItem('username', user.userName);
-  //             localStorage.setItem('role', user.role || 'viewer'); // Assign role if available
-
-  //             navigate('/travel-planner'); // Redirect to Travel Planner
-  //         } else {
-  //             setError('User not found. Please check your username.');
-  //         }
-  //     } catch (err) {
-  //         console.error(err);
-  //         setError('Error while trying to log in. Please try again later.');
-  //     }
-  // };
-
+//     if (response.data.success && response.data.data.length > 0) {
+//       const user = response.data.data[0]; // Assuming the first result is the user
+//       login(user.userName); // Call the login function with the username
+//       navigate("/home"); // Redirect to Home after login
+//     } else {
+//       setError("User not found. Please check your username.");
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     setError("Error while trying to log in. Please try again later.");
+//   }
+// };
   return (
     <div className="login-container">
       <h1>Login</h1>
