@@ -1,100 +1,87 @@
-import mongoose, { Schema, Types } from 'mongoose';
-import { z } from 'zod';
+import mongoose, { Schema, Types } from 'mongoose'
+import { z } from 'zod'
 
-// Zod Validation Schema
-export const ObjectIdSchema = z.instanceof(Types.ObjectId).refine((val) => Types.ObjectId.isValid(val), {
-  message: 'Invalid ObjectId',
-});
+export const ObjectIdSchema = z
+  .instanceof(Types.ObjectId)
+  .refine((val) => Types.ObjectId.isValid(val), {
+    message: 'Invalid ObjectId',
+  })
 
-// Mongoose Schema for Planner
-const PlannerMongoSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    auto: true,
+const PlannerMongoSchema = new Schema<Planner>(
+  {
+    _id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      auto: true,
+    },
+    createdAt: {
+      type: String,
+      required: true,
+      default: () => new Date().toISOString(),
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+    updatedAt: {
+      type: String,
+      required: true,
+      default: () => new Date().toISOString(),
+    },
+    startDate: {
+      type: String,
+      required: true,
+    },
+    endDate: {
+      type: String,
+      required: true,
+    },
+    roUsers: {
+      type: [Schema.Types.ObjectId],
+      ref: 'User',
+      required: true,
+    },
+    rwUsers: {
+      type: [Schema.Types.ObjectId],
+      ref: 'User',
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    destinations: [{ type: Schema.Types.ObjectId, ref: 'Destination' }],
+    locations: [{ type: Schema.Types.ObjectId, ref: 'Location' }],
+    accommodations: [{ type: Schema.Types.ObjectId, ref: 'Accommodation' }],
+    transportations: [{ type: Schema.Types.ObjectId, ref: 'Transportation' }],
+    invites: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
-  createdAt: {
-    type: String,
-    required: true,
-    default: () => new Date().toISOString(),
+  {
+    timestamps: true,
   },
-  createdBy: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: 'User',
-  },
-  updatedAt: {
-    type: String,
-    required: true,
-    default: () => new Date().toISOString(),
-  },
-  startDate: {
-    type: String,
-    required: true,
-  },
-  endDate: {
-    type: String,
-    required: true,
-  },
-  comments: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Comment',
-    required: false,
-  },
-  roUsers: {  // Read-only users
-    type: [Schema.Types.ObjectId],
-    ref: 'User',
-    required: true,
-  },
-  rwUsers: {  // Read-write users
-    type: [Schema.Types.ObjectId],
-    ref: 'User',
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,  // Typo fix from describtion to description
-    required: false,
-  },
-  destinations: {  // Linked destinations
-    type: [Schema.Types.ObjectId],
-    ref: 'Destination',
-    required: true,
-  },
-  locations: [{  // locations within the planner
-    name: { type: String, required: true },
-    votes: { type: Number, default: 0 },
-  }],
-  accommodations: [{  // Accommodations for the planner
-    name: { type: String, required: true },
-    votes: { type: Number, default: 0 },
-  }],
-  transportations: [{  // Transport options for the planner
-    name: { type: String, required: true },
-    votes: { type: Number, default: 0 },
-  }],
-}, {
-  timestamps: true,  // Automatically add createdAt and updatedAt fields
-});
+)
 
 export const PlannerSchema = z.object({
-  createdBy: ObjectIdSchema,  // Required
+  _id: ObjectIdSchema,
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  createdBy: ObjectIdSchema,
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
-  roUsers: z.array(ObjectIdSchema),  // Read-only users
-  rwUsers: z.array(ObjectIdSchema),  // Read-write users
+  roUsers: z.array(ObjectIdSchema),
+  rwUsers: z.array(ObjectIdSchema),
   name: z.string(),
   description: z.string().optional(),
-  destinations: z.array(ObjectIdSchema),  // List of destinations
-  locations: z.array(z.object({ name: z.string(), votes: z.number() })).optional(),
-  accommodations: z.array(z.object({ name: z.string(), votes: z.number() })).optional(),
-  transportations: z.array(z.object({ name: z.string(), votes: z.number() })).optional(),
-});
+  destinations: z.array(ObjectIdSchema).optional(),
+  locations: z.array(ObjectIdSchema).optional(),
+  accommodations: z.array(ObjectIdSchema).optional(),
+  transportations: z.array(ObjectIdSchema).optional(),
+  invites: z.array(ObjectIdSchema).optional(),
+})
 
-
-// Export the Planner Model for use in controllers/services
-export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema);
-export type Planner = z.infer<typeof PlannerSchema>;
+export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema)
+export type Planner = z.infer<typeof PlannerSchema>
