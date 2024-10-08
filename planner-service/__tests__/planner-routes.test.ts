@@ -24,8 +24,8 @@ describe('Planner API', () => {
 
   it('should return OK', async () => {
     const response = await request(app.app)
-      .get('/planner')
-      .send({ createdBy: testUser._id })
+      .get(`/planner?createdBy=${testUser._id}`)
+      //.send({ createdBy: testUser._id })
       .expect('Content-Type', /json/)
       .expect(StatusCodes.OK)
     expect(response.body.success).toBe(true)
@@ -55,8 +55,8 @@ describe('Planner API', () => {
 
   it('should return OK', async () => {
     const response = await request(app.app)
-      .get('/planner')
-      .send({ createdBy: testUser._id })
+      .get(`/planner?createdBy=${testUser._id}`)
+      //.send({ createdBy: testUser._id })
       .expect('Content-Type', /json/)
       .expect(StatusCodes.OK)
     expect(response.body.success).toBe(true)

@@ -1,107 +1,94 @@
-import { Types } from 'mongoose';
-import { ObjectIdSchema, PlannerSchema, PlannerModel } from '../models/Planner';
-import { RecordNotFoundException } from '../exceptions/RecordNotFoundException';
+import { Request, Response } from 'express';
+import { PlannerService } from '../services/PlannerService';
 import { MalformedRequestException } from '../exceptions/MalformedRequestException';
-import { ZodError } from 'zod';  // Import ZodError for validation handling
+import { StatusCodes } from 'http-status-codes';  // Make sure to import this
 
-export interface PlannerParams {
-  plannerId?: string;
-  createdBy?: string;
-  createdAt?: string;
-  updatedAt?: string;
+// Initialize the PlannerService
+const plannerService = new PlannerService();
 
-  startDate?: string;
-  endDate?: string;
 
-  comments?: string[];
-
-  roUsers?: string[];
-  rwUsers?: string[];
-
-  name?: string;
-  description?: string;
-  destinations?: string[];
-  transportations?: string[];
-  accommodations?: string[];
-}
-
-// Create a new travel planner
-// Create a new travel planner
-export async function createPlanner({
-  createdBy,
-  startDate,
-  endDate,
-  roUsers,
-  rwUsers,
-  name,
-  description,
-  destinations,
-  transportations,
-  accommodations,
-}: PlannerParams) {
+export async function createPlanner(req: Request, res: Response) {
   try {
-    // Validate input using Zod schema
-    
-     // Validate the ObjectId for the createdBy field
-     const isValidObjectId = ObjectIdSchema.parseAsync(new Types.ObjectId(createdBy));
-         
+    const plannerData = req.body;
+    //console.log('plannerData', plannerData);
+    if (!plannerData) {
+      //console.log('Invalid request body ENTEREDDDDD ');
+      throw new MalformedRequestException({ requestType: 'createPlanner', message: 'Invalid request body' });
+    }
 
-    // Create the planner in the database
-    const planner = await PlannerModel.create({
-      createdBy,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      startDate,
-      endDate,
-      comments: [],
-      roUsers: roUsers || [],
-      rwUsers: rwUsers || [],
-      name,
-      description,
-      destinations: destinations || [],
-      transportations: transportations || [],
-      accommodations: accommodations || [],
-    });
+    const result = await plannerService.createPlanner(plannerData);
 
-    return { data: planner };
+    // Ensure to return 201 for a successful creation
+    console.log(result, 'createddddddddddddd Controller');
+    //console.log(res.status(StatusCodes.CREATED).json({ success: true, ...result }), 'status created Controller');
+    //return res.status(StatusCodes.CREATED).send(result)
+    return res.status(StatusCodes.CREATED).json({ success: true, data: result });
   } catch (error: any) {
-    // Handle validation errors (Zod)
-      throw new MalformedRequestException({
-        requestType: 'createPlanner',
-        message: `Validation failed: ${ error.message }`,
-      });
-    
-
+    // Use JSON.stringify with Object.getOwnPropertyNames to avoid circular references in logging
+    if (error instanceof MalformedRequestException) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
+    }
+    //return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
   }
 }
 
-// Get planners by user ID
-export async function getPlannersByUserId({ createdBy }: PlannerParams) {
+
+
+
+// Controller function to get planners by user ID
+export async function getPlannersByUserId(req: Request, res: Response) {
   try {
-    // Validate the ObjectId for the createdBy field
-    const isValidObjectId = ObjectIdSchema.parseAsync(new Types.ObjectId(createdBy));
+    const { createdBy } = req.query;
+
+ // Assuming the userId comes from route params
+    const result = await plannerService.getPlannersByUserId(createdBy as string);
+    return res.status(StatusCodes.OK).json({success: true, data: result});
+  } catch (error: any) {
+    //res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+  }
+}
+
+// // Join a travel plan
+// export async function joinPlanner(planId: string, userId: string, role: 'ro' | 'rw') {
+//   try {
+//     const planner = await PlannerModel.findById(new Types.ObjectId(planId));
+//     if (!planner) throw new RecordNotFoundException({ recordType: 'planner', message: 'Planner not found' });
+
+//     const userObjectId = new Types.ObjectId(userId);
+
+//     // Check if the user is already in the planner
+//     const isUserInPlanner = planner.roUsers.includes(userObjectId) || planner.rwUsers.includes(userObjectId);
+//     if (isUserInPlanner) throw new Error('User is already part of the planner');
+
+//     // Add user to the appropriate role list (roUsers or rwUsers)
+//     if (role === 'ro') {
+//       planner.roUsers.push(userObjectId);
+//     } else if (role === 'rw') {
+//       planner.rwUsers.push(userObjectId);
+//     }
+
+//     // Save the updated planner
+//     await planner.save();
+//     return { data: planner };
+//   } catch (error: any) {
+//     throw new Error(`Failed to join planner: ${error.message}`);
+//   }
+// }
+
+// Controller function to join a planner
+
+export async function joinPlanner(req: Request, res: Response) {
+  try {
+    const { planId, userId } = req.params;  // Assuming planId and userId come from route params
+    const { role } = req.body;  // Assuming role is sent in the request body ('ro' or 'rw')
     
-
-    // Fetch planners from the database
-    const planners = await PlannerModel.find({ createdBy });
-
-    // Return an empty array if no planners are found
-    if (!planners || !planners.length) {
-      return { data: [] };
+    if (!role || (role !== 'ro' && role !== 'rw')) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid role specified' });
     }
 
-    return { data: planners };
-  } catch (error) {
-    // Handle specific known error types
-    if (error instanceof RecordNotFoundException) {
-      throw error;  // Re-throw custom exceptions to preserve context
-    }
-
-    if (error instanceof MalformedRequestException) {
-      throw error;  // Re-throw custom validation exceptions
-    }
-
-    // Handle any other errors
-    throw new Error(`Failed to retrieve planners: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    const result = await plannerService.joinPlanner(planId, userId,'ro'); // Pass 'ro' or 'rw' as the role needed
+    res.status(StatusCodes.OK).json(result);
+  } catch (error: any) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 }

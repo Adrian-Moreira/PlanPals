@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express"; // import { NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { activityRouter } from "./activity";
-import { accommodationRouter } from "./accommodation";
+import { accommodationRouter } from "./accommodationService";
 
 // import {
 //   createDestination,

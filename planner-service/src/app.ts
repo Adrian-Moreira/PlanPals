@@ -3,7 +3,7 @@
 import express, { Express, NextFunction, Request, Response } from 'express'
 import { createServer, Server } from 'node:http'
 import config from './config'
-import { closeMongoConnection, connectToMongoDB } from './db/mongoose'
+import { closeMongoConnection, connectToMongoDB } from './config/db'
 import userRouter from './routes/user'
 import { StatusCodes } from 'http-status-codes'
 import router from './routes/routers'
@@ -18,9 +18,10 @@ const errorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-     console.error(err)
-  let statusCode = err.exceptionFault || StatusCodes.INTERNAL_SERVER_ERROR
+  // console.error(err)
+  let statusCode = err.status || StatusCodes.INTERNAL_SERVER_ERROR
   if (err.name === 'BSONError') {
+    //console.error(typeof err)
     statusCode = StatusCodes.BAD_REQUEST
   }
   res.status(statusCode).json({

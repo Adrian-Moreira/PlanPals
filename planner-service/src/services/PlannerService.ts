@@ -1,76 +1,156 @@
-import { PlannerModel, PlannerSchema } from '../models/Planner';  // Import the Mongoose model and Zod schema
-import { ZodError } from 'zod';
 import { Types } from 'mongoose';
-
+import { PlannerModel, PlannerSchema } from '../models/Planner';
+import { MalformedRequestException } from '../exceptions/MalformedRequestException';
+import { RecordNotFoundException } from '../exceptions/RecordNotFoundException';
 
 export class PlannerService {
-    
-    // Create a new travel plan
-    public async createTravelPlan(planData: any): Promise<any> {
-        try {
-            // Validate the incoming data using Zod
-            const validatedData = PlannerSchema.parse(planData);
+  public async createPlanner(params: any) {
+    try {
+      const {
+        createdBy,
+        startDate,
+        endDate,
+        roUsers,
+        rwUsers,
+        name,
+        description,
+        destinations,
+        locations,
+        accommodations,
+        transportations
+      } = params;
 
-            // Create a new plan using the Mongoose model
-            const newPlan = new PlannerModel(validatedData);
-            return await newPlan.save();  // Save the new planner to the database
-        } catch (error:any) {
-           
-            if (error instanceof ZodError) {
-                // Handle validation errors
-                throw new Error(`Validation failed: ${error.errors.map(e => e.message).join(', ')}`);
-            } else {
-                throw new Error(`Failed to create travel plan: ${error.message}`);
-            }
-        
+      // Ensure that IDs are properly validated
+      const newPlanner = {
+        createdBy: createdBy ? new Types.ObjectId(createdBy.toString()) : undefined,
+        startDate,
+        endDate,
+        roUsers: roUsers ? roUsers.map((userId: string) => new Types.ObjectId(userId)) : [],
+        rwUsers: rwUsers ? rwUsers.map((userId: string) => new Types.ObjectId(userId)) : [],
+        name,
+        description,
+        destinations: destinations ? destinations.map((destId: string) => new Types.ObjectId(destId)) : [],
+        locations: locations || [],
+        accommodations: accommodations || [],
+        transportations: transportations || []
+      };
+
+      // Use Zod's .pick() to only validate necessary fields
+      await PlannerSchema.pick({
+        createdBy: true,
+        startDate: true,
+        endDate: true,
+        roUsers: true,
+        rwUsers: true,
+        name: true,
+        destinations: true,
+        description: true,
+      }).parseAsync(newPlanner);
+
+      const createdPlanner = await PlannerModel.create(newPlanner);
+      console.log(createdPlanner, 'createdPlanner returned from createPlanner service');
+      return { data: createdPlanner };
+    } catch (error: any) {
+      if (error.name === 'BSONError') {
+        throw new MalformedRequestException({ requestType: 'createPlanner', message: 'Invalid ObjectId format' });
+      }
+      throw new Error(`Failed to create planner: ${error.message}`);
     }
-}
+  }
+  
+  
 
-    // Get a planner by ID
-    public async getPlannerById(planId: string): Promise<any> {
+    // Get planners
+    public async getPlanners(): Promise<any> {
         try {
-            const planner = await PlannerModel.findById(planId).populate('createdBy').populate('comments');
-            if (!planner) {
-                throw new Error('Planner not found');
-            }
-            return planner;
+          
+            const planners = await PlannerModel.find().lean();
+            return { success: true, data: planners };
         } catch (error: any) {
-            throw new Error(`Failed to retrieve planner: ${error.message}`);
+            throw new Error(`Failed to retrieve planners: ${error.message}`);
         }
     }
 
 
-       // Invite a user
-       public async inviteUser(planId: string, userId: string): Promise<void> {
+    // Get planners by user ID
+    public async getPlannersByUserId(userId: string): Promise<any> {
         try {
-            const planner = await PlannerModel.findById(planId);
-            if (!planner) {
-                throw new Error('Planner not found');
+            // Validate that the userId is a valid ObjectId
+            if (!Types.ObjectId.isValid(userId)) {
+                throw new Error('Invalid ObjectId for userId');
             }
-            if (planner.roUsers.includes(new Types.ObjectId(userId)) || planner.rwUsers.includes(new Types.ObjectId(userId))) {
-                throw new Error('User is already a member of this planner');
+
+            // Fetch planners where the `createdBy` matches the valid ObjectId
+            const planners = await PlannerModel.find({ createdBy: new Types.ObjectId(userId) }).populate('createdBy');
+            return planners;
+        } catch (error: any) {
+            if (error.name === 'BSONError' || error.message.includes('Invalid ObjectId')) {
+                throw new Error(`Invalid userId: ${error.message}`);
             }
-            planner.roUsers.push(new Types.ObjectId(userId));
-            await planner.save();
-        } catch (error) {
-            throw error;
+            throw new Error(`Failed to retrieve planners: ${error.message}`);
         }
     }
-       
-       // Join a travel plan
-       public async joinTravelPlan(planId: string, userId: string): Promise<void> {
-        try {
-            const planner = await PlannerModel.findById(planId);
-            if (!planner) {
-                throw new Error('Planner not found');
-            }
-            if (planner.roUsers.includes(new Types.ObjectId(userId)) || planner.rwUsers.includes(new Types.ObjectId(userId))) {
-                throw new Error('User is already a member of this planner');
-            }
-            planner.rwUsers.push(new Types.ObjectId(userId));
-            await planner.save();
-        } catch (error) {
-            throw error;
+
+    public async joinPlanner(planId: string, userId: string, role: 'ro' | 'rw') {
+      try {
+        // Convert planId and userId to valid ObjectId
+        const planObjectId = new Types.ObjectId(planId.toString());
+        const userObjectId = new Types.ObjectId(userId.toString());
+  
+        const planner = await PlannerModel.findById(planObjectId);
+        if (!planner) throw new RecordNotFoundException({ recordType: 'planner', message: 'Planner not found' });
+  
+        // Check if the user is already part of the planner
+        const isUserInPlanner = planner.roUsers.includes(userObjectId) || planner.rwUsers.includes(userObjectId);
+        if (isUserInPlanner) throw new Error('User is already part of the planner');
+  
+        // Add user to the appropriate role list (roUsers or rwUsers)
+        if (role === 'ro') {
+          planner.roUsers.push(userObjectId);
+        } else if (role === 'rw') {
+          planner.rwUsers.push(userObjectId);
         }
+  
+        await planner.save();
+        return { data: planner };
+      } catch (error: any) {
+        if (error.name === 'BSONError') {
+          throw new MalformedRequestException({ requestType: 'joinPlanner', message: 'Invalid ObjectId format' });
+        }
+        throw new Error(`Failed to join planner: ${error.message}`);
+      }
     }
-}
+  }
+
+
+    // Function to join a travel plan
+  // public async joinPlanner(planId: string, userId: string, role: 'ro' | 'rw') {
+  //   try {
+  //     const planner = await PlannerModel.findById(planId);
+  //     if (!planner) throw new RecordNotFoundException({ recordType: 'planner', message: 'Planner not found' });
+
+  //     const userObjectId = new Types.ObjectId(userId);
+
+  //     // Check if the user is already part of the planner
+  //     const isUserInPlanner = planner.roUsers.includes(userObjectId) || planner.rwUsers.includes(userObjectId);
+  //     if (isUserInPlanner) throw new Error('User is already part of the planner');
+
+  //     // Add user to the appropriate role list (roUsers or rwUsers)
+  //     if (role === 'ro') {
+  //       planner.roUsers.push(userObjectId);
+  //     } else if (role === 'rw') {
+  //       planner.rwUsers.push(userObjectId);
+  //     }
+
+  //     // Save the updated planner
+  //     await planner.save();
+  //     return { data: planner };
+  //   } catch (error: any) {
+  //     throw new MalformedRequestException({
+  //       requestType: 'joinPlanner',
+  //       message: `Failed to join planner: ${error.message}`,
+  //     });
+  //   }
+  // }
+
+

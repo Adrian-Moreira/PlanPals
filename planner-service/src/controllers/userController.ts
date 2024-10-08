@@ -69,13 +69,9 @@ export async function deleteUser({ userId }: UserParams) {
 }
 
 export async function getUsersByUserName({ userName = 'null' }: UserParams) {
-  const users = await UserModel.find({ userName: { $regex: new RegExp(userName, 'i') } })
-  if (!users.length) {
-    throw new RecordNotFoundException({
-      recordType: 'User',
-      recordId: undefined, // or undefined, depending on your requirements
-      message: `No users found with username ${userName}`,
-    })
+  const user = await UserModel.find({ userName: { $regex: new RegExp(userName, 'i') } })
+  if (!user) {
+    throw new RecordNotFoundException({ recordType: 'User', recordId: userName, message: `No users found with username ${userName}` })
   }
-  return { data: users }
+  return { data: user }
 }
