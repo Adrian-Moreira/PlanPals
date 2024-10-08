@@ -1,0 +1,54 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "lambda-express:HelloWorldFunction (nodejs20.x)",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/planner-service/lambda/lambda-express/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {},
+                "runtime": "nodejs20.x"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "API lambda-express:HelloWorldFunction (nodejs20.x)",
+            "invokeTarget": {
+                "target": "api",
+                "templatePath": "${workspaceFolder}/planner-service/lambda/lambda-express/template.yaml",
+                "logicalId": "HelloWorldFunction"
+            },
+            "api": {
+                "path": "/hello",
+                "httpMethod": "get",
+                "payload": {
+                    "json": {}
+                }
+            },
+            "lambda": {
+                "runtime": "nodejs20.x"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "http-function-url-tutorial:index.handler (nodejs18.x)",
+            "invokeTarget": {
+                "target": "code",
+                "projectRoot": "${workspaceFolder}/planner-service/lambda/http-function-url-tutorial",
+                "lambdaHandler": "index.handler"
+            },
+            "lambda": {
+                "runtime": "nodejs18.x",
+                "payload": {},
+                "environmentVariables": {}
+            }
+        }
+    ]
+}

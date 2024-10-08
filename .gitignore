@@ -1,0 +1,8 @@
+.DS_Store
+out
+coverage
+node_modules
+junit.xml
+lambda
+.env
+.direnv
