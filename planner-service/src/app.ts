@@ -45,7 +45,6 @@ class PlanPals {
 
   private initRoutes(): void {
     this.app.use(express.json())
-    this.app.use('/user', userRouter)
     this.app.use(router)
     this.app.use(errorHandler)
   }
