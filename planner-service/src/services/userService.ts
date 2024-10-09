@@ -12,10 +12,10 @@ export const createUserService = async ({
   const newUser = await BasicUserSchema.parseAsync({
     userName: userName as string,
     preferredName: preferredName as string,
-  }).catch(() => {
+  }).catch((err) => {
     throw new MalformedRequestException({
       requestType: 'createUser',
-      requestBody: 'Invalid request data for creating a new user',
+      requestBody: 'Invalid request data for creating a new user ' + err.message,
     })
   })
 
