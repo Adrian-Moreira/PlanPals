@@ -2,10 +2,12 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import {
   createPlannerService,
+  deletePlannerService,
   getPlannerByIdService,
   getPlannersByAccessService,
   getPlannersByUserIdService,
   inviteIntoPlannerService,
+  updatePlannerService,
 } from '../services/plannerService'
 
 export const getPlanners = async (
@@ -62,13 +64,31 @@ export const updatePlanner = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): Promise<any> => {}
+): Promise<any> => {
+  try {
+    const { plannerId } = req.params
+    const { userId } = req.query
+    const result = await updatePlannerService({ plannerId, userId, ...req.body })
+    return res.status(StatusCodes.OK).json({ success: true, data: result })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const deletePlanner = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): Promise<any> => {}
+): Promise<any> => {
+  try {
+    const { plannerId } = req.params
+    const { userId } = req.query
+    const result = await deletePlannerService({ plannerId, userId })
+    return res.status(StatusCodes.OK).json({ success: true, data: result })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const inviteIntoPlanner = async (
   req: Request,
@@ -76,7 +96,7 @@ export const inviteIntoPlanner = async (
   next: NextFunction,
 ): Promise<any> => {
   try {
-    const { plannerId } = req.params as { plannerId: string }
+    const { plannerId } = req.params
     const { userId, listOfUserIdWithRole } = req.body
 
     const result = await inviteIntoPlannerService({

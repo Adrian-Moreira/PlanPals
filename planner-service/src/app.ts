@@ -20,6 +20,10 @@ const errorHandler = (
   if (err.name === 'BSONError') {
     statusCode = StatusCodes.BAD_REQUEST
   }
+
+  if (statusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
+    console.error(err.message)
+  }
   res.status(statusCode).json({
     success: false,
     message: err.message || 'Internal Server Error',

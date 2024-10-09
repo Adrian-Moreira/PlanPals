@@ -42,7 +42,7 @@ const PlannerMongoSchema = new Schema<Planner>(
     destinations: [{ type: Schema.Types.ObjectId, ref: 'Destination' }],
     locations: [{ type: Schema.Types.ObjectId, ref: 'Location' }],
     accommodations: [{ type: Schema.Types.ObjectId, ref: 'Accommodation' }],
-    transportations: [{ type: Schema.Types.ObjectId, ref: 'Transportation' }],
+    transportations: [{ type: Schema.Types.ObjectId, ref: 'Transport' }],
     invites: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
   {
