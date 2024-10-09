@@ -51,8 +51,8 @@ class PlanPals {
     this.app.use(errorHandler)
   }
 
-  public startServer(): void {
-    connectToMongoDB(this.dbURI)
+  public async startServer(): Promise<void> {
+    await connectToMongoDB(this.dbURI)
     this.server.listen(port, () => {
       console.log(`PP erected on port ${port}`)
     })

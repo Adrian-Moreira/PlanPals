@@ -22,7 +22,7 @@ describe('T11n API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
-    app.startServer()
+    await app.startServer()
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})

@@ -14,7 +14,7 @@ describe('Comment API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL || 'mongodb://localhost:27017';
     app = new PlanPals({ dbURI: mongoURI });
-    app.startServer();
+    await app.startServer();
 
     // Create a test user
     testUser = await UserModel.create({
