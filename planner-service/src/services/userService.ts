@@ -1,36 +1,36 @@
 import { Types } from 'mongoose'
 import { ObjectIdSchema } from '../models/Planner'
-import { BasicUserSchema, UserModel } from '../models/User'
+import { BasicUserSchema, UserModel, UserSchema } from '../models/User'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { MalformedRequestException } from '../exceptions/MalformedRequestException'
 
-export async function createUserService(
-  userName: string,
-  preferredName: string,
-): Promise<any> {
+export const createUserService = async ({
+  userName,
+  preferredName,
+}: any): Promise<any> => {
   const newUser = await BasicUserSchema.parseAsync({
     userName: userName as string,
     preferredName: preferredName as string,
-  }).catch(() => {
+  }).catch((err) => {
     throw new MalformedRequestException({
       requestType: 'createUser',
-      message: 'Invalid request data for creating a new user',
+      requestBody: 'Invalid request data for creating a new user ' + err.message,
     })
   })
 
   if (await UserModel.exists({ userName: newUser.userName })) {
     throw new RecordConflictException({
       requestType: 'createUser',
-      message: 'User already exists',
+      conflict: 'User already exists',
     })
   }
-  const createdUser = await UserModel.create(newUser)
 
-  return createdUser
+  const user = await UserModel.create(newUser)
+  return await UserSchema.omit({}).parseAsync(user)
 }
 
-export async function getUserByIdService(userId: string): Promise<any> {
+export const getUserByIdService = async ({ userId }: any): Promise<any> => {
   ObjectIdSchema.parseAsync(new Types.ObjectId(userId as string)).catch(() => {
     throw new MalformedRequestException({
       requestType: 'getUserById',
@@ -43,14 +43,14 @@ export async function getUserByIdService(userId: string): Promise<any> {
     throw new RecordNotFoundException({ recordType: 'User', recordId: userId })
   }
 
-  return user
+  return await UserSchema.omit({}).parseAsync(user)
 }
 
-export async function updateUserService(
-  userId: string,
-  userName: string,
-  preferredName: string,
-): Promise<any> {
+export const updateUserService = async ({
+  userId,
+  userName,
+  preferredName,
+}: any): Promise<any> => {
   ObjectIdSchema.parseAsync(new Types.ObjectId(userId as string)).catch(() => {
     throw new MalformedRequestException({
       requestType: 'updateUser',
@@ -61,7 +61,12 @@ export async function updateUserService(
     userId,
     { userName: userName, preferredName: preferredName },
     { new: true },
-  )
+  ).catch((err) => {
+    throw new RecordConflictException({
+      requestType: 'updateUser',
+      conflict: 'User with name ' + userName + ' already exists ' + err.message,
+    })
+  })
   if (!updatedUser) {
     throw new RecordNotFoundException({
       recordType: 'User',
@@ -69,14 +74,14 @@ export async function updateUserService(
       message: `User with ID ${userId} not found for update`,
     })
   }
-  return updatedUser
+  return await UserSchema.omit({}).parseAsync(updatedUser)
 }
 
-export async function deleteUserService(userId: string): Promise<any> {
-  ObjectIdSchema.parseAsync(new Types.ObjectId(userId)).catch(() => {
+export const deleteUserService = async ({ userId }: any): Promise<any> => {
+  ObjectIdSchema.parseAsync(new Types.ObjectId(userId as string)).catch(() => {
     throw new MalformedRequestException({
       requestType: 'deleteUser',
-      message: 'Invalid user ID provided for deletion',
+      requestBody: `Invalid user ID provided for deletion ${userId}`,
     })
   })
   const user = await UserModel.findByIdAndDelete(userId)
@@ -86,11 +91,19 @@ export async function deleteUserService(userId: string): Promise<any> {
       recordId: userId,
     })
   }
-  return user
+  return await UserSchema.omit({}).parseAsync(user)
 }
-export async function getUsersByUserNameService(
-  userName: string,
-): Promise<any> {
+export const getUsersByUserNameService = async ({
+  userName,
+}: any): Promise<any> => {
+  UserSchema.pick({ userName: true })
+    .parseAsync({ userName })
+    .catch((err) => {
+      throw new MalformedRequestException({
+        requestType: 'getUsersByUserName',
+        requestBody: `Invalid user name provided ${userName} ` + err.message,
+      })
+    })
   const user = await UserModel.findOne({ userName })
   if (!user) {
     throw new RecordNotFoundException({
@@ -98,5 +111,5 @@ export async function getUsersByUserNameService(
       recordId: userName,
     })
   }
-  return user
+  return await UserSchema.omit({}).parseAsync(user)
 }

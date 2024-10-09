@@ -2,10 +2,12 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import {
   createPlannerService,
+  deletePlannerService,
   getPlannerByIdService,
   getPlannersByAccessService,
   getPlannersByUserIdService,
   inviteIntoPlannerService,
+  updatePlannerService,
 } from '../services/plannerService'
 
 export const getPlanners = async (
@@ -13,13 +15,17 @@ export const getPlanners = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { userId, access } = req.params
+  const { userId, access } = req.query
   try {
-    if (!userId || !access) {
-      return await getPlannersByUserId(req, res, next)
-    }
-    if (access == 'ro' || access == 'rw') {
-      return await getPlannersByAccess(req, res, next)
+    if (!access) {
+      const result = await getPlannersByUserIdService({ userId })
+      res.status(StatusCodes.OK).json({ success: true, data: result })
+    } else {
+      const result = await getPlannersByAccessService({
+        userId,
+        access,
+      })
+      res.status(StatusCodes.OK).json({ success: true, data: result })
     }
   } catch (error) {
     next(error)
@@ -35,37 +41,6 @@ export const getPlannerById = async (
   const { userId } = req.query
   try {
     const result = await getPlannerByIdService({ plannerId, userId })
-    res.status(StatusCodes.OK).json({ success: true, data: result })
-  } catch (error) {
-    next(error)
-  }
-}
-
-async function getPlannersByUserId(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> {
-  try {
-    const { createdBy } = req.query
-    const result = await getPlannersByUserIdService(createdBy as string)
-    res.status(StatusCodes.OK).json({ success: true, data: result })
-  } catch (error) {
-    next(error)
-  }
-}
-
-async function getPlannersByAccess(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> {
-  try {
-    const { userId, access } = req.query
-    const result = await getPlannersByAccessService({
-      userId,
-      access,
-    })
     res.status(StatusCodes.OK).json({ success: true, data: result })
   } catch (error) {
     next(error)
@@ -89,13 +64,31 @@ export const updatePlanner = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): Promise<any> => {}
+): Promise<any> => {
+  try {
+    const { plannerId } = req.params
+    const { userId } = req.query
+    const result = await updatePlannerService({ plannerId, userId, ...req.body })
+    return res.status(StatusCodes.OK).json({ success: true, data: result })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const deletePlanner = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): Promise<any> => {}
+): Promise<any> => {
+  try {
+    const { plannerId } = req.params
+    const { userId } = req.query
+    const result = await deletePlannerService({ plannerId, userId })
+    return res.status(StatusCodes.OK).json({ success: true, data: result })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const inviteIntoPlanner = async (
   req: Request,
@@ -103,7 +96,7 @@ export const inviteIntoPlanner = async (
   next: NextFunction,
 ): Promise<any> => {
   try {
-    const { plannerId } = req.params as { plannerId: string }
+    const { plannerId } = req.params
     const { userId, listOfUserIdWithRole } = req.body
 
     const result = await inviteIntoPlannerService({
