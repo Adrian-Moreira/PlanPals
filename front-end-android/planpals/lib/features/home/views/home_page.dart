@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
-import 'package:planpals/features/travel_planner/models/flight_model.dart';
-import 'package:planpals/features/travel_planner/models/travel_planner_model.dart';
-import 'package:planpals/features/travel_planner/views/components/cards/flight_card.dart';
-import 'package:planpals/features/travel_planner/views/travel_planners_view.dart';
+import 'package:planpals/features/travel_planner/models/transport_model.dart';
+import 'package:planpals/features/travel_planner/models/planner_model.dart';
+import 'package:planpals/features/travel_planner/views/components/cards/transport_card.dart';
+import 'package:planpals/features/travel_planner/views/planners_view.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 
 class HomePage extends StatelessWidget {
@@ -34,7 +34,7 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TravelPlannersView()),  // navigate to travel planners
+                  MaterialPageRoute(builder: (context) => PlannersView()),  // navigate to travel planners
                 );
               },
               child: const Text('Go to Travel Planner'),

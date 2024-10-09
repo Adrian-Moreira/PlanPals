@@ -1,30 +1,31 @@
 class User {
-  final String userId;            // Unique identifier for the user
-  final String username;          // Name of the user
-  final String? profilePicture; // URL to the user's profile picture (optional)
+  final String id;
+  final String userName;
+  final DateTime? createdAt; // Changed to DateTime
+  final DateTime? updatedAt; // Changed to DateTime
 
   User({
-    required this.userId,
-    required this.username,
-    this.profilePicture,
+    required this.id,
+    required this.userName,
+     this.createdAt,
+     this.updatedAt,
   });
 
-  // Convert a User instance to a Map (for sending to an API)
-  Map<String, dynamic> toJson() {
-    return {
-      'userId': userId,
-      'username': username,
-      'profilePicture': profilePicture,
-    };
-  }
-
-  // Create a User instance from a Map (for receiving from an API)
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      userId: json['userId'] as String,
-      username: json['username'] as String,
-      profilePicture: json['profilePicture'] as String?,
+      id: json['_id'] as String,
+      userName: json['userName'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String), // Convert String to DateTime
+      updatedAt: DateTime.parse(json['updatedAt'] as String), // Convert String to DateTime
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'userName': userName,
+      'createdAt': createdAt?.toIso8601String(), // Convert DateTime to String
+      'updatedAt': updatedAt?.toIso8601String(), // Convert DateTime to String
+    };
+  }
 }

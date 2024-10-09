@@ -19,9 +19,9 @@ class ActivityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-          title: Text(activity.activityName),
+          title: Text(activity.name),
           subtitle: Text(
-              '${DateTimeFormat.formatDate(activity.startDate)}, ${DateTimeFormat.formatTime(activity.startDate)} - ${DateTimeFormat.formatTime(activity.endDate)}'),
+              '${activity.date}, ${activity.time}'),
           trailing: functional
               ? Row(
                   mainAxisSize: MainAxisSize.min,

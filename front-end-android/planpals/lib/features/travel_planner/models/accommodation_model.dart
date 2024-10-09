@@ -1,45 +1,41 @@
 class Accommodation {
   final String accommodationId;
+  final String destinationId;
   final String name;
   final String address;
-  final DateTime checkIn;
-  final DateTime checkOut;
-  final String pricePerNight;
-  final String travelPlanId;
+  final String checkInDate; // Date as a string
+  final String checkOutDate; // Date as a string
 
   Accommodation({
     required this.accommodationId,
+    required this.destinationId,
     required this.name,
     required this.address,
-    required this.checkIn,
-    required this.checkOut,
-    required this.pricePerNight,
-    required this.travelPlanId,
+    required this.checkInDate,
+    required this.checkOutDate,
   });
 
-  // Convert an Accommodation object into a Map.
-  Map<String, dynamic> toJson() {
-    return {
-      'accommodationId': accommodationId,
-      'name': name,
-      'address': address,
-      'checkIn': checkIn,
-      'checkOut': checkOut,
-      'pricePerNight': pricePerNight,
-      'travelPlanId': travelPlanId,
-    };
-  }
-
-  // Create an Accommodation object from a Map.
+  // Factory method to create an Accommodation from a JSON map
   factory Accommodation.fromJson(Map<String, dynamic> json) {
     return Accommodation(
       accommodationId: json['accommodationId'],
+      destinationId: json['destinationId'],
       name: json['name'],
       address: json['address'],
-      checkIn: json['checkIn'],
-      checkOut: json['checkOut'],
-      pricePerNight: json['pricePerNight'],
-      travelPlanId: json['travelPlanId'],
+      checkInDate: json['checkInDate'],
+      checkOutDate: json['checkOutDate'],
     );
+  }
+
+  // Method to convert Accommodation to JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'accommodationId': accommodationId,
+      'destinationId': destinationId,
+      'name': name,
+      'address': address,
+      'checkInDate': checkInDate,
+      'checkOutDate': checkOutDate,
+    };
   }
 }

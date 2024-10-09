@@ -17,7 +17,6 @@ class _AccommodationFormState extends State<AccommodationForm> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
   DateTime? _checkIn;
   DateTime? _checkOut;
 
@@ -33,7 +32,7 @@ class _AccommodationFormState extends State<AccommodationForm> {
           key: _formKey,
           child: ListView(
             children: [
-              // Accommodation Field
+              // Accommodation Name Field
               TextFormField(
                 controller: _nameController,
                 decoration:
@@ -46,7 +45,7 @@ class _AccommodationFormState extends State<AccommodationForm> {
                 },
               ),
 
-              const SizedBox(height: 20), //margin
+              const SizedBox(height: 20), // margin
 
               // Address Field
               TextFormField(
@@ -60,32 +59,9 @@ class _AccommodationFormState extends State<AccommodationForm> {
                 },
               ),
 
-              const SizedBox(height: 20), //margin
+              const SizedBox(height: 20), // margin
 
-              // Price Per Night Field
-              TextFormField(
-                controller: _priceController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Price Per Night',
-                  prefixText: '\$  ', // Adds a dollar sign as a prefix
-                  suffixText: ' CAD', // Adds CAD as a suffix
-                  prefixStyle:
-                      TextStyle(color: Colors.black), // Style for the prefix
-                  suffixStyle:
-                      TextStyle(color: Colors.black), // Style for the suffix
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the price per night';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 20), //margin
-
-              // CheckIn Date field
+              // Check-In Date field
               DateTimeForm(
                 initialDate: _checkIn,
                 labelText: 'Check-In Date and Time',
@@ -99,7 +75,7 @@ class _AccommodationFormState extends State<AccommodationForm> {
 
               const SizedBox(height: 15), // Space between date fields
 
-              // CheckOut Date field
+              // Check-Out Date field
               DateTimeForm(
                 initialDate: _checkOut,
                 labelText: 'Check-Out Date and Time',
@@ -111,7 +87,7 @@ class _AccommodationFormState extends State<AccommodationForm> {
                 },
               ),
 
-              const SizedBox(height: 20), //margin
+              const SizedBox(height: 20), // margin
 
               // Submit Button
               ElevatedButton(
@@ -127,16 +103,14 @@ class _AccommodationFormState extends State<AccommodationForm> {
                       return;
                     }
 
-                    // Create a Accommoodation object
+                    // Create an Accommodation object
                     final accommodation = Accommodation(
-                      accommodationId: "123",
+                      accommodationId: '',
                       name: _nameController.text,
                       address: _addressController.text,
-                      pricePerNight: _priceController.text,
-                      checkIn: _checkIn!,
-                      checkOut: _checkOut!,
-                      travelPlanId:
-                          'SomeId', // This could be passed or managed differently
+                      checkInDate: _checkIn!.toIso8601String().split('T')[0],
+                      checkOutDate: _checkOut!.toIso8601String().split('T')[1], 
+                      destinationId: '',
                     );
 
                     // Call the callback with the new Accommodation

@@ -3,27 +3,26 @@ import 'package:planpals/features/travel_planner/models/activity_model.dart';
 import 'package:planpals/features/travel_planner/validators/activity_validator.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
 
-class ActivityForm extends StatefulWidget {
+class SimpleActivityForm extends StatefulWidget {
   final Function(Activity) onActivityAdd;
 
-  const ActivityForm({super.key, required this.onActivityAdd});
+  const SimpleActivityForm({super.key, required this.onActivityAdd});
 
   @override
-  _ActivityFormState createState() => _ActivityFormState();
+  _SimpleActivityFormState createState() => _SimpleActivityFormState();
 }
 
-class _ActivityFormState extends State<ActivityForm> {
+class _SimpleActivityFormState extends State<SimpleActivityForm> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _activityNameController = TextEditingController();
-  DateTime? _startDate;
-  DateTime? _endDate;
+  DateTime? _selectedDate;
+  String? _selectedTime; // Store the time as a string
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Activity Form'),
+        title: const Text('Simple Activity Form'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -43,62 +42,54 @@ class _ActivityFormState extends State<ActivityForm> {
                 },
               ),
 
+              const SizedBox(height: 20), // Margin
 
-              const SizedBox(height: 20), //margin
-
-              // Start Date field
+              // Date Field
               DateTimeForm(
-                initialDate: _startDate,
-                labelText: 'Start Date and Time',
-                placeholder: 'Set Start Date and Time',
+                initialDate: _selectedDate,
+                labelText: 'Date',
+                placeholder: 'Select Date',
                 dateTimeSelected: (selectedDateTime) {
                   setState(() {
-                    _startDate = selectedDateTime;
+                    _selectedDate = selectedDateTime;
                   });
                 },
               ),
 
-              const SizedBox(height: 15), // Space between date fields
+              const SizedBox(height: 15), // Space between fields
 
-              // End Date field
-              DateTimeForm(
-                initialDate: _endDate,
-                labelText: 'End Date and Time',
-                placeholder: 'Set End Date and Time',
-                dateTimeSelected: (selectedDateTime) {
-                  setState(() {
-                    _endDate = selectedDateTime;
-                  });
+              // Time Field
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Time (HH:mm)'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the time';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  _selectedTime = value;
                 },
               ),
 
-              const SizedBox(height: 20), //margin
+              const SizedBox(height: 20), // Margin
 
               // Submit Button
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState?.validate() == true) {
-                    // Validate custom date logic
-                    final dateError = ActivityValidator.validateDates(
-                        _startDate, _endDate);
-                    if (dateError != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(dateError)),
-                      );
-                      return;
-                    }
+                    // Validate custom date logic (if needed)
+                    // Note: You might want to add validation for the time format as well
 
-                    // Create a Flight object
+                    // Create an Activity object
                     final activity = Activity(
-                      activityId: '123',
-                      activityName: _activityNameController.text,
-                      startDate: _startDate!,
-                      endDate: _endDate!,
-                      travelPlanId:
-                          'SomeId', // This could be passed or managed differently
+                      activityId: '123', // Placeholder ID, you may want to generate or fetch this
+                      name: _activityNameController.text,
+                      date: _selectedDate!.toIso8601String().split('T')[0],
+                      time: _selectedDate!.toIso8601String().split('T')[1],
                     );
 
-                    // Call the callback with the new flight
+                    // Call the callback with the new activity
                     widget.onActivityAdd(activity);
 
                     // Close the form screen

@@ -23,6 +23,8 @@ class ErrorMessage {
   // Travel planner Error Messages
   static const String nullTravelPlanner = "No Travel Planner Available.";
 
+  static var nullPlanner = "No Travel Planner Available.";
+
 }
 
 class EndPoints {
