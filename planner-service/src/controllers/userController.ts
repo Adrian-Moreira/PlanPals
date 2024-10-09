@@ -1,77 +1,89 @@
-import { Types } from 'mongoose'
-import { ObjectIdSchema } from '../models/Planner'
-import { UserSchema, UserModel } from '../models/User'
-import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { MalformedRequestException } from '../exceptions/MalformedRequestException'
+import { NextFunction, Request, Response } from 'express'
+import { StatusCodes } from 'http-status-codes'
+import {
+  createUserService,
+  deleteUserService,
+  getUserByIdService,
+  getUsersByUserNameService,
+  updateUserService,
+} from '../services/userService'
 
-interface UserParams {
-  userId?: string
-  userName?: string
-}
-
-export async function createUser({ userName }: UserParams) {
-  const newUser = {
-    userName: userName,
-  }
-
-  UserSchema.pick({ userName: true }).parseAsync(newUser).catch(() => {
-    throw new MalformedRequestException({ requestType: 'createUser', message: 'Invalid request data for creating a new user' })
-  })
-
-  const createdUser = await UserModel.create(
-    UserSchema.pick({ userName: true }).parse(newUser),
-  )
-
-  return { data: createdUser }
-}
-
-export async function getUserById({ userId }: UserParams) {
-  ObjectIdSchema.parseAsync(new Types.ObjectId(userId)).catch(() => {
-    throw new MalformedRequestException({ requestType: 'getUserById', message: 'Invalid user ID provided' })
-  })
-  const user = await UserModel.findById(userId)
-  if (!user) {
-    throw new RecordNotFoundException({ recordType: 'User', recordId: userId })
-  } else {
-    return { data: user }
+export const createUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  const { userName, preferredName } = req.body
+  try {
+    const user = await createUserService({
+      userName: userName as string,
+      preferredName: preferredName as string,
+    })
+    res.status(StatusCodes.CREATED).json({ success: true, data: user })
+  } catch (error) {
+    next(error)
   }
 }
 
-export async function getAllUsers() {
-  const users = await UserModel.find()
-  return { data: users }
+export const getUserById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  const { userId } = req.params
+  try {
+    const user = await getUserByIdService({ userId })
+    res.status(StatusCodes.OK).json({ success: true, data: user })
+  } catch (error) {
+    next(error)
+  }
 }
 
-export async function updateUser({ userId, userName }: UserParams) {
-  ObjectIdSchema.parseAsync(new Types.ObjectId(userId)).catch(() => {
-    throw new MalformedRequestException({ requestType: 'updateUser', message: 'Invalid user ID provided for update' })
-  })
-  const updatedUser = await UserModel.findByIdAndUpdate(
-    userId,
-    { userName: userName },
-    { new: true },
-  )
-  if (!updatedUser) {
-    throw new RecordNotFoundException({ recordType: 'User', recordId: userId, message: `User with ID ${userId} not found for update` })
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  const { userId } = req.params
+  const { userName, preferredName } = req.body
+  try {
+    const updatedUser = await updateUserService({
+      userId,
+      userName: userName as string,
+      preferredName: preferredName as string,
+    })
+    res.status(StatusCodes.OK).json({ success: true, data: updatedUser })
+  } catch (error) {
+    next(error)
   }
-  return { data: updatedUser }
 }
 
-export async function deleteUser({ userId }: UserParams) {
-  ObjectIdSchema.parseAsync(new Types.ObjectId(userId)).catch(() => {
-    throw new MalformedRequestException({ requestType: 'deleteUser', message: 'Invalid user ID provided for deletion' })
-  })
-  const deletedUser = await UserModel.findByIdAndDelete(userId)
-  if (!deletedUser) {
-    throw new RecordNotFoundException({ recordType: 'User', recordId: userId, message: `User with ID ${userId} not found for deletion` })
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  const { userId } = req.params
+  try {
+    const deletedUser = await deleteUserService({ userId })
+    res.status(StatusCodes.OK).json({ success: true, data: deletedUser })
+  } catch (error) {
+    next(error)
   }
-  return { data: deletedUser }
 }
 
-export async function getUsersByUserName({ userName = 'null' }: UserParams) {
-  const user = await UserModel.find({ userName: { $regex: new RegExp(userName, 'i') } })
-  if (!user) {
-    throw new RecordNotFoundException({ recordType: 'User', recordId: userName, message: `No users found with username ${userName}` })
+export const getUsersByUserName = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  try {
+    const { userName } = req.query
+    const user = await getUsersByUserNameService({
+      userName: userName as string,
+    })
+    res.status(StatusCodes.OK).json({ success: true, data: user })
+  } catch (error) {
+    next(error)
   }
-  return { data: user }
 }

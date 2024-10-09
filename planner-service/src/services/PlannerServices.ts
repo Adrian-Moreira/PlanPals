@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { PlannerModel, PlannerSchema } from '../models/Planner';
+import {  CommentModel, CommentSchema  } from '../models/Comment';
 import { MalformedRequestException } from '../exceptions/MalformedRequestException';
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException';
 
@@ -48,7 +49,7 @@ export class PlannerService {
       }).parseAsync(newPlanner);
 
       const createdPlanner = await PlannerModel.create(newPlanner);
-      console.log(createdPlanner, 'createdPlanner returned from createPlanner service');
+      //console.log(createdPlanner, 'createdPlanner returned from createPlanner service');
       return { data: createdPlanner };
     } catch (error: any) {
       if (error.name === 'BSONError') {
@@ -123,34 +124,12 @@ export class PlannerService {
   }
 
 
-    // Function to join a travel plan
-  // public async joinPlanner(planId: string, userId: string, role: 'ro' | 'rw') {
-  //   try {
-  //     const planner = await PlannerModel.findById(planId);
-  //     if (!planner) throw new RecordNotFoundException({ recordType: 'planner', message: 'Planner not found' });
+  // Update planner by ID
+export const updatePlanner = async (id: string, updateData: any) => {
+  return await PlannerModel.findByIdAndUpdate(id, updateData, { new: true });
+};
 
-  //     const userObjectId = new Types.ObjectId(userId);
-
-  //     // Check if the user is already part of the planner
-  //     const isUserInPlanner = planner.roUsers.includes(userObjectId) || planner.rwUsers.includes(userObjectId);
-  //     if (isUserInPlanner) throw new Error('User is already part of the planner');
-
-  //     // Add user to the appropriate role list (roUsers or rwUsers)
-  //     if (role === 'ro') {
-  //       planner.roUsers.push(userObjectId);
-  //     } else if (role === 'rw') {
-  //       planner.rwUsers.push(userObjectId);
-  //     }
-
-  //     // Save the updated planner
-  //     await planner.save();
-  //     return { data: planner };
-  //   } catch (error: any) {
-  //     throw new MalformedRequestException({
-  //       requestType: 'joinPlanner',
-  //       message: `Failed to join planner: ${error.message}`,
-  //     });
-  //   }
-  // }
-
-
+// Get comments for a planner
+export const getPlannerComments = async (plannerId: string) => {
+  return await CommentModel.find({ plannerId });
+};

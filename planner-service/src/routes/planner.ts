@@ -1,5 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import { getCommentsByPlanner } from '../controllers/plannerController';
+import { CommentController } from '../controllers/commentController';
 // import { createPlanner, getPlannersByUserId } from '../controllers/plannerController'
 import { destinationRouter } from './destination'
 
@@ -7,6 +9,9 @@ import { transportationRouter } from './transportation'
 import { joinPlanner, createPlanner, getPlannersByUserId } from '../controllers/plannerController';
 
 const plannerRouter = express.Router({ mergeParams: true })
+
+const commentController = new CommentController();
+
 plannerRouter.get('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
    try {
      
@@ -15,7 +20,7 @@ plannerRouter.get('/', async (req: Request, res: Response, next: NextFunction): 
      const result = await getPlannersByUserId(req,res);
 
      // Log the result for debugging purposes
-     console.log('Result:', result);
+     //console.log('Result:', result);
 
      // Return the result with a success status
       res.status(StatusCodes.OK).json({ success: true, data: result });
@@ -30,7 +35,7 @@ plannerRouter.get('/', async (req: Request, res: Response, next: NextFunction): 
 plannerRouter.get('/planner', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await getPlannersByUserId(req, res);
-    console.log(result, '.get /planner LOGG');
+    //console.log(result, '.get /planner LOGG');
     res.status(StatusCodes.OK).json({ success: true, ...result });
   } catch (error) {
     next(error);
@@ -70,6 +75,22 @@ plannerRouter.get('/planner', async (req: Request, res: Response, next: NextFunc
 //     }
 //   },
 // )
+
+
+// Route to get comments for a planner
+plannerRouter.get('/:plannerId/comments', (req, res, next) => commentController.getCommentsByPlanner(req, res));
+
+// Route to create a comment for a planner
+plannerRouter.post('/:plannerId/comments', async (req, res, next) => {
+  try {
+    await commentController.createComment(req, res);
+  } catch (error) {
+    next(error);
+  }
+});
+// Route to delete a comment
+plannerRouter.delete('/comments/:commentId', (req, res, next) => commentController.deleteComment(req, res));
+
 
 plannerRouter.post('/', async (req, res, next) => {
   try {
