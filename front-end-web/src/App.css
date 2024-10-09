@@ -1,6 +1,5 @@
 .App {
   text-align: center;
-  background-color: #E9ECFF;
 }
 
 .App-logo {
@@ -82,7 +81,6 @@
 
 .List-button:hover {
   background-color: #2b318acf;
-  color: white;
 }
 
 /* .Planner-item-header {
@@ -118,19 +116,13 @@
 
 .Icon-button {
   color: rgb(0, 0, 0);
-  background-color: #E9ECFF;
   font-size: 150%;
   transition-duration: 0.2s;
 }
 
 .Icon-button:hover {
   color: rgb(100, 100, 100);
-  background-color: #E9ECFF;
 
-}
-
-.Page-color {
-  background-color: #E9ECFF;
 }
 
 .Container {
