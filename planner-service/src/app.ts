@@ -41,12 +41,7 @@ class PlanPals {
 
   private initRoutes(): void {
     this.app.use(express.json())
-    this.app.use(
-      cors({
-        origin: 'http://localhost:3000',
-        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-      }),
-    )
+    this.app.use(cors())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(router)
     this.app.use(errorHandler)
