@@ -17,7 +17,5 @@ export class MalformedRequestException extends BaseException {
       message,
       status: StatusCodes.BAD_REQUEST,
     })
-
-    console.error(this.message)
   }
 }

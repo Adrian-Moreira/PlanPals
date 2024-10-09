@@ -115,8 +115,6 @@ export const getPlannerByIdService = async ({
       'roUsers',
       'rwUsers',
       'destinations',
-      'locations',
-      'accommodations',
       'transportations',
       'invites',
     ])
@@ -131,7 +129,6 @@ export const getPlannerByIdService = async ({
 export const getPlannersByUserIdService = async ({
   userId,
 }: any): Promise<any> => {
-  console.error('userId', userId)
   const id = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(userId as string),
   ).catch((err) => {

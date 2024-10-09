@@ -201,13 +201,17 @@ export async function getTransportationsByPlannerIdService({
   const planner = await PlannerModel.findById(plannerObjectId).lean()
   if (!planner) throw new RecordNotFoundException({ recordType: 'planner' })
   if (
-    !planner.roUsers.includes(userObjectId) ||
-    !planner.rwUsers.includes(userObjectId) ||
-    !planner.createdBy.equals(userObjectId)
+    !planner.rwUsers.toString().includes(userObjectId.toString()) &&
+    !planner.roUsers.toString().includes(userObjectId.toString()) &&
+    planner.createdBy.equals(userObjectId)
   ) {
     throw new RecordNotFoundException({
       recordType: 'transportation',
-      message: 'No transportations found for the given planner ID',
+      recordId:
+        'No transportations found for the given planner ID ' +
+        plannerId +
+        ' and user ID ' +
+        userId,
     })
   }
 

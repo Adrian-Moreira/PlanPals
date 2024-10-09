@@ -34,10 +34,7 @@ describe('Comment API', () => {
     });
   });
 
-  afterAll(async () => {
-    await CommentModel.deleteMany({});
-    await PlannerModel.deleteMany({});
-    await UserModel.deleteMany({});
+  afterAll(() => {
     app.stopServer();
   });
 

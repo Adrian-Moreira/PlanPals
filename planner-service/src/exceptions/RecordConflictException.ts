@@ -16,7 +16,5 @@ export class RecordConflictException extends BaseException {
       message,
       status: StatusCodes.CONFLICT,
     })
-
-    console.error(this.message)
   }
 }
