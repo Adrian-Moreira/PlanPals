@@ -4,11 +4,6 @@ import mongoose, { Schema } from 'mongoose'
 
 const DestinationMongoSchema = new Schema<Destination>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      auto: true,
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -47,7 +42,7 @@ const DestinationMongoSchema = new Schema<Destination>(
       ref: 'Accommodation',
     },
   },
-  { timestamps: true }
+  { _id: true, timestamps: true }
 )
 
 export const DestinationSchema = z.object({
