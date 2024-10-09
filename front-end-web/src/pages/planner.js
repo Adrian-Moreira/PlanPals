@@ -1,6 +1,6 @@
 
-import React from "react";
-//import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 import { BiSolidPlane } from "react-icons/bi";
 import { BiSolidBed } from "react-icons/bi";
 import { BiCalendarEvent } from "react-icons/bi";

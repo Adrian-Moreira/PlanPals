@@ -17,11 +17,12 @@ const Login = () => {
       const response = await axios.get(`http://localhost:8080/user/search`, {
         params: { userName: username }  // Pass username in the request
       });
-
+   
       // If the user exists, log them in
       if (response.data.success && response.data.data) {
         const user = response.data.data; // Get the user object
-        login(user.userName); // Call the login function with the username
+        login(user.userName ,user._id); // Call the login function with the username
+        console.log(user._id)
         navigate("/home"); // Redirect to Home after login
       }
     } catch (err) {
@@ -42,7 +43,7 @@ const Login = () => {
               // Check if user creation was successful
               if (createResponse.data.success) {
                 // If user creation is successful, log them in
-                login(createResponse.data.data.userName); // Log in with the created user
+                login(createResponse.data.data.userName, createResponse.data.data._id); // Log in with the created user
                 navigate("/home"); // Redirect to Home after login
               } else {
                 // Handle user creation error
