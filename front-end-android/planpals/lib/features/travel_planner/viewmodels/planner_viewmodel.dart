@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/db/mock_db.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
@@ -10,7 +11,8 @@ class PlannerViewModel extends ChangeNotifier {
   final PlannerService _plannerService = PlannerService();
 
   // State variables for the UI
-  List<Planner> planners = [];
+  // List<Planner> planners = [];
+  List<Planner> planners = MockDataBase.planners;
   List<Destination> destinations = [];
   List<Activity> activities = [];
   List<Transport> transports = [];

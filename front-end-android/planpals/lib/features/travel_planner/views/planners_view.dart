@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/db/mock_db.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
+import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/planner_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/planner_card.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
+import 'package:provider/provider.dart';
 
 class PlannersView extends StatelessWidget {
   PlannersView({super.key});
 
-  final List<Planner> plannerList = MockDataBase.planners;
+  // final List<Planner> plannerList = MockDataBase.planners;
 
   @override
   Widget build(BuildContext context) {
+
+    PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
+    // plannerViewModel.fetchPlannersByUserId('507f1f77bcf8cd799439011');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Travel Planners"),
       ),
       body: GenericListView(
-        itemList: plannerList,
+        itemList: plannerViewModel.planners,
         itemBuilder: (planner) => PlannerCard(
           travelPlanner: planner,
         ),
