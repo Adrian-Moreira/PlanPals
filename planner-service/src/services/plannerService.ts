@@ -65,14 +65,7 @@ export const createPlannerService = async ({
     transportations: true,
     description: true,
     invites: true,
-  })
-    .parseAsync(newPlanner)
-    .catch(() => {
-      throw new MalformedRequestException({
-        requestType: 'createPlanner',
-        message: 'Invalid request body',
-      })
-    })
+  }).parseAsync(newPlanner)
 
   return await PlannerModel.create(newPlanner)
 }
@@ -83,21 +76,12 @@ export const getPlannerByIdService = async ({
 }: any): Promise<any> => {
   const userObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(userId as string),
-  ).catch((err) => {
-    throw new MalformedRequestException({
-      requestType: 'getPlannerById',
-      message: 'Invalid User ObjectId format ' + err.message,
-    })
-  })
+  )
 
   const plannerObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(plannerId as string),
-  ).catch((err) => {
-    throw new MalformedRequestException({
-      requestType: 'getPlannerById',
-      message: 'Invalid User ObjectId format ' + err.message,
-    })
-  })
+  )
+
   const planner = await PlannerModel.findOne({ _id: plannerObjectId })
   if (!planner)
     throw new RecordNotFoundException({
@@ -131,12 +115,7 @@ export const getPlannersByUserIdService = async ({
 }: any): Promise<any> => {
   const id = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(userId as string),
-  ).catch((err) => {
-    throw new MalformedRequestException({
-      requestType: 'getPlannersByUserId',
-      requestBody: 'Invalid ObjectId format ' + err.message,
-    })
-  })
+  )
 
   const planners = await PlannerModel.find({ createdBy: id })
 
@@ -155,12 +134,7 @@ export const getPlannersByAccessService = async ({
 }: any): Promise<any> => {
   const id = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(userId as string),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'getPlannersByAccess',
-      message: 'Invalid ObjectId format',
-    })
-  })
+  )
 
   if (access == 'ro') {
     return await PlannerModel.find({ roUsers: id }).catch(() => {
@@ -197,21 +171,10 @@ export const inviteIntoPlannerService = async ({
 }: PlannerInviteParams): Promise<any> => {
   const plannerObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(plannerId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'inviteIntoPlanner',
-      message: 'Invalid Planner ObjectId format',
-    })
-  })
-
+  )
   const userObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(userId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'inviteIntoPlanner',
-      message: 'Invalid User ObjectId format',
-    })
-  })
+  )
 
   const planner = await PlannerModel.findById(plannerObjectId)
   if (!planner) {
@@ -225,14 +188,7 @@ export const inviteIntoPlannerService = async ({
     throw new Error('User is not a RW in the planner')
 
   for (const { _id, access } of listOfUserIdWithRole) {
-    const toBeAdded = await ObjectIdSchema.parseAsync(
-      new Types.ObjectId(_id),
-    ).catch(() => {
-      throw new MalformedRequestException({
-        requestType: 'inviteIntoPlanner',
-        message: 'Invalid User ObjectId format',
-      })
-    })
+    const toBeAdded = await ObjectIdSchema.parseAsync(new Types.ObjectId(_id))
 
     if (
       toBeAdded.equals(userObjectId) ||
@@ -265,12 +221,7 @@ export const updatePlannerService = async ({
 }: any): Promise<any> => {
   const plannerObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(plannerId as string),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'updatePlanner',
-      message: 'Invalid Planner ObjectId format',
-    })
-  })
+  )
 
   const targetPlanner = await PlannerModel.findById(plannerObjectId)
   if (!targetPlanner)
@@ -312,12 +263,7 @@ export const deletePlannerService = async ({
 }: any): Promise<any> => {
   const plannerObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(plannerId as string),
-  ).catch((err) => {
-    throw new MalformedRequestException({
-      requestType: 'deletePlanner',
-      message: 'Invalid Planner ObjectId format ' + err.message,
-    })
-  })
+  )
 
   const targetPlanner = await PlannerModel.findById(plannerObjectId)
   if (!targetPlanner)
@@ -346,4 +292,3 @@ export const deletePlannerService = async ({
     })
   }
 }
-

@@ -58,12 +58,18 @@ export const updateTransportation = async (
   next: NextFunction,
 ): Promise<any> => {
   const { plannerId, transportationId } = req.params
-  const { type, details, departureTime, arrivalTime, vehicleID } = req.body
+  const { type, details, departureTime, arrivalTime, vehicleId } = req.body
+  const { userId } = req.query
   try {
     const updatedTransportation = await updateTransportationService({
+      userId,
+      plannerId,
       transportationId,
       type,
       details,
+      departureTime,
+      arrivalTime,
+      vehicleId,
     })
     res
       .status(StatusCodes.OK)

@@ -17,10 +17,10 @@ export class BaseException extends Error {
       Error.captureStackTrace(this, BaseException)
     }
     
-    debug('baseException', {
-      exceptionClassName: name,
-      exceptionFault: status,
-      exceptionMessage: message,
-    })
+    // debug('baseException', {
+    //   exceptionClassName: name,
+    //   exceptionFault: status,
+    //   exceptionMessage: message,
+    // })
   }
 }

@@ -15,16 +15,32 @@ export const createTransportationService = async ({
 }: any): Promise<any> => {
   const plannerObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(plannerId as string),
-  ).catch((err) => {
-    throw new MalformedRequestException({
-      requestType: 'createTransportation',
-      requestBody: 'Invalid Planner ObjectId format ' + err.message,
+  )
+
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(createdBy as string),
+  )
+
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerObjectId })
+  if (!targetPlanner) {
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
     })
-  })
+  }
+  if (
+    !targetPlanner.rwUsers.includes(userObjectId) &&
+    !targetPlanner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'transportation',
+      recordId: createdBy,
+    })
+  }
 
   const newTransportation = {
     plannerId: plannerObjectId,
-    createdBy,
+    createdBy: userObjectId,
     type,
     details,
     departureTime,
@@ -55,13 +71,6 @@ export const createTransportationService = async ({
   return createdTransportation
 }
 
-export async function getTransportationsService(): Promise<any> {
-  const transportations = await TransportModel.find().lean()
-  if (!transportations)
-    throw new RecordNotFoundException({ recordType: 'transportation' })
-  return transportations
-}
-
 export async function getTransportationByIdService({
   plannerId,
   transportationId,
@@ -82,8 +91,8 @@ export async function getTransportationByIdService({
   const planner = await PlannerModel.findById(plannerObjectId).lean()
   if (!planner) throw new RecordNotFoundException({ recordType: 'planner' })
   if (
-    !planner.roUsers.includes(userObjectId) ||
-    !planner.rwUsers.includes(userObjectId) ||
+    !planner.roUsers.includes(userObjectId) &&
+    !planner.rwUsers.includes(userObjectId) &&
     !planner.createdBy.equals(userObjectId)
   ) {
     throw new RecordNotFoundException({
@@ -105,32 +114,66 @@ export async function getTransportationByIdService({
 }
 
 export async function updateTransportationService({
+  userId,
+  plannerId,
   transportationId,
   type,
   details,
   departureTime,
   arrivalTime,
+  vehicleId,
 }: any): Promise<any> {
   const transportationObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(transportationId as string),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'updateTransportation',
-      message: 'Invalid Transportation ObjectId format',
+  )
+
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
+
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  )
+
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerObjectId })
+  if (!targetPlanner) {
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
     })
-  })
-
-  const updatedTransportation = await TransportModel.findByIdAndUpdate(
-    transportationObjectId,
-    { type, details, departureTime, arrivalTime },
-    { new: true },
-  ).lean()
-
-  if (!updatedTransportation)
+  }
+  if (
+    !targetPlanner.rwUsers.includes(userObjectId) &&
+    !targetPlanner.createdBy.equals(userObjectId)
+  ) {
     throw new RecordNotFoundException({
       recordType: 'transportation',
       recordId: transportationId,
     })
+  }
+
+  const targetT11n = await TransportModel.findOne({
+    _id: transportationObjectId,
+    plannerId: plannerObjectId,
+  })
+  if (!targetT11n) {
+    throw new RecordNotFoundException({
+      recordType: 'transportation',
+      recordId: transportationId,
+    })
+  }
+
+  const updatedTransportation = await TransportModel.findByIdAndUpdate(
+    transportationObjectId,
+    {
+      type: type || targetT11n.type,
+      details: details || targetT11n.details,
+      vehicleId: vehicleId || targetT11n.vehicleId,
+      departureTime: departureTime || targetT11n.departureTime,
+      arrivalTime: arrivalTime || targetT11n.arrivalTime,
+    },
+    { new: true },
+  ).lean()
 
   return updatedTransportation
 }
@@ -152,10 +195,10 @@ export async function deleteTransportationService({
     new Types.ObjectId(transportationId as string),
   )
 
-  const planner = await PlannerModel.findById(plannerObjectId).lean()
+  const planner = await PlannerModel.findOne({ _id: plannerObjectId }).lean()
   if (!planner) throw new RecordNotFoundException({ recordType: 'planner' })
   if (
-    !planner.rwUsers.includes(userObjectId) ||
+    !planner.rwUsers.includes(userObjectId) &&
     !planner.createdBy.equals(userObjectId)
   ) {
     throw new RecordNotFoundException({
@@ -164,18 +207,11 @@ export async function deleteTransportationService({
     })
   }
 
-  const deletedTransportation = await TransportModel.findByIdAndDelete(
-    transportationObjectId,
-  ).lean()
+  const deletedTransportation = await TransportModel.findOneAndDelete({
+    _id: transportationObjectId,
+    plannerId: plannerObjectId,
+  }).lean()
 
-  await PlannerModel.findOneAndUpdate(
-    { _id: plannerObjectId },
-    {
-      transportations: planner.transportations?.splice(
-        planner.transportations.indexOf(transportationObjectId),
-      ),
-    },
-  )
   if (!deletedTransportation) {
     throw new RecordNotFoundException({
       recordType: 'transportation',
@@ -186,10 +222,10 @@ export async function deleteTransportationService({
   return deletedTransportation
 }
 
-export async function getTransportationsByPlannerIdService({
+export const getTransportationsByPlannerIdService = async ({
   plannerId,
   userId,
-}: any): Promise<any> {
+}: any): Promise<any> => {
   const plannerObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(plannerId as string),
   )
@@ -198,12 +234,12 @@ export async function getTransportationsByPlannerIdService({
     new Types.ObjectId(userId as string),
   )
 
-  const planner = await PlannerModel.findById(plannerObjectId).lean()
+  const planner = await PlannerModel.findOne({ _id: plannerObjectId })
   if (!planner) throw new RecordNotFoundException({ recordType: 'planner' })
   if (
-    !planner.rwUsers.toString().includes(userObjectId.toString()) &&
-    !planner.roUsers.toString().includes(userObjectId.toString()) &&
-    planner.createdBy.equals(userObjectId)
+    !planner.rwUsers.includes(userObjectId) &&
+    !planner.roUsers.includes(userObjectId) &&
+    !planner.createdBy.equals(userObjectId)
   ) {
     throw new RecordNotFoundException({
       recordType: 'transportation',
