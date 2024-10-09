@@ -15,10 +15,10 @@ export const createUser = async (
 ): Promise<any> => {
   const { userName, preferredName } = req.body
   try {
-    const user = await createUserService(
-      userName as string,
-      preferredName as string,
-    )
+    const user = await createUserService({
+      userName: userName as string,
+      preferredName: preferredName as string,
+    })
     res.status(StatusCodes.CREATED).json({ success: true, data: user })
   } catch (error) {
     next(error)
@@ -32,7 +32,7 @@ export const getUserById = async (
 ): Promise<any> => {
   const { userId } = req.params
   try {
-    const user = await getUserByIdService(userId)
+    const user = await getUserByIdService({ userId })
     res.status(StatusCodes.OK).json({ success: true, data: user })
   } catch (error) {
     next(error)
@@ -47,11 +47,11 @@ export const updateUser = async (
   const { userId } = req.params
   const { userName, preferredName } = req.body
   try {
-    const updatedUser = await updateUserService(
+    const updatedUser = await updateUserService({
       userId,
-      userName as string,
-      preferredName as string,
-    )
+      userName: userName as string,
+      preferredName: preferredName as string,
+    })
     res.status(StatusCodes.OK).json({ success: true, data: updatedUser })
   } catch (error) {
     next(error)
@@ -65,7 +65,7 @@ export const deleteUser = async (
 ): Promise<any> => {
   const { userId } = req.params
   try {
-    const deletedUser = await deleteUserService(userId)
+    const deletedUser = await deleteUserService({ userId })
     res.status(StatusCodes.OK).json({ success: true, data: deletedUser })
   } catch (error) {
     next(error)
@@ -79,7 +79,9 @@ export const getUsersByUserName = async (
 ): Promise<any> => {
   try {
     const { userName } = req.query
-    const user = await getUsersByUserNameService(userName as string)
+    const user = await getUsersByUserNameService({
+      userName: userName as string,
+    })
     res.status(StatusCodes.OK).json({ success: true, data: user })
   } catch (error) {
     next(error)

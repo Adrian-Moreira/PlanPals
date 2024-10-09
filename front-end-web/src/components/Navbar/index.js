@@ -27,6 +27,9 @@ const Navbar = () => {
                     <NavLink to="/about" >
                         About
                     </NavLink>
+                    <NavLink to="/planners" >
+                        Travel Planners
+                    </NavLink>
                     <button onClick={logout}>Logout</button>
                     </>
                 )}

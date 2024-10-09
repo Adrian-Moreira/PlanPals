@@ -10,7 +10,7 @@ export class MalformedRequestException extends BaseException {
   }: {
     requestType: string
     requestBody?: any
-    message: string
+    message?: string
   }) {
     super({
       name: 'MalformedRequestException',
