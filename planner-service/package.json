@@ -6,8 +6,8 @@
   "bin": "src/app.ts",
   "scripts": {
     "build": "tsc",
-    "start": "nodemon out/app.js",
-    "debug": "nodemon --inspect=0.0.0.0:9229 out/app.js",
+    "start": "nodemon",
+    "debug": "nodemon --inspect=0.0.0.0:9229",
     "test": "jest"
   },
   "dependencies": {

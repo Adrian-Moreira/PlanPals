@@ -6,13 +6,10 @@ COPY package.json package.json
 COPY package-lock.json package-lock.json
 
 RUN npm install
-
 RUN npm install -g nodemon
-
 RUN npm install -g typescript
+RUN npm install -g ts-node
 
 COPY . .
 
-RUN tsc
-
-CMD [ "node", "out/app.js" ]
+CMD ["npm", "run", "start"]
