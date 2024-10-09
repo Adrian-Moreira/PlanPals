@@ -13,12 +13,15 @@ class PlannerService {
   String? _errorMessage;
 
   // Fetch the entire travel planner (flights, accommodations, activities)
-  Future<Planner> fetchPlanner() async {
+  Future<List<Planner>> fetchAllPlanners() async {
     try {
       final response =
-          await _apiService.get(Urls.travelPlanner); // Using URL from constants
-      return Planner.fromJson(json
-          .decode(response.body)); // Assuming 'data' contains the response body
+          await _apiService.get('/planner');
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      print('FETCHING:${response.body}');
+
+      // Convert the JSON list into a List<Planner>
+      return jsonList.map((json) => Planner.fromJson(json)).toList();
     } catch (e) {
       throw Exception("Failed to fetch travel planner");
     }
@@ -28,7 +31,7 @@ class PlannerService {
   Future<List<Planner>> fetchPlannersByUserId(String userId) async {
     try {
       final response =
-          await _apiService.get('baseUrl/planner?createdBy=$userId');
+          await _apiService.get('/planner?createdBy=$userId');
       final List<dynamic> jsonList = jsonDecode(response.body);
 
       // Convert the JSON list into a List<Planner>
@@ -39,13 +42,18 @@ class PlannerService {
   }
 
   // Add a new planner
-  Future<void> addPlanner(Planner planner) async {
+  Future<Planner> addPlanner(Planner planner) async {
     try {
       final response =
-          await _apiService.post(EndPoints.travelPlanner, planner.toJson());
+          await _apiService.post('/planner', planner.toJson());
+
       if (response.statusCode != 201) {
         throw Exception('Failed to create the travel planner.');
       }
+
+      // Parse the response body into a Planner object
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      return Planner.fromJson(responseData);
     } catch (e) {
       throw Exception('Failed to create the travel planner: $e');
     }
@@ -55,7 +63,7 @@ class PlannerService {
   Future<List<Transport>> fetchAllTransports(String plannerId) async {
     try {
       final response = await _apiService
-          .get('${Urls.travelPlanner}/$plannerId/transportation');
+          .get('/planner/$plannerId/transportation');
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((json) => Transport.fromJson(json)).toList();
     } catch (e) {
@@ -68,7 +76,7 @@ class PlannerService {
   Future<List<Destination>> fetchAllDestinations(String plannerId) async {
     try {
       final response =
-          await _apiService.get('${Urls.travelPlanner}/$plannerId/destination');
+          await _apiService.get('/planner/$plannerId/destination');
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((json) => Destination.fromJson(json)).toList();
     } catch (e) {
@@ -82,7 +90,7 @@ class PlannerService {
       String plannerId, String destinationId) async {
     try {
       final response = await _apiService.get(
-          '${Urls.travelPlanner}/$plannerId/destination/$destinationId/activity');
+          '/planner/$plannerId/destination/$destinationId/activity');
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((json) => Activity.fromJson(json)).toList();
     } catch (e) {
@@ -96,7 +104,7 @@ class PlannerService {
       String plannerId, String destinationId, String activityId) async {
     try {
       final response = await _apiService.get(
-          '${Urls.travelPlanner}/$plannerId/destination/$destinationId/activity/$activityId/location');
+          '/planner/$plannerId/destination/$destinationId/activity/$activityId/location');
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((json) => Location.fromJson(json)).toList();
     } catch (e) {
@@ -109,7 +117,8 @@ class PlannerService {
   Future<void> addDestination(String plannerId, Destination destination) async {
     try {
       await _apiService.post(
-        '${Urls.travelPlanner}/$plannerId/destination', destination.toJson(),
+        '/planner/$plannerId/destination',
+        destination.toJson(),
       );
     } catch (e) {
       throw Exception('Failed to add destination: $e');
@@ -120,7 +129,8 @@ class PlannerService {
   Future<void> addTransport(String plannerId, Transport transport) async {
     try {
       await _apiService.post(
-        '${Urls.travelPlanner}/$plannerId/transportation', transport.toJson(),
+        '/planner/$plannerId/transportation',
+        transport.toJson(),
       );
     } catch (e) {
       throw Exception('Failed to add transportation: $e');

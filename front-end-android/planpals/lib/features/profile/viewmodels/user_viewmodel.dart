@@ -19,8 +19,13 @@ class UserViewModel extends ChangeNotifier {
     _errorMessage = null; // Reset error message
     notifyListeners(); // Notify listeners for UI update
 
+
     try {
+          print('USER VEIWMODEL: FETCHING BY USER NAME:$userName');
+
       _user = await _userService.fetchUserByUserName(userName); // Fetch user from repository
+              print('USERVIEWMODEL: FETCHING BY USER NAME AFTER:$userName');
+
     } catch (error) {
       _errorMessage = error.toString(); // Set error message
     } finally {
@@ -28,5 +33,4 @@ class UserViewModel extends ChangeNotifier {
       notifyListeners(); // Notify listeners for UI update
     }
   }
-
 }

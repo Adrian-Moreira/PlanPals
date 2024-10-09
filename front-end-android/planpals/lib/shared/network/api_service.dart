@@ -7,14 +7,23 @@ class ApiService {
 
   // GET request
   Future<http.Response> get(String endpoint) async {
+    final url = Uri.parse('$baseUrl$endpoint'); // Construct the full URL
+
     try {
-      final url = Uri.parse('$baseUrl$endpoint');
-      final response = await http.get(url);
+      final response = await http.get(url); // Make the GET request
+      print('RESPONSE STATUS: ${response.statusCode}'); // Log response status
+      print('Response body: ${response.body}'); // Log response body
 
       // Check for successful response
-      _handleResponse(response);
-      return response;
+      if (response.statusCode == 200) {
+        return response; // Return the response if successful
+      } else {
+        // Handle errors based on status codes (optional)
+        throw Exception('Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
+      }
     } catch (error) {
+      // Log the error for debugging
+      print('Error occurred: $error');
       throw Exception('Failed to load data: $error');
     }
   }
@@ -75,8 +84,9 @@ class ApiService {
 
   // Handle HTTP response and throw exceptions for error statuses
   void _handleResponse(http.Response response) {
-    if (response.statusCode != 200) {
-      throw Exception('Error: ${response.statusCode} - ${response.body}');
-    }
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    // Handle error responses
+    throw Exception('Failed to load data: ${response.statusCode}');
   }
+}
 }

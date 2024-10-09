@@ -17,14 +17,34 @@ class PlannerViewModel extends ChangeNotifier {
   List<Activity> activities = [];
   List<Transport> transports = [];
   List<Location> locations = [];
-  
+
   bool isLoading = false;
   String? errorMessage;
+
+  // Fetch all planners by user ID
+  Future<void> fetchAllPlanners() async {
+    isLoading = true;
+    notifyListeners(); // Notify listeners about the loading state
+    
+    print('PLANNERVIEWMODEL: FETCHING ALL PLANNERS');
+
+    try {
+      planners = await _plannerService.fetchAllPlanners();
+      errorMessage = null; // Clear any previous error message
+    } catch (e) {
+      errorMessage = e.toString(); // Store error message
+    } finally {
+      isLoading = false; // Set loading to false
+      notifyListeners(); // Notify listeners about the loading state change
+    }
+  }
 
   // Fetch all planners by user ID
   Future<void> fetchPlannersByUserId(String userId) async {
     isLoading = true;
     notifyListeners(); // Notify listeners about the loading state
+    
+    print('Fetching Planners by userid:$userId)');
 
     try {
       planners = await _plannerService.fetchPlannersByUserId(userId);
@@ -70,12 +90,14 @@ class PlannerViewModel extends ChangeNotifier {
   }
 
   // Fetch all activities by planner ID and destination ID
-  Future<void> fetchAllActivities(String plannerId, String destinationId) async {
+  Future<void> fetchAllActivities(
+      String plannerId, String destinationId) async {
     isLoading = true;
     notifyListeners();
 
     try {
-      activities = await _plannerService.fetchAllActivities(plannerId, destinationId);
+      activities =
+          await _plannerService.fetchAllActivities(plannerId, destinationId);
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();
@@ -86,18 +108,40 @@ class PlannerViewModel extends ChangeNotifier {
   }
 
   // Fetch all locations by planner ID, destination ID, and activity ID
-  Future<void> fetchAllLocations(String plannerId, String destinationId, String activityId) async {
+  Future<void> fetchAllLocations(
+      String plannerId, String destinationId, String activityId) async {
     isLoading = true;
     notifyListeners();
 
     try {
-      locations = await _plannerService.fetchAllLocations(plannerId, destinationId, activityId);
+      locations = await _plannerService.fetchAllLocations(
+          plannerId, destinationId, activityId);
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();
     } finally {
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  // Add a new destination to the planner
+  Future<Planner> addPlanner(Planner planner) async {
+    try {
+      // Call the service to add the planner
+      Planner newPlanner = await _plannerService.addPlanner(planner);
+
+      // Add the newly created planner to the list
+      planners.add(newPlanner);
+
+      // Notify listeners about the change in state
+      notifyListeners();
+
+      // Return the new planner
+      return newPlanner;
+    } catch (e) {
+      // Handle the exception and throw an error with a meaningful message
+      throw Exception('Failed to add destination: $e');
     }
   }
 
@@ -124,5 +168,4 @@ class PlannerViewModel extends ChangeNotifier {
       throw Exception('Failed to add destination: $e');
     }
   }
-
 }

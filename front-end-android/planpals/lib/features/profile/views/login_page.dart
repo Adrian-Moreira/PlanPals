@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/home/views/home_page.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -8,7 +10,6 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     UserViewModel userViewModel = Provider.of<UserViewModel>(context);
 
     return Scaffold(
@@ -68,16 +69,33 @@ class LoginPage extends StatelessWidget {
                 SizedBox(height: 20),
                 // Login Button
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    // Mark the function as async
                     if (_formKey.currentState?.validate() == true) {
-                      // Handle login logic
-                      userViewModel.fetchUserByUserName(_usernameController);
+                      // Fetch the user by username and wait for the result
+                      await userViewModel
+                          .fetchUserByUserName(_usernameController.text);
 
-                      // NAVIGATE TO THE HOME PAGE
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => HomePage()));
-
-                      return;
+                      // Check if the user has been fetched successfully
+                      if (userViewModel.currentUser != null) {
+                        // NAVIGATE TO THE HOME PAGE
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(
+                              loggedIn: userViewModel.currentUser!,
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Handle the case where the user was not found or there was an error
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Failed to log in. User not found or an error occurred.'),
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(

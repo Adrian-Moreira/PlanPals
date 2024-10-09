@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/features/travel_planner/services/planner_service.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
+import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/views/planner_details_view.dart';
+import 'package:provider/provider.dart';
 
 class PlannerForm extends StatefulWidget {
   const PlannerForm({super.key});
@@ -25,24 +27,21 @@ class _PlannerFormState extends State<PlannerForm> {
   @override
   Widget build(BuildContext context) {
     // Use provider to access data of user currently logged in
-    // final plannerViewModel = Provider.of<PlannerViewModel>(context);
-    // final user = Provider.of<UserViewModel>(context).currentUser;
-
-    PlannerService plannerService = PlannerService();
-    User user = User(id: '123', userName: 'bobby');
+    final plannerViewModel = Provider.of<PlannerViewModel>(context);
+    final user = Provider.of<UserViewModel>(context).currentUser;
 
     // return plannerViewModel.isLoading
     //     ? const LoadingScreen()
     //     : _buildPlannerForm(context, plannerViewModel, user);
 
-    return _buildPlannerForm(context, plannerService, user);
+    return _buildPlannerForm(context, plannerViewModel, user!);
   }
 
   Widget _buildPlannerForm(
-      BuildContext context, PlannerService plannerService, User userModel) {
+      BuildContext context, PlannerViewModel plannerViewModel, User userModel) {
     // Use provider to access data of user currently logged in
     final user = userModel;
-    final service = plannerService;
+    final viewModel = plannerViewModel;
 
     return Scaffold(
       appBar: AppBar(
@@ -146,7 +145,7 @@ class _PlannerFormState extends State<PlannerForm> {
                           transportations: []);
 
                       try {
-                        await service.addPlanner(planner);
+                        planner = await viewModel.addPlanner(planner);
                       } catch (e) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
