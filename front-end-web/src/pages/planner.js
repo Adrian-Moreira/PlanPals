@@ -6,11 +6,12 @@ import { useParams } from 'react-router-dom';
 import { BiSolidPlane } from "react-icons/bi";
 import { BiSolidBed } from "react-icons/bi";
 import { BiCalendarEvent } from "react-icons/bi";
-import { BsFillHandThumbsUpFill } from "react-icons/bs";
-import { BsFillHandThumbsDownFill } from "react-icons/bs";
+// import { BsFillHandThumbsUpFill } from "react-icons/bs";
+// import { BsFillHandThumbsDownFill } from "react-icons/bs";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { BsPencilFill } from "react-icons/bs";
 import { BsTrashFill } from "react-icons/bs";
+import { BsChatFill } from "react-icons/bs";
 
 // const planner = 
 //     {
@@ -102,7 +103,8 @@ import { BsTrashFill } from "react-icons/bs";
 // ];
 
 function Planner() {
-    const { id } = useParams();
+    const { plannerId, access } = useParams();
+    const isReadOnly = access === "ro";
 
     const [planner, setPlanner] = useState([]);
     const [destinations, setDestinations] = useState([]);
@@ -112,48 +114,55 @@ function Planner() {
 
     const [locations, setLocations] = useState([]);
     const [comments, setComments] = useState([]);
-    const [votes, setVotes] = useState([]);
+    // const [votes, setVotes] = useState([]);
 
     useEffect(() => {
         axios
-        .get('http://localhost:8080/planner/'+id)
+        .get('http://localhost:8080/planner/'+plannerId)
         .then((response) => setPlanner(response.data))
         .catch((error) => console.error('Error fetching planner:', error));
     }, []);
 
     useEffect(() => {
         axios
-        .get('http://localhost:8080/planner/'+id+'/destination')
+        .get('http://localhost:8080/planner/'+plannerId+'/destination')
         .then((response) => setDestinations(response.data))
         .catch((error) => console.error('Error fetching destination:', error));
     }, []);
 
     useEffect(() => {
         axios
-        .get('http://localhost:8080/planner/'+id+'/transportation')
+        .get('http://localhost:8080/planner/'+plannerId+'/transportation')
         .then((response) => setTransportation(response.data))
         .catch((error) => console.error('Error fetching transportation:', error));
     }, []);
 
     useEffect(() => {
         axios
-        .get('http://localhost:8080/planner/'+id+'/destination/'+destinations[0].destinationId+'/accommodation')
+        .get('http://localhost:8080/planner/'+plannerId+'/destination/'+destinations[0].destinationId+'/accommodation')
         .then((response) => setAccommodations(response.data))
         .catch((error) => console.error('Error fetching accommodations:', error));
     }, []);
 
     useEffect(() => {
         axios
-        .get('http://localhost:8080/planner/'+id+'/destination/'+destinations[0].destinationId+'/activity')
+        .get('http://localhost:8080/planner/'+plannerId+'/destination/'+destinations[0].destinationId+'/activity')
         .then((response) => setActivities(response.data))
         .catch((error) => console.error('Error fetching activities:', error));
+    }, []);
+
+    useEffect(() => {
+        axios
+        .get('http://localhost:8080/planner/'+plannerId+'/destination/'+destinations[0].destinationId+'/comment')
+        .then((response) => setComments(response.data))
+        .catch((error) => console.error('Error fetching comments:', error));
     }, []);
 
     // Fetch locations for each activity
     useEffect(() => {
         // For each activity, fetch locations by its id
         activities.forEach(activity => {
-        axios.get('http://localhost:8080/planner/'+id+'/destination/'+destinations[0].destinationId+'/activity/'+activity.activityId+'/location')
+        axios.get('http://localhost:8080/planner/'+plannerId+'/destination/'+destinations[0].destinationId+'/activity/'+activity.activityId+'/location')
             .then((response) => {
             // Set locations in the state, with activity.id as the key
             setLocations(prevLocations => ({
@@ -167,44 +176,26 @@ function Planner() {
         });
     }, [activities]);
 
-    // Fetch comments for each activity
-    useEffect(() => {
-        // For each activity, fetch comments by its id
-        activities.forEach(activity => {
-        axios.get('http://localhost:8080/planner/'+id+'/destination/'+destinations[0].destinationId+'/activity/'+activity.activityId+'/comment')
-            .then((response) => {
-            // Set comments in the state, with activity.id as the key
-            setComments(prevComments => ({
-                ...prevComments,
-                [activity.activityId]: response.data, // Assuming data is a list of comments
-            }));
-            })
-            .catch((error) => {
-            console.error('Error fetching comments for activity ${activity.activityId}:', error);
-            });
-        });
-    }, [activities]);
-
-    // Fetch votes for each activity
-    useEffect(() => {
-        // For each activity, fetch votes by its id
-        activities.forEach(activity => {
-        axios.get('http://localhost:8080/planner/'+id+'/destination/'+destinations[0].destinationId+'/activity/'+activity.activityId+'/vote')
-            .then((response) => {
-            // Set votes in the state, with activity.id as the key
-            setVotes(prevVotes => ({
-                ...prevVotes,
-                [activity.activityId]: response.data, // Assuming data is a list of votes
-            }));
-            })
-            .catch((error) => {
-            console.error('Error fetching locations for activity ${activity.activityId}:', error);
-            });
-        });
-    }, [activities]);
+    // // Fetch votes for each activity
+    // useEffect(() => {
+    //     // For each activity, fetch votes by its id
+    //     activities.forEach(activity => {
+    //     axios.get('http://localhost:8080/planner/'+plannerId+'/destination/'+destinations[0].destinationId+'/activity/'+activity.activityId+'/vote')
+    //         .then((response) => {
+    //         // Set votes in the state, with activity.id as the key
+    //         setVotes(prevVotes => ({
+    //             ...prevVotes,
+    //             [activity.activityId]: response.data, // Assuming data is a list of votes
+    //         }));
+    //         })
+    //         .catch((error) => {
+    //         console.error('Error fetching locations for activity ${activity.activityId}:', error);
+    //         });
+    //     });
+    // }, [activities]);
 
     return (
-        <div>
+        <div className="Page-color">
             <header className="Page-header">
                 <p>
                     {planner.name}
@@ -226,15 +217,23 @@ function Planner() {
                 </div>
                 {transportation.map((transport) => (
                     <div className="List-item" key={transport.transportationId}>
+                        {!isReadOnly &&(
+                            <div className="Right-side">
+                                <button className="Icon-button"> <BsPencilFill /></button> 
+                                <button className="Icon-button"> <BsTrashFill /></button>
+                            </div>
+                        )}
                         {transport.type}
-                        <span className="Icon-button"> <BsPencilFill /></span> 
-                        <span className="Icon-button"> <BsTrashFill /></span>
                         <div className="Planner-item">{transport.details}</div>
                         <div className="Planner-item">Departure: {transport.departureTime}</div>
                         <div className="Planner-item">Arrival: {transport.arrivalTime}</div>
                     </div>
                 ))}
-                <div className="Icon-button"><BsFillPlusCircleFill /></div >
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button"><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
                 <p/>
 
                 <div className="List-header">
@@ -242,15 +241,23 @@ function Planner() {
                 </div>
                 {accommodations.map((accomodation) => (
                     <div className="List-item" key={accomodation.accommodationId}>
+                        {!isReadOnly &&(
+                            <div className="Right-side">
+                                <button className="Icon-button"> <BsPencilFill /></button> 
+                                <button className="Icon-button"> <BsTrashFill /></button>
+                            </div>
+                        )}
                         {accomodation.name}
-                        <span className="Icon-button"> <BsPencilFill /></span> 
-                        <span className="Icon-button"> <BsTrashFill /></span>
                         <div className="Planner-item">{accomodation.address}</div>
                         <div className="Planner-item">Check In: {accomodation.checkInDate}</div>
                         <div className="Planner-item">Check Out: {accomodation.checkOutDate}</div>
                     </div>
                 ))}
-                <div className="Icon-button"><BsFillPlusCircleFill /></div >
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button"><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
                 <p/>
 
                 <div className="List-header">
@@ -258,14 +265,24 @@ function Planner() {
                 </div>
                 {activities.map((activity) => (
                     <div className="List-item" key={activity.activityId}>
+                        {!isReadOnly &&(
+                            <div className="Right-side">
+                                <button className="Icon-button"> <BsPencilFill /></button> 
+                                <button className="Icon-button"> <BsTrashFill /></button>
+                            </div>
+                        )}
                         {activity.name}
-                        <span className="Icon-button"> <BsPencilFill /></span> 
-                        <span className="Icon-button"> <BsTrashFill /></span>
                         <div className="Planner-item">{activity.date}</div>
                         <div className="Planner-item">{activity.time}</div>
                         
                         <p/>
                         Locations:
+                        {/* {locations.map((location) => (
+                            <div className="List-item"  key={location.locationId}>
+                                {location.name}
+                                <div className="Planner-item">{location.address}</div>
+                            </div>
+                        ))} */}
                         {locations[activity.activityId] ? (
                             locations[activity.activityId].map(location => (
                                 <div className="List-item"  key={location.locationId}>
@@ -277,20 +294,7 @@ function Planner() {
                             <div className="List-item">Loading locations...</div>
                         )}
 
-                        <p/>
-                        Comments:
-                        {comments[activity.activityId] ? (
-                            comments[activity.activityId].map(comment => (
-                                <div className="List-item"  key={comment.commentId}>
-                                    {comment.createdBy}
-                                    <div className="Planner-item">{comment.content}</div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="List-item">Loading comments...</div>
-                        )}
-
-                        <div className="Planner-vote">
+                        {/* <div className="Planner-vote">
                             Vote Score:
                             {votes[activity.activityId] ? (
                                 votes[activity.activityId].reduce((total, vote) => {
@@ -301,12 +305,32 @@ function Planner() {
                                 <div className="List-item">Loading votes...</div>
                             )}
                             <div className="Vote-button"><BsFillHandThumbsUpFill /></div><div className="Vote-button"><BsFillHandThumbsDownFill /></div>
-                            {/* Voting is currently non-functional */}
-                        </div>
+                             Voting is currently non-functional 
+                        </div> */}
                     </div>
                 ))}
 
-                <div className="Icon-button"><BsFillPlusCircleFill /></div >
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button"><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
+                
+                <p/>
+                <div className="List-header">
+                    <BsChatFill /> Comments
+                </div>
+                {comments.map((comment) => (
+                    <div className="List-item"  key={comment.commentId}>
+                        {comment.createdBy}
+                        <div className="Planner-item">{comment.content}</div>
+                    </div>
+                ))}
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button"><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
 
             </div>
       </div>

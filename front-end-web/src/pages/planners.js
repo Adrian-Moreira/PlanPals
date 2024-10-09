@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 // const plannerList = [
@@ -19,30 +19,36 @@ import axios from 'axios';
 //       }
 // ];
 
-const uid = 0;
+const uid = 0; //temp userid
 
 function Planners() {
     const [editPlannerList, setPlannersRW] = useState([]);
-
-    useEffect(() => {
-        axios
-        .get('http://localhost:8080/planner?userId='+uid+'&access=\'rw\'')
-        .then((response) => setPlannersRW(response.data))
-        .catch((error) => console.error('Error fetching planners:', error));
-    }, []);
-
     const [viewPlannerList, setPlannersRO] = useState([]);
 
-    useEffect(() => {
-        axios
-        .get('http://localhost:8080/planner?userId='+uid+'&access=\'ro\'')
-        .then((response) => setPlannersRO(response.data))
-        .catch((error) => console.error('Error fetching planners:', error));
-    }, []);
-  
+    const getPlanners = async (e) => {
+        e.preventDefault();
+    
+        try {
+            await axios
+            .get(`http://localhost:8080/planner`, {
+                params: { userId: uid, access:'rw'}
+            })
+            .then((response) => setPlannersRW(response.data));
+
+            await axios
+            .get(`http://localhost:8080/planner`, {
+                params: { userId: uid, access:'ro'}
+            })
+            .then((response) => setPlannersRO(response.data));
+            
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <div>
+            {getPlanners}
             <header className="Page-header">
                 <p>
                     Your Planners:
@@ -53,7 +59,7 @@ function Planners() {
             <div className="List">
                 {editPlannerList.map((planner) => (
                     <div key={planner.plannerId}>
-                        <Link className="List-button" to={`/planner/${planner.plannerId}`}>{planner.name}</Link>
+                        <Link className="List-button" to={`/planner/rw/${planner.plannerId}`}>{planner.name}</Link>
                     </div>
                 ))}
             </div>
@@ -67,8 +73,8 @@ function Planners() {
 
             <div className="List">
                 {viewPlannerList.map((planner) => (
-                    <div key={planner.id}>
-                        <Link className="List-button" to={`/planner/${planner.id}`}>{planner.name}</Link>
+                    <div key={planner.plannerId}>
+                        <Link className="List-button" to={`/planner/ro/${planner.plannerId}`}>{planner.name}</Link>
                     </div>
                 ))}
             </div>
