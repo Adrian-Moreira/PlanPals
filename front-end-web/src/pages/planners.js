@@ -2,7 +2,22 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
-const plannerList = [
+const editPlannerList = [
+    {
+        "plannerId": "5",
+        "createdBy": "user123",
+        "startDate": "2023-10-01T00:00:00Z",
+        "endDate": "2023-10-10T00:00:00Z",
+        "name": "Trip to Spain",
+        "description": "Exploring Barcelona and Madrid",
+        "roUsers": ["user456"],
+        "rwUsers": ["user789"],
+        "destinations": ["dest001"],
+        "transportations": ["trans001"]
+      }
+];
+
+const viewPlannerList = [
     {
         "plannerId": "5",
         "createdBy": "user123",
@@ -18,6 +33,7 @@ const plannerList = [
 ];
 
 function Planners() {
+
     return (
         <div>
             <header className="Page-header">
@@ -28,9 +44,9 @@ function Planners() {
             </header>
 
             <div className="List">
-                {plannerList.map((planner) => (
+                {editPlannerList.map((planner) => (
                     <div key={planner.plannerId}>
-                        <Link className="List-button" to={`/planner/${planner.plannerId}`}>{planner.name}</Link>
+                        <Link className="List-button" to={`/planner/rw/${planner.plannerId}`}>{planner.name}</Link>
                     </div>
                 ))}
             </div>
@@ -43,9 +59,9 @@ function Planners() {
             </header>
 
             <div className="List">
-                {plannerList.map((planner) => (
-                    <div key={planner.id}>
-                        <Link className="List-button" to={`/planner/${planner.id}`}>{planner.name}</Link>
+                {viewPlannerList.map((planner) => (
+                    <div key={planner.plannerId}>
+                        <Link className="List-button" to={`/planner/ro/${planner.plannerId}`}>{planner.name}</Link>
                     </div>
                 ))}
             </div>
