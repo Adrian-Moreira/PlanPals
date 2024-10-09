@@ -121,12 +121,12 @@ Retrieve a list of planners created by a specific user.
 
 #### Query Parameters:
 
-- `createdBy` (string): **Required.** The user ID of the planner creator.
+- `userId` (string): **Required.** The user ID of the planner creator.
 
 #### Example Request:
 
 ```
-GET /planner?createdBy=user123
+GET /planner?userId=user123
 ```
 
 #### Response:
@@ -136,16 +136,17 @@ GET /planner?createdBy=user123
   "success": true,
   "data": [
     {
-      "plannerId": "planner001",
+      "_id": "planner001",
       "createdBy": "user123",
       "startDate": "2023-10-01T00:00:00Z",
-      "endDate": "2023-10-10T00:00:00Z",
+      "endDate": "2023-10-10T00:00:00Z", // ISODateString
       "name": "Trip to Spain",
       "description": "Exploring Barcelona and Madrid",
-      "roUsers": ["user456"],
-      "rwUsers": ["user789"],
-      "destinations": ["dest001"],
-      "transportations": ["trans001"]
+      "roUsers": [{}: User],
+      "rwUsers": [{}: User],
+      "destinations": [{}: Destination],
+      "transportations": [{}: Transport],
+      "invites": [{}: User],
     }
     // ... more planners
   ]
@@ -163,8 +164,8 @@ Create a new planner.
   "createdBy": "user123",
   "startDate": "2023-10-01T00:00:00Z",
   "endDate": "2023-10-10T00:00:00Z",
-  "roUsers": ["user456"],        // Optional: Read-only users
-  "rwUsers": ["user789"],        // Optional: Read-write users
+  "roUsers": ["user456"],        // Optional: Read-only user ids
+  "rwUsers": ["user789"],        // Optional: Read-write user ids
   "name": "Trip to Spain",
   "description": "Exploring Barcelona and Madrid",  // Optional
   "destinations": ["dest001"],   // List of destination IDs
@@ -178,16 +179,17 @@ Create a new planner.
 {
   "success": true,
   "data": {
-    "plannerId": "planner002",
+    "_id": "planner002",
     "createdBy": "user123",
     "startDate": "2023-10-01T00:00:00Z",
     "endDate": "2023-10-10T00:00:00Z",
     "name": "Trip to Spain",
     "description": "Exploring Barcelona and Madrid",
-    "roUsers": ["user456"],
-    "rwUsers": ["user789"],
-    "destinations": ["dest001"],
-    "transportations": ["trans001"]
+    "roUsers": [{}: User],
+    "rwUsers": [{}: User],
+    "destinations": [{}: Destination],
+    "transportations": [{}: Transport],
+    "invites": [{}: User],
   }
 }
 ```
@@ -207,7 +209,7 @@ Retrieve all transportation entries associated with a planner.
 #### Example Request:
 
 ```
-GET /planner/planner001/transportation
+GET /planner/planner001/transportation?userId=uid001
 ```
 
 #### Response:
@@ -217,12 +219,13 @@ GET /planner/planner001/transportation
   "success": true,
   "data": [
     {
-      "transportationId": "trans001",
+      "_id": "trans001",
       "plannerId": "planner001",
       "type": "Flight",
-      "details": "Flight from NYC to Madrid",
-      "departureTime": "2023-10-01T08:00:00Z",
-      "arrivalTime": "2023-10-01T20:00:00Z"
+      "details": "Flight from NYC to Madrid with Iberia",
+      "vehicleId": "IB6252",
+      "departureTime": "2024-10-09T20:45:00-04:00",
+      "arrivalTime": "2024-10-10T09:54:00+02:00"
     }
     // ... more transportation entries
   ]
@@ -241,10 +244,12 @@ Add a new transportation entry to a planner.
 
 ```json
 {
-  "type": "Train",
-  "details": "Train from Madrid to Barcelona",
-  "departureTime": "2023-10-05T09:00:00Z",
-  "arrivalTime": "2023-10-05T12:00:00Z"
+  "createdBy": "uid001",
+  "type": "Flight",
+  "details": "Flight from NYC to Madrid with Iberia",
+  "departureTime": "2024-10-09T20:45:00-04:00",
+  "arrivalTime": "2024-10-10T09:54:00+02:00",
+  "vehicleId": "IB6252"
 }
 ```
 
@@ -254,12 +259,13 @@ Add a new transportation entry to a planner.
 {
   "success": true,
   "data": {
-    "transportationId": "trans002",
+    "_id": "trans002",
     "plannerId": "planner001",
     "type": "Train",
+    "vehicleId": "AVE #3141",
     "details": "Train from Madrid to Barcelona",
-    "departureTime": "2023-10-05T09:00:00Z",
-    "arrivalTime": "2023-10-05T12:00:00Z"
+    "departureTime": "2024-10-11T14:30:00+02:00",
+    "arrivalTime": "2024-10-11T16:30:00+02:00"
   }
 }
 ```
@@ -297,8 +303,10 @@ GET /planner/planner001/transportation/trans001
 
 ```json
 {
-  "details": "Updated flight details",
-  "departureTime": "2023-10-01T09:00:00Z" // Updated time
+  "details"?: "Updated flight details",
+  "vehicleId"?: "",
+  "departureTime"?: "",
+  "arrivalTime"?: ""
 }
 ```
 
@@ -307,14 +315,7 @@ GET /planner/planner001/transportation/trans001
 ```json
 {
   "success": true,
-  "data": {
-    "transportationId": "trans001",
-    "plannerId": "planner001",
-    "type": "Flight",
-    "details": "Updated flight details",
-    "departureTime": "2023-10-01T09:00:00Z",
-    "arrivalTime": "2023-10-01T20:00:00Z"
-  }
+  "data": {}: Transport // updated object
 }
 ```
 

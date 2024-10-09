@@ -2,29 +2,52 @@ import { Types } from 'mongoose'
 import { TransportModel, TransportSchema } from '../models/Transport'
 import { MalformedRequestException } from '../exceptions/MalformedRequestException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { ObjectIdSchema } from '../models/Planner'
+import { ObjectIdSchema, PlannerModel } from '../models/Planner'
 
-export async function createTransportationService({
+export const createTransportationService = async ({
   plannerId,
+  createdBy,
   type,
   details,
   departureTime,
   arrivalTime,
-}: any) {
+  vehicleId,
+}: any): Promise<any> => {
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  ).catch((err) => {
+    throw new MalformedRequestException({
+      requestType: 'createTransportation',
+      requestBody: 'Invalid Planner ObjectId format ' + err.message,
+    })
+  })
+
   const newTransportation = {
-    plannerId: plannerId ? new Types.ObjectId(plannerId as string) : undefined,
+    plannerId: plannerObjectId,
+    createdBy,
     type,
     details,
     departureTime,
     arrivalTime,
+    vehicleId,
   }
 
-  await TransportSchema.pick({})
+  await TransportSchema.pick({
+    plannerId: true,
+    createdBy: true,
+    type: true,
+    details: true,
+    departureTime: true,
+    arrivalTime: true,
+    vehicleId: true,
+  })
     .parseAsync(newTransportation)
-    .catch(() => {
+    .catch((err) => {
       throw new MalformedRequestException({
         requestType: 'createTransportation',
-        message: 'Invalid request body',
+        message:
+          'Invalid request body for creating a new transportation ' +
+          err.message,
       })
     })
 
@@ -39,17 +62,35 @@ export async function getTransportationsService(): Promise<any> {
   return transportations
 }
 
-export async function getTransportationByIdService(
-  transportationId: string,
-): Promise<any> {
+export async function getTransportationByIdService({
+  plannerId,
+  transportationId,
+  userId,
+}: any): Promise<any> {
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  )
+
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
+
   const transportationObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(transportationId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'getTransportationById',
-      message: 'Invalid Transportation ObjectId format',
+    new Types.ObjectId(transportationId as string),
+  )
+
+  const planner = await PlannerModel.findById(plannerObjectId).lean()
+  if (!planner) throw new RecordNotFoundException({ recordType: 'planner' })
+  if (
+    !planner.roUsers.includes(userObjectId) ||
+    !planner.rwUsers.includes(userObjectId) ||
+    !planner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'transportation',
+      recordId: transportationId,
     })
-  })
+  }
 
   const transportation = await TransportModel.findById(
     transportationObjectId,
@@ -94,41 +135,81 @@ export async function updateTransportationService({
   return updatedTransportation
 }
 
-export async function deleteTransportationService(
-  transportationId: string,
-): Promise<any> {
-  const transportationObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(transportationId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'deleteTransportation',
-      message: 'Invalid Transportation ObjectId format',
-    })
-  })
+export async function deleteTransportationService({
+  plannerId,
+  transportationId,
+  userId,
+}: any): Promise<any> {
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  )
 
-  const deletedTransportation = await TransportModel.findByIdAndDelete(
-    transportationObjectId,
-  ).lean()
-  if (!deletedTransportation)
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
+
+  const transportationObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(transportationId as string),
+  )
+
+  const planner = await PlannerModel.findById(plannerObjectId).lean()
+  if (!planner) throw new RecordNotFoundException({ recordType: 'planner' })
+  if (
+    !planner.rwUsers.includes(userObjectId) ||
+    !planner.createdBy.equals(userObjectId)
+  ) {
     throw new RecordNotFoundException({
       recordType: 'transportation',
       recordId: transportationId,
     })
+  }
+
+  const deletedTransportation = await TransportModel.findByIdAndDelete(
+    transportationObjectId,
+  ).lean()
+
+  await PlannerModel.findOneAndUpdate(
+    { _id: plannerObjectId },
+    {
+      transportations: planner.transportations?.splice(
+        planner.transportations.indexOf(transportationObjectId),
+      ),
+    },
+  )
+  if (!deletedTransportation) {
+    throw new RecordNotFoundException({
+      recordType: 'transportation',
+      recordId: transportationId,
+    })
+  }
 
   return deletedTransportation
 }
 
-export async function getTransportationsByPlannerIdService(
-  plannerId: string,
-): Promise<any> {
+export async function getTransportationsByPlannerIdService({
+  plannerId,
+  userId,
+}: any): Promise<any> {
   const plannerObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(plannerId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'getTransportationsByPlannerId',
-      message: 'Invalid Planner ObjectId format',
+    new Types.ObjectId(plannerId as string),
+  )
+
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
+
+  const planner = await PlannerModel.findById(plannerObjectId).lean()
+  if (!planner) throw new RecordNotFoundException({ recordType: 'planner' })
+  if (
+    !planner.roUsers.includes(userObjectId) ||
+    !planner.rwUsers.includes(userObjectId) ||
+    !planner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'transportation',
+      message: 'No transportations found for the given planner ID',
     })
-  })
+  }
 
   const transportations = await TransportModel.find({
     plannerId: plannerObjectId,

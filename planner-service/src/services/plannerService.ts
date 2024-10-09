@@ -4,10 +4,6 @@ import { MalformedRequestException } from '../exceptions/MalformedRequestExcepti
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { UserModel } from '../models/User'
-import { deletePlanner } from '../controllers/plannerController'
-import { DestinationModel } from '../models/Destination'
-import { TransportModel } from '../models/Transport'
-import { AccommodationModel } from '../models/Accommodation'
 
 export const createPlannerService = async ({
   createdBy,
@@ -18,9 +14,8 @@ export const createPlannerService = async ({
   name,
   description,
   destinations,
-  locations,
-  accommodations,
   transportations,
+  invites,
 }: any): Promise<any> => {
   const newPlanner = {
     createdBy: createdBy ? new Types.ObjectId(createdBy as string) : undefined,
@@ -37,9 +32,12 @@ export const createPlannerService = async ({
     destinations: destinations
       ? destinations.map((destId: string) => new Types.ObjectId(destId))
       : [],
-    locations: locations || [],
-    accommodations: accommodations || [],
-    transportations: transportations || [],
+    transportations: transportations
+      ? transportations.map((transId: string) => new Types.ObjectId(transId))
+      : [],
+    invites: invites
+      ? invites.map((invId: string) => new Types.ObjectId(invId))
+      : [],
   }
 
   if (!newPlanner.createdBy || !newPlanner.name) {
@@ -64,10 +62,9 @@ export const createPlannerService = async ({
     rwUsers: true,
     name: true,
     destinations: true,
-    locations: true,
-    accommodations: true,
     transportations: true,
     description: true,
+    invites: true,
   })
     .parseAsync(newPlanner)
     .catch(() => {

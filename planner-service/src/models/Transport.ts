@@ -4,21 +4,31 @@ import mongoose, { Schema } from 'mongoose'
 
 const TransportMongoSchema = new Schema<Transport>(
   {
-    _id: {
+    plannerId: {
       type: Schema.Types.ObjectId,
       required: true,
-      auto: true,
+      ref: 'Planner',
     },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },
-    startDate: {
+    type: {
       type: String,
       required: true,
     },
-    endDate: {
+    details: {
+      type: String,
+    },
+    vehicleId: {
+      type: String,
+    },
+    departureTime: {
+      type: String,
+      required: true,
+    },
+    arrivalTime: {
       type: String,
       required: true,
     },
@@ -27,32 +37,32 @@ const TransportMongoSchema = new Schema<Transport>(
       required: true,
       ref: 'Comment',
     },
-    modeOfTransport: {
-      type: String,
-      required: true,
-    },
-    vehicleID: {
-      type: String,
-    },
   },
-  { timestamps: true }
+  { _id: true, timestamps: true },
 )
 
 export const TransportSchema = z.object({
   _id: ObjectIdSchema,
 
+  plannerId: ObjectIdSchema,
+
   createdAt: z.string().datetime(),
   createdBy: ObjectIdSchema,
   updatedAt: z.string().datetime(),
 
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+  departureTime: z.string().datetime(),
+  arrivalTime: z.string().datetime(),
 
   comments: z.array(ObjectIdSchema),
 
-  modeOfTransport: z.string(),
-  vehicleID: z.string().optional(),
+  details: z.string().optional(),
+
+  type: z.string(),
+  vehicleId: z.string().optional(),
 })
 
-export const TransportModel = mongoose.model<Transport>('Transport', TransportMongoSchema)
+export const TransportModel = mongoose.model<Transport>(
+  'Transport',
+  TransportMongoSchema,
+)
 export type Transport = z.infer<typeof TransportSchema>
