@@ -3,7 +3,6 @@ import { useAuth } from '../../AuthContext'; // Import useAuth hook
 import {
     Nav,
     NavLink,
-    Bars,
     NavMenu,
 } from "./NavbarElements";
 
@@ -12,7 +11,6 @@ const Navbar = () => {
     return (
         <>
             <Nav>
-                <Bars />
 
                 <NavMenu>
                 {!isAuthenticated && (
