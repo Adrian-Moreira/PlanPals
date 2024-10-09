@@ -16,7 +16,7 @@ describe('Planner API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
-    app.startServer()
+    await app.startServer()
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
     testUser = await UserModel.create({

@@ -40,8 +40,6 @@ const PlannerMongoSchema = new Schema<Planner>(
       type: String,
     },
     destinations: [{ type: Schema.Types.ObjectId, ref: 'Destination' }],
-    locations: [{ type: Schema.Types.ObjectId, ref: 'Location' }],
-    accommodations: [{ type: Schema.Types.ObjectId, ref: 'Accommodation' }],
     transportations: [{ type: Schema.Types.ObjectId, ref: 'Transport' }],
     invites: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
@@ -63,8 +61,6 @@ export const PlannerSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   destinations: z.array(ObjectIdSchema).optional(),
-  locations: z.array(ObjectIdSchema).optional(),
-  accommodations: z.array(ObjectIdSchema).optional(),
   transportations: z.array(ObjectIdSchema).optional(),
   invites: z.array(ObjectIdSchema).optional(),
 })

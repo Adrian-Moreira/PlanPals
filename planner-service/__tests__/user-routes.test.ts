@@ -19,7 +19,7 @@ describe('User API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
-    app.startServer()
+    await app.startServer()
     await UserModel.deleteMany({})
     testUser = await UserModel.create(testUser)
     testUser = await UserSchema.parseAsync(testUser.toObject())
