@@ -6,3 +6,4 @@ junit.xml
 lambda
 .env
 .direnv
+planner-service/coverage.tar.gz
