@@ -61,10 +61,10 @@ export const updateUserService = async ({
     userId,
     { userName: userName, preferredName: preferredName },
     { new: true },
-  ).catch(() => {
+  ).catch((err) => {
     throw new RecordConflictException({
       requestType: 'updateUser',
-      conflict: 'User with name ' + userName + ' already exists',
+      conflict: 'User with name ' + userName + ' already exists ' + err.message,
     })
   })
   if (!updatedUser) {
@@ -98,10 +98,10 @@ export const getUsersByUserNameService = async ({
 }: any): Promise<any> => {
   UserSchema.pick({ userName: true })
     .parseAsync({ userName })
-    .catch(() => {
+    .catch((err) => {
       throw new MalformedRequestException({
         requestType: 'getUsersByUserName',
-        requestBody: `Invalid user name provided ${userName}`,
+        requestBody: `Invalid user name provided ${userName} ` + err.message,
       })
     })
   const user = await UserModel.findOne({ userName })
