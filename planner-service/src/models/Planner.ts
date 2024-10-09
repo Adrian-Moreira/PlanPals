@@ -1,5 +1,6 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { z } from 'zod'
+import { DestinationModel } from './Destination'
 
 export const ObjectIdSchema = z
   .instanceof(Types.ObjectId)
@@ -48,6 +49,26 @@ const PlannerMongoSchema = new Schema<Planner>(
     timestamps: true,
   },
 )
+
+PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
+  try {
+    const query = this.getQuery()
+    const planner = await this.model.findOne(query)
+
+    if (planner) {
+      planner.destinations.forEach(async (destination: { _id: any }) => {
+        await DestinationModel.findOneAndDelete({ _id: destination._id })
+      })
+      planner.transportations.forEach(async (transportation: { _id: any }) => {
+        await DestinationModel.findOneAndDelete({ _id: transportation._id })
+      })
+    }
+
+    next()
+  } catch (error) {
+    next(error as Error)
+  }
+})
 
 export const PlannerSchema = z.object({
   _id: ObjectIdSchema,

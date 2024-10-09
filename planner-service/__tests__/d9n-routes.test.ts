@@ -4,7 +4,7 @@ import PlanPals from '../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { UserModel } from '../src/models/User'
 import { PlannerModel } from '../src/models/Planner'
-import { TransportModel } from '../src/models/Transport'
+import { DestinationModel } from '../src/models/Destination'
 
 let app: PlanPals
 
@@ -16,9 +16,11 @@ let testUser4: any
 let testPlanner: any
 let testPlanner2: any
 
-let testTransportation1: any
+let testDestination1: any
+let testDestination2: any
+let testDestination3: any
 
-describe('T11n API', () => {
+describe('D9n API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
@@ -26,7 +28,7 @@ describe('T11n API', () => {
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
-    await TransportModel.deleteMany({})
+    await DestinationModel.deleteMany({})
 
     testUser1 = await UserModel.create({
       userName: 'TUser1',
@@ -72,29 +74,38 @@ describe('T11n API', () => {
       transportations: [],
     })
 
-    testTransportation1 = await TransportModel.create({
-      type: 'Train',
-      details: 'From Madrid To Barcelona',
-      plannerId: testPlanner._id,
+    testDestination1 = await DestinationModel.create({
+      name: 'Barcelona',
       createdBy: testUser1._id,
-      arrivalTime: new Date().toISOString(),
-      departureTime: new Date().toISOString(),
-      vehicleId: 'AC1234',
+      plannerId: testPlanner._id,
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
     })
 
-    testPlanner.transportations.push(testTransportation1._id)
+    testDestination2 = await DestinationModel.create({
+      name: 'Tallinn',
+      createdBy: testUser4._id,
+      plannerId: testPlanner2._id,
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+    })
+
+    testPlanner.destinations.push(testDestination1._id)
     testPlanner = await testPlanner.save()
+
+    testPlanner2.destinations.push(testDestination2._id)
+    testPlanner2 = await testPlanner2.save()
   })
 
   afterAll(() => {
     app.stopServer()
   })
 
-  describe('perform GET from /transportation with plannerId', () => {
-    it('should return OK and get transportations for planner', async () => {
+  describe('perform GET from /destination with plannerId', () => {
+    it('should return OK and get destinations for planner', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation?userId=${testUser1._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser1._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
@@ -103,10 +114,10 @@ describe('T11n API', () => {
       expect(response.body.data).toHaveLength(1)
     })
 
-    it('should return OK and get transportations for planner', async () => {
+    it('should return OK and get destinations for planner', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation?userId=${testUser2._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser2._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
@@ -115,10 +126,10 @@ describe('T11n API', () => {
       expect(response.body.data).toHaveLength(1)
     })
 
-    it('should return OK and get transportations for planner', async () => {
+    it('should return OK and get destinations for planner', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation?userId=${testUser3._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser3._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
@@ -130,7 +141,7 @@ describe('T11n API', () => {
     it('should return Not Found', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser4._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -140,7 +151,7 @@ describe('T11n API', () => {
 
     it('should return Bad Request', async () => {
       const response = await request(app.app)
-        .get(`/planner/${testPlanner._id.toString()}/transportation?userId=abc`)
+        .get(`/planner/${testPlanner._id.toString()}/destination?userId=abc`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.BAD_REQUEST)
 
@@ -150,7 +161,7 @@ describe('T11n API', () => {
     it('should return Not Found', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testUser4._id.toString()}/transportation?userId=${testUser1._id.toString()}`,
+          `/planner/${testUser4._id.toString()}/destination?userId=${testUser1._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -161,7 +172,7 @@ describe('T11n API', () => {
     it('should return Not Found', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner2._id.toString()}/transportation?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner2._id.toString()}/destination?userId=${testUser1._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -170,23 +181,23 @@ describe('T11n API', () => {
     })
   })
 
-  describe('perform GET from /transportation with plannerId and transportId', () => {
-    it('should return OK and get transportations for planner', async () => {
+  describe('perform GET from /destination with plannerId and destinationId', () => {
+    it('should return OK and get destinations for planner', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser1._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data._id).toBe(testTransportation1._id.toString())
+      expect(response.body.data._id).toBe(testDestination1._id.toString())
     })
 
     it('should return Not Found with invalid user', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser4._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -197,7 +208,7 @@ describe('T11n API', () => {
     it('should return Not Found with invalid planner', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testUser1._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser4._id.toString()}`,
+          `/planner/${testUser1._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser4._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -208,7 +219,7 @@ describe('T11n API', () => {
     it('should return Not Found with invalid transport', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation/${testUser1._id.toString()}?userId=${testUser1._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testUser1._id.toString()}?userId=${testUser1._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -219,7 +230,7 @@ describe('T11n API', () => {
     it('should return Not Found with invalid transport', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner._id.toString()}/transportation/${testUser1._id.toString()}?userId=}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testUser1._id.toString()}?userId=}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.BAD_REQUEST)
@@ -228,29 +239,29 @@ describe('T11n API', () => {
     })
   })
 
-  describe('perform PATCH to /transportation with plannerId and transportId', () => {
-    it('should return OK and update transportation', async () => {
+  describe('perform PATCH to /destination with plannerId and destinationId', () => {
+    it('should return OK and update destination', async () => {
       const response = await request(app.app)
         .patch(
-          `/planner/${testPlanner._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser1._id.toString()}`,
+          `/planner/${testPlanner2._id.toString()}/destination/${testDestination2._id.toString()}?userId=${testUser4._id.toString()}`,
         )
         .send({
-          arrivalTime: new Date().toISOString(),
+          name: 'Ивангород',
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data._id).toBe(testTransportation1._id.toString())
+      expect(response.body.data.name).toBe('Ивангород')
     })
 
     it('should return Not Found with invalid user', async () => {
       const response = await request(app.app)
         .patch(
-          `/planner/${testPlanner._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser4._id.toString()}`,
         )
         .send({
-          arrivalTime: new Date().toISOString(),
+          name: 'Ивангород',
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -261,10 +272,10 @@ describe('T11n API', () => {
     it('should return Not Found with invalid planner', async () => {
       const response = await request(app.app)
         .patch(
-          `/planner/${testUser1._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser1._id.toString()}`,
+          `/planner/${testUser1._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`,
         )
         .send({
-          arrivalTime: new Date().toISOString(),
+          name: 'Ивангород',
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -275,10 +286,10 @@ describe('T11n API', () => {
     it('should return Not Found with invalid planner', async () => {
       const response = await request(app.app)
         .patch(
-          `/planner/${testPlanner2._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser4._id.toString()}`,
         )
         .send({
-          arrivalTime: new Date().toISOString(),
+          name: 'Ивангород',
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -287,33 +298,31 @@ describe('T11n API', () => {
     })
   })
 
-  describe('perform POST to /transportation with plannerId and transportId', () => {
-    it('should return CREATED and create transportation', async () => {
+  describe('perform POST to /destination with plannerId and destinationId', () => {
+    it('should return CREATED and create destination', async () => {
       const response = await request(app.app)
-        .post(`/planner/${testPlanner._id.toString()}/transportation`)
+        .post(`/planner/${testPlanner2._id.toString()}/destination`)
         .send({
-          createdBy: testUser1._id.toString(),
-          type: 'FlixBus',
-          arrivalTime: new Date().toISOString(),
-          departureTime: new Date().toISOString(),
-          vehicleId: 'FX2468',
+          createdBy: testUser4._id.toString(),
+          startDate: new Date().toISOString(),
+          endDate: new Date().toISOString(),
+          name: 'Ivangrod',
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.CREATED)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data.type).toBe('FlixBus')
+      expect(response.body.data.name).toBe('Ivangrod')
     })
 
     it('should return Not Found with invalid user', async () => {
       const response = await request(app.app)
-        .post(`/planner/${testPlanner2._id.toString()}/transportation`)
+        .post(`/planner/${testPlanner._id.toString()}/destination`)
         .send({
-          createdBy: testUser1._id.toString(),
-          type: 'RegioJet',
-          arrivalTime: new Date().toISOString(),
-          departureTime: new Date().toISOString(),
-          vehicleId: 'RJ369',
+          createdBy: testUser4._id.toString(),
+          startDate: new Date().toISOString(),
+          endDate: new Date().toISOString(),
+          name: 'Ivangrod',
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -323,13 +332,12 @@ describe('T11n API', () => {
 
     it('should return Not Found with invalid planner', async () => {
       const response = await request(app.app)
-        .post(`/planner/${testUser1._id.toString()}/transportation`)
+        .post(`/planner/${testUser1._id.toString()}/destination`)
         .send({
-          createdBy: testUser1._id.toString(),
-          type: 'RegioJet',
-          arrivalTime: new Date().toISOString(),
-          departureTime: new Date().toISOString(),
-          vehicleId: 'RJ369',
+          createdBy: testUser4._id.toString(),
+          startDate: new Date().toISOString(),
+          endDate: new Date().toISOString(),
+          name: 'Ivangrod',
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -338,11 +346,11 @@ describe('T11n API', () => {
     })
   })
 
-  describe('perform DELETE to /transportation with plannerId and transportId', () => {
+  describe('perform DELETE to /destination with plannerId and destinationId', () => {
     it('should return Not Found with invalid user', async () => {
       const response = await request(app.app)
         .delete(
-          `/planner/${testPlanner._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser4._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -353,7 +361,7 @@ describe('T11n API', () => {
     it('should return Not Found with invalid planner', async () => {
       const response = await request(app.app)
         .delete(
-          `/planner/${testUser1._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser1._id.toString()}`,
+          `/planner/${testUser1._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -361,19 +369,19 @@ describe('T11n API', () => {
       expect(response.body.success).toBe(false)
     })
 
-    it('should return OK and delete transportation', async () => {
+    it('should return OK and delete destination', async () => {
       const response = await request(app.app)
         .delete(
-          `/planner/${testPlanner._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser1._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data._id).toBe(testTransportation1._id.toString())
+      expect(response.body.data._id).toBe(testDestination1._id.toString())
       expect(
         await PlannerModel.findOne({ _id: testPlanner._id }),
-      ).not.toContain(testTransportation1._id)
+      ).not.toContain(testDestination1._id)
     })
   })
 })
