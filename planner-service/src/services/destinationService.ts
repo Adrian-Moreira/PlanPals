@@ -2,27 +2,62 @@ import { Types } from 'mongoose'
 import { DestinationModel, DestinationSchema } from '../models/Destination'
 import { MalformedRequestException } from '../exceptions/MalformedRequestException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { ObjectIdSchema } from '../models/Planner'
+import { ObjectIdSchema, PlannerModel } from '../models/Planner'
 
 export async function createDestinationService({
   plannerId,
+  createdBy,
+  startDate,
+  endDate,
   name,
-  location,
-  description,
 }: any) {
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  )
+
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(createdBy as string),
+  )
+
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerObjectId })
+  if (!targetPlanner) {
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
+    })
+  }
+  if (
+    !targetPlanner.rwUsers.includes(userObjectId) &&
+    !targetPlanner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'destination',
+      recordId: 'No destination found for the given planner ID ' + plannerId,
+    })
+  }
   const newDestination = {
-    plannerId: plannerId ? new Types.ObjectId(plannerId as string) : undefined,
+    plannerId: plannerObjectId,
+    createdBy: userObjectId,
+    startDate,
+    endDate,
     name,
-    location,
-    description,
+    comments: [],
+    activities: [],
+    accommodations: [],
   }
 
-  await DestinationSchema.pick({})
+  await DestinationSchema.pick({
+    plannerId: true,
+    createdBy: true,
+    name: true,
+    startDate: true,
+    endDate: true,
+  })
     .parseAsync(newDestination)
-    .catch(() => {
+    .catch((err) => {
       throw new MalformedRequestException({
         requestType: 'createDestination',
-        message: 'Invalid request body',
+        requestBody: 'Invalid Destination format ' + err.message,
       })
     })
 
@@ -30,26 +65,37 @@ export async function createDestinationService({
   return createdDestination
 }
 
-// Get All Destinations
-export async function getDestinationsService(): Promise<any> {
-  const destinations = await DestinationModel.find().lean()
-  if (!destinations)
-    throw new RecordNotFoundException({ recordType: 'destination' })
-  return destinations
-}
-
-// Get Destination by ID
-export async function getDestinationByIdService(
-  destinationId: string,
-): Promise<any> {
+export async function getDestinationByIdService({
+  plannerId,
+  destinationId,
+  userId,
+}: any): Promise<any> {
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  )
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
   const destinationObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(destinationId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'getDestinationById',
-      message: 'Invalid Destination ObjectId format',
+    new Types.ObjectId(destinationId as string),
+  )
+
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerObjectId })
+  if (!targetPlanner) {
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
     })
-  })
+  }
+  if (
+    !targetPlanner.rwUsers.includes(userObjectId) &&
+    !targetPlanner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'destination',
+      recordId: 'No destination found for the given planner ID ' + plannerId,
+    })
+  }
 
   const destination = await DestinationModel.findById(
     destinationObjectId,
@@ -63,25 +109,60 @@ export async function getDestinationByIdService(
   return destination
 }
 
-// Update Destination
 export async function updateDestinationService({
+  userId,
+  plannerId,
   destinationId,
+  startDate,
+  endDate,
   name,
-  location,
-  description,
 }: any): Promise<any> {
   const destinationObjectId = await ObjectIdSchema.parseAsync(
     new Types.ObjectId(destinationId as string),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'updateDestination',
-      message: 'Invalid Destination ObjectId format',
+  )
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
+
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  )
+
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerObjectId })
+  if (!targetPlanner) {
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
     })
+  }
+  if (
+    !targetPlanner.rwUsers.includes(userObjectId) &&
+    !targetPlanner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'destination',
+      recordId: 'No destination found for the given planner ID ' + plannerId,
+    })
+  }
+
+  const targetDestination = await DestinationModel.findOne({
+    _id: destinationObjectId,
+    plannerId: plannerObjectId,
   })
+  if (!targetDestination) {
+    throw new RecordNotFoundException({
+      recordType: 'transportation',
+      recordId: destinationId,
+    })
+  }
 
   const updatedDestination = await DestinationModel.findByIdAndUpdate(
     destinationObjectId,
-    { name, location, description },
+    {
+      startDate: startDate ? startDate : targetDestination.startDate,
+      endDate: endDate ? endDate : targetDestination.endDate,
+      name: name ? name : targetDestination.name,
+    },
     { new: true },
   ).lean()
 
@@ -94,22 +175,44 @@ export async function updateDestinationService({
   return updatedDestination
 }
 
-// Delete Destination
-export async function deleteDestinationService(
-  destinationId: string,
-): Promise<any> {
+export async function deleteDestinationService({
+  plannerId,
+  destinationId,
+  userId,
+}: any): Promise<any> {
   const destinationObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(destinationId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'deleteDestination',
-      message: 'Invalid Destination ObjectId format',
-    })
-  })
+    new Types.ObjectId(destinationId as string),
+  )
 
-  const deletedDestination = await DestinationModel.findByIdAndDelete(
-    destinationObjectId,
-  ).lean()
+  const plannerObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(plannerId as string),
+  )
+
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
+
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerObjectId })
+  if (!targetPlanner) {
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
+    })
+  }
+  if (
+    !targetPlanner.rwUsers.includes(userObjectId) &&
+    !targetPlanner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'destination',
+      recordId: 'No destination found for the given planner ID ' + plannerId,
+    })
+  }
+
+  const deletedDestination = await DestinationModel.findOneAndDelete({
+    _id: destinationObjectId,
+    plannerId: plannerObjectId,
+  }).lean()
   if (!deletedDestination)
     throw new RecordNotFoundException({
       recordType: 'destination',
@@ -119,18 +222,35 @@ export async function deleteDestinationService(
   return deletedDestination
 }
 
-// Get Destinations by Planner ID
-export async function getDestinationsByPlannerIdService(
-  plannerId: string,
-): Promise<any> {
+export async function getDestinationsByPlannerIdService({
+  plannerId,
+  userId,
+}: any): Promise<any> {
   const plannerObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(plannerId),
-  ).catch(() => {
-    throw new MalformedRequestException({
-      requestType: 'getDestinationsByPlannerId',
-      message: 'Invalid Planner ObjectId format',
+    new Types.ObjectId(plannerId as string),
+  )
+
+  const userObjectId = await ObjectIdSchema.parseAsync(
+    new Types.ObjectId(userId as string),
+  )
+
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerObjectId })
+  if (!targetPlanner) {
+    throw new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
     })
-  })
+  }
+  if (
+    !targetPlanner.roUsers.includes(userObjectId) &&
+    !targetPlanner.rwUsers.includes(userObjectId) &&
+    !targetPlanner.createdBy.equals(userObjectId)
+  ) {
+    throw new RecordNotFoundException({
+      recordType: 'destination',
+      recordId: 'No destination found for the given planner ID ' + plannerId,
+    })
+  }
 
   const destinations = await DestinationModel.find({
     plannerId: plannerObjectId,

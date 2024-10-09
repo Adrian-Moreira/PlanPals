@@ -1,15 +1,11 @@
 import { z } from 'zod'
 import mongoose, { Schema } from 'mongoose'
 
-import { ObjectIdSchema} from './Planner'
+import { ObjectIdSchema } from './Planner'
+import { CommentModel } from './Comment'
 
 const LocationMongoSchema = new Schema<Location>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      auto: true,
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -29,17 +25,30 @@ const LocationMongoSchema = new Schema<Location>(
     address: {
       type: String,
     },
-
-    plannerId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'Planner',
-    },
   },
   {
+    _id: true,
     timestamps: true,
-  }
+  },
 )
+
+LocationMongoSchema.pre('findOneAndDelete', async function (next) {
+  try {
+    const query = this.getQuery()
+    const location = await this.model.findOne(query)
+
+    if (location) {
+      location.comments.forEach(async (c: { _id: any }) => {
+        await CommentModel.findOneAndDelete({ _id: c._id })
+      })
+    }
+
+    next()
+  } catch (error) {
+    next(error as Error)
+  }
+})
+
 
 export const LocationSchema = z.object({
   _id: ObjectIdSchema,
@@ -52,8 +61,6 @@ export const LocationSchema = z.object({
 
   name: z.string(),
   address: z.string().optional(),
-
-  plannerId: ObjectIdSchema,
 })
 
 export const ReadOnlyLocationSchema = LocationSchema.pick({
@@ -67,7 +74,10 @@ export const ImmutableLocationSchema = LocationSchema.omit({
   updatedAt: true,
 })
 
-export const LocationModel = mongoose.model<Location>('Location', LocationMongoSchema)
+export const LocationModel = mongoose.model<Location>(
+  'Location',
+  LocationMongoSchema,
+)
 export type Location = z.infer<typeof LocationSchema>
 export type ReadOnlyLocation = z.infer<typeof ReadOnlyLocationSchema>
 export type ImmutableLocation = z.infer<typeof ImmutableLocationSchema>

@@ -13,12 +13,15 @@ export const createDestination = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { plannerId, name, location } = req.body
+  const { plannerId } = req.params
+  const { createdBy, startDate, endDate, name } = req.body
   try {
     const destination = await createDestinationService({
       plannerId,
+      createdBy,
+      startDate,
+      endDate,
       name,
-      location,
     })
     res.status(StatusCodes.CREATED).json({ success: true, data: destination })
   } catch (error) {
@@ -31,9 +34,14 @@ export const getDestinationById = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { destinationId } = req.params
+  const { plannerId, destinationId } = req.params
+  const { userId } = req.query
   try {
-    const destination = await getDestinationByIdService(destinationId)
+    const destination = await getDestinationByIdService({
+      plannerId,
+      destinationId,
+      userId,
+    })
     res.status(StatusCodes.OK).json({ success: true, data: destination })
   } catch (error) {
     next(error)
@@ -45,13 +53,17 @@ export const updateDestination = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { destinationId } = req.params
-  const { name, location } = req.body
+  const { plannerId, destinationId } = req.params
+  const { startDate, endDate, name } = req.body
+  const { userId } = req.query
   try {
     const updatedDestination = await updateDestinationService({
+      userId,
+      plannerId,
       destinationId,
+      startDate,
+      endDate,
       name,
-      location,
     })
     res.status(StatusCodes.OK).json({ success: true, data: updatedDestination })
   } catch (error) {
@@ -64,9 +76,14 @@ export const deleteDestination = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { destinationId } = req.params
+  const { plannerId, destinationId } = req.params
+  const { userId } = req.query
   try {
-    const deletedDestination = await deleteDestinationService(destinationId)
+    const deletedDestination = await deleteDestinationService({
+      plannerId,
+      destinationId,
+      userId,
+    })
     res.status(StatusCodes.OK).json({ success: true, data: deletedDestination })
   } catch (error) {
     next(error)
@@ -78,11 +95,13 @@ export const getDestinationsByPlannerId = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { plannerId } = req.query
+  const { plannerId } = req.params
+  const { userId } = req.query
   try {
-    const destinations = await getDestinationsByPlannerIdService(
-      plannerId as string,
-    )
+    const destinations = await getDestinationsByPlannerIdService({
+      plannerId,
+      userId,
+    })
     res.status(StatusCodes.OK).json({ success: true, data: destinations })
   } catch (error) {
     next(error)

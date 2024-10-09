@@ -1,6 +1,9 @@
 import { z } from 'zod'
-import { ObjectIdSchema } from './Planner'
+import { ObjectIdSchema, PlannerModel } from './Planner'
 import mongoose, { Schema } from 'mongoose'
+import { ActivityModel } from './Activity'
+import { AccommodationModel } from './Accommodation'
+import { CommentModel } from './Comment'
 
 const DestinationMongoSchema = new Schema<Destination>(
   {
@@ -36,21 +39,54 @@ const DestinationMongoSchema = new Schema<Destination>(
       ref: 'Activity',
     },
 
-    accommodation: {
-      type: Schema.Types.ObjectId,
+    accommodations: {
+      type: [Schema.Types.ObjectId],
       required: true,
       ref: 'Accommodation',
     },
+
+    plannerId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Planner',
+    },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 )
+
+DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
+  try {
+    const query = this.getQuery()
+    const destination = await this.model.findOne(query)
+
+    if (destination) {
+      await PlannerModel.findByIdAndUpdate(
+        { _id: destination.plannerId },
+        { $pull: { destinations: destination._id } },
+      )
+      destination.activities.forEach(async (a: { _id: any }) => {
+        await ActivityModel.findOneAndDelete({ _id: a._id })
+      })
+      destination.accommodations.forEach(async (a: { _id: any }) => {
+        await AccommodationModel.findOneAndDelete({ _id: a._id })
+      })
+      destination.comments.forEach(async (c: { _id: any }) => {
+        await CommentModel.findOneAndDelete({ _id: c._id })
+      })
+    }
+
+    next()
+  } catch (error) {
+    next(error as Error)
+  }
+})
 
 export const DestinationSchema = z.object({
   _id: ObjectIdSchema,
 
-  createdAt: z.string().datetime(),
+  createdAt: z.string().datetime().or(z.date()),
   createdBy: ObjectIdSchema,
-  updatedAt: z.string().datetime(),
+  updatedAt: z.string().datetime().or(z.date()),
 
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
@@ -59,8 +95,13 @@ export const DestinationSchema = z.object({
 
   name: z.string(),
   activities: z.array(ObjectIdSchema),
-  accommodation:ObjectIdSchema,
+  accommodations: z.array(ObjectIdSchema),
+
+  plannerId: ObjectIdSchema,
 })
 
-export const DestinationModel = mongoose.model<Destination>('Destination', DestinationMongoSchema)
+export const DestinationModel = mongoose.model<Destination>(
+  'Destination',
+  DestinationMongoSchema,
+)
 export type Destination = z.infer<typeof DestinationSchema>

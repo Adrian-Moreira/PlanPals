@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { ObjectIdSchema, PlannerModel } from './Planner'
 import mongoose, { Schema } from 'mongoose'
+import { CommentModel } from './Comment'
 
 const TransportMongoSchema = new Schema<Transport>(
   {
@@ -47,13 +48,14 @@ TransportMongoSchema.pre('findOneAndDelete', async function (next) {
     const transport = await this.model.findOne(query)
 
     if (transport) {
-      console.error(transport._id)
       await PlannerModel.findByIdAndUpdate(
         { _id: transport.plannerId },
         { $pull: { transportations: transport._id } },
       )
 
-      console.error(await PlannerModel.findOne({ _id: transport.plannerId }))
+      transport.comments.forEach(async (c: { _id: any }) => {
+        await CommentModel.findOneAndDelete({ _id: c._id })
+      })
     }
 
     next()

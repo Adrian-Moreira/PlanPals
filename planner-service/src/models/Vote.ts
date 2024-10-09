@@ -4,11 +4,6 @@ import mongoose, { Schema } from 'mongoose'
 
 const VoteMongoSchema = new Schema<Vote>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      auto: true,
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -24,6 +19,7 @@ const VoteMongoSchema = new Schema<Vote>(
     },
   },
   {
+    _id: true,
     timestamps: true,
   },
 )
