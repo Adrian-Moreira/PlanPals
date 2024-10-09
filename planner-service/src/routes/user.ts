@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express'
+import express from 'express'
 import {
   createUser,
   deleteUser,
@@ -6,7 +6,6 @@ import {
   getUsersByUserName,
   updateUser,
 } from '../controllers/userController'
-import { StatusCodes } from 'http-status-codes'
 
 const userRouter = express.Router({ mergeParams: true })
 
@@ -28,7 +27,7 @@ userRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await getUserById({ userId: req.params.userId })
-      console.log(result, 'LOOGGGGGGGGGGGED')
+      //console.log(result, 'LOOGGGGGGGGGGGED')
       res.status(StatusCodes.OK).json({ success: true, ...result })
     } catch (error) {
       next(error)

@@ -9,46 +9,28 @@ const TransportMongoSchema = new Schema<Transport>(
       required: true,
       auto: true,
     },
-
-    createdAt: {
-      type: String,
-      required: true,
-      default: () => new Date().toISOString(),
-    },
-
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },
-
-    updatedAt: {
-      type: String,
-      required: true,
-      default: () => new Date().toISOString(),
-    },
-
     startDate: {
       type: String,
       required: true,
     },
-
     endDate: {
       type: String,
       required: true,
     },
-
     comments: {
       type: [Schema.Types.ObjectId],
       required: true,
       ref: 'Comment',
     },
-
     modeOfTransport: {
       type: String,
       required: true,
     },
-
     vehicleID: {
       type: String,
     },

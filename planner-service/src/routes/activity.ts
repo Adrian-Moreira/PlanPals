@@ -7,9 +7,9 @@ import { StatusCodes } from "http-status-codes";
 //   updateActivityById,
 //   deleteActivityById,
 // } from '../controllers/activity';
-import { commentRouter } from './comment';
+import  commentRouter  from './comment';
 import { voteRouter } from './vote';
-import { locationRouter } from './location';
+//import { locationRouter } from './location'; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 export const activityRouter = express.Router({ mergeParams: true });
 
 activityRouter.get(
@@ -85,6 +85,6 @@ activityRouter.delete(
   },
 );
 
-activityRouter.use('/:activityId/location', locationRouter);
+//activityRouter.use('/:activityId/location', locationRouter);!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 activityRouter.use('/:activityId/vote', voteRouter);
 activityRouter.use('/:activityId/comment', commentRouter);

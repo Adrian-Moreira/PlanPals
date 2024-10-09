@@ -1,68 +1,39 @@
-import express, { Request, Response, NextFunction } from "express"; // import { NextFunction } from "express";
-import { StatusCodes } from "http-status-codes";
-// import {
-//   createComment,
-//   getCommentsByActivityId,
-//   getCommentById,
-//   updateCommentById,
-// } from '../controllers/comment';
+import express, { Request, Response, NextFunction } from 'express';
+import { CommentController } from '../controllers/commentController';
+import { StatusCodes } from 'http-status-codes';
 
-export const commentRouter = express.Router({ mergeParams: true });
 
-commentRouter.get(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { activityId } = req.params;
-    //   const result = await getCommentsByActivityId(activityId);
-    //   res.status(StatusCodes.OK).json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+//import { CommentController } from './commentController';
 
-commentRouter.post(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { activityId } = req.params;
-      const commentData = req.body;
-    //   const result = await createComment(activityId, commentData);
-    //   res.status(StatusCodes.CREATED).json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
 
-commentRouter.get(
-  '/:commentId',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { activityId, commentId } = req.params;
-    //   const result = await getCommentById(activityId, commentId);
-    //   res.status(StatusCodes.OK).json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+const commentRouter = express.Router({ mergeParams: true });
+const commentController = new CommentController();
 
-commentRouter.put(
-  '/:commentId',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { activityId, commentId } = req.params;
-      const commentData = req.body;
-    //   const result = await updateCommentById(
-    //     activityId,
-    //     commentId,
-    //     commentData,
-    //   );
-    //   res.status(StatusCodes.OK).json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+commentRouter.post('/', async (req: Request, res: Response) => {
+  try {
+    console.log(req.body, 'req.body');
+    console.log(commentController.createComment(req, res), 'commentController.createComment(req, res)');
+    res.status(StatusCodes.CREATED).json({ success: true, data: commentController.createComment(req, res)});
+  } catch (error) {
+    //next(error);
+  }
+});
+
+commentRouter.get('/:plannerId/comments', async (req: Request, res: Response) => {
+  try {
+    res.status(StatusCodes.OK).json({ success: true, data: commentController.getCommentsByPlanner(req, res) });
+  } catch (error) {
+    //next(error);
+  }
+});
+
+commentRouter.delete('/comments/:commentId', async (req: Request, res: Response) => {
+  try {
+     
+    res.status(StatusCodes.OK).json({ success: true, data: commentController.deleteComment(req, res) });
+  } catch (error) {
+    //next(error);
+  }
+});
+
+export default commentRouter;

@@ -1,42 +1,33 @@
 import { z } from 'zod'
-import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
-
+import { ObjectIdSchema } from './Planner'
 const UserMongoSchema = new Schema<User>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      auto: true,
-    },
-
     userName: {
       type: String,
       required: true,
+      unique: true,
     },
-
-    createdAt: {
+    preferredName: {
       type: String,
       required: true,
-      default: () => new Date().toISOString(),
-    },
-    updatedAt: {
-      type: String,
-      required: true,
-      default: () => new Date().toISOString(),
     },
   },
   {
+    _id: true,
     timestamps: true,
-  }
+  },
 )
-
 export const UserSchema = z.object({
   _id: ObjectIdSchema,
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.string().datetime().or(z.date()),
+  updatedAt: z.string().datetime().or(z.date()),
   userName: z.string(),
+  preferredName: z.string(),
 })
-
+export const BasicUserSchema = UserSchema.pick({
+  userName: true,
+  preferredName: true,
+})
 export const UserModel = mongoose.model<User>('User', UserMongoSchema)
 export type User = z.infer<typeof UserSchema>

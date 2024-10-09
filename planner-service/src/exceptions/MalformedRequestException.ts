@@ -1,16 +1,23 @@
 // planner-service/src/exceptions/MalformedRequestException.ts`
-import { StatusCodes } from 'http-status-codes';
-import { BaseException } from './BaseException';
+import { StatusCodes } from 'http-status-codes'
+import { BaseException } from './BaseException'
 
 export class MalformedRequestException extends BaseException {
-  constructor({ requestType, message }: { requestType: string, message: string }) {
+  constructor({
+    requestType,
+    requestBody,
+    message = `The request is badly formatted. Request Type: ${requestType}. Request Body: ${requestBody}`,
+  }: {
+    requestType: string
+    requestBody?: any
+    message?: string
+  }) {
     super({
       name: 'MalformedRequestException',
-      message: `The request is badly formatted. Request Type: ${requestType}. ${message}`,
+      message,
       status: StatusCodes.BAD_REQUEST,
     })
 
     console.error(this.message)
   }
 }
-
