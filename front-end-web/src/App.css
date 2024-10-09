@@ -129,6 +129,12 @@
 
 }
 
+.Icon-button:disabled {
+  color: rgb(100, 100, 100);
+  background-color: #E9ECFF;
+  cursor: default;
+}
+
 .Page-color {
   background-color: #E9ECFF;
 }
