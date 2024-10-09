@@ -10,23 +10,11 @@ const LocationMongoSchema = new Schema<Location>(
       required: true,
       auto: true,
     },
-
-    createdAt: {
-      type: String,
-      required: true,
-      default: () => new Date().toISOString(),
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },
-    updatedAt: {
-      type: String,
-      required: true,
-      default: () => new Date().toISOString(),
-    },
-
     comments: {
       type: [Schema.Types.ObjectId],
       required: true,
