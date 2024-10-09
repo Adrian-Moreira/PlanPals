@@ -16,7 +16,7 @@ class PlannersView extends StatelessWidget {
   Widget build(BuildContext context) {
 
     PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
-    // plannerViewModel.fetchPlannersByUserId('507f1f77bcf8cd799439011');
+    plannerViewModel.fetchPlannersByUserId('507f1f77bcf8cd799439011');
 
     return Scaffold(
       appBar: AppBar(

@@ -1,5 +1,5 @@
 class Urls {
-  static const String baseUrl = 'https:localhost';
+  static const String baseUrl = 'http://ec2-54-224-27-60.compute-1.amazonaws.com:8080';
   
   // Travel planner URLs
   static const String travelPlanner = '$baseUrl/planner';
@@ -14,7 +14,7 @@ class Urls {
   static const String todoList = '$baseUrl/todolist';
 
   // Users
-  static const String users = '$baseUrl/users';
+  static const String users = '$baseUrl/user';
 }
 
 

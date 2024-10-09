@@ -12,7 +12,7 @@ class PlannerViewModel extends ChangeNotifier {
 
   // State variables for the UI
   // List<Planner> planners = [];
-  List<Planner> planners = MockDataBase.planners;
+  List<Planner> planners = [];
   List<Destination> destinations = [];
   List<Activity> activities = [];
   List<Transport> transports = [];

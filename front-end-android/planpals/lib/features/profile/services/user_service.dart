@@ -18,4 +18,17 @@ class UserService {
       throw Exception('Failed to load user: ${response.statusCode}');
     }
   }
+
+  // Fetch user details by userName
+  Future<User> fetchUserByUserName(String userName) async {
+    final response = await _apiService.get('${Urls.users}/userName/$userName'); // Construct the URL using your constants
+
+    if (response.statusCode == 200) {
+      // If the response is successful, parse the JSON
+      return User.fromJson(json.decode(response.body));
+    } else {
+      // If the response is not successful, throw an exception
+      throw Exception('Failed to load user: ${response.statusCode}');
+    }
+  }
 }

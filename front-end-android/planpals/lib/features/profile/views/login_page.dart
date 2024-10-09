@@ -8,6 +8,9 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    UserViewModel userViewModel = Provider.of<UserViewModel>(context);
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -68,7 +71,9 @@ class LoginPage extends StatelessWidget {
                   onPressed: () {
                     if (_formKey.currentState?.validate() == true) {
                       // Handle login logic
+                      userViewModel.fetchUserByUserName(_usernameController);
 
+                      // NAVIGATE TO THE HOME PAGE
                       Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) => HomePage()));
 
