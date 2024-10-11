@@ -7,3 +7,4 @@ lambda
 .env
 .direnv
 planner-service/coverage.tar.gz
+planner-service/planner-express-aarch64.tar
