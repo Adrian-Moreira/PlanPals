@@ -85,3 +85,25 @@ The server will be accessible at `http://localhost:8080`.
 ## License
 
 [WTFPL](./LICENSE)
+
+## Diagrams
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API Server
+    participant Database
+
+    Client->>API Server: POST /planner (with planner data)
+    API Server->>API Server: Validate request body
+    alt Invalid request
+        API Server-->>Client: 400 Bad Request
+    else Planner Not Found for User
+        API Server-->>Client: 404 Not Found
+    else Valid request
+        API Server->>Database: Create new planner document
+        Database-->>API Server: Return created planner
+        API Server->>API Server: Format response
+        API Server-->>Client: 201 Created (with planner data)
+    end
+```
