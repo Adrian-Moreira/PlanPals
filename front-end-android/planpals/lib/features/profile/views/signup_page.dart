@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/home/views/home_page.dart';
+import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
-import 'package:planpals/features/profile/views/signup_page.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
+class SignUpPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _preferredNameController =
+      TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -49,6 +51,24 @@ class LoginPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
+                // Preferred Name Field
+                TextFormField(
+                  controller: _preferredNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Preferred Name',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.person_outline),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a preferred name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
                 // Password Field
                 TextFormField(
                   controller: _passwordController,
@@ -68,45 +88,56 @@ class LoginPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
-                // Login Button
+                // Sign Up Button
                 ElevatedButton(
                   onPressed: () async {
-                    // Mark the function as async
                     if (_formKey.currentState?.validate() == true) {
-                      // Fetch the user by username and wait for the result
                       await userViewModel
                           .fetchUserByUserName(_usernameController.text);
+        
+                      print('SIGN UP: ${userViewModel.currentUser}');
 
-                      // Check if the user has been fetched successfully
                       if (userViewModel.currentUser != null) {
-                        // NAVIGATE TO THE HOME PAGE
-                        Navigator.pushReplacementNamed(context, '/home');
-                      } else {
-                        // Handle the case where the user was not found or there was an error
+                        // User already exists
+                        print('User already exists');
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text(
-                                'Failed to log in. User not found or an error occurred.'),
+                            content: Text('Username already exists'),
                           ),
                         );
-                      }
+                        userViewModel.logout();   // set current user to null
+                        return;
+                      } 
+                        // Add user
+                        print('Adding user');
+                        User user = User(
+                          id: '',
+                          userName: _usernameController.text,
+                          preferredName: _preferredNameController.text,
+                        );
+                        userViewModel.addUser(user);
+
+                        // Navigate to the home page
+                        Navigator.pushReplacementNamed(context, '/login');
+                      
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
                     textStyle: const TextStyle(fontSize: 16),
                   ),
-                  child: const Text('Login'),
+                  child: const Text('Sign Up'),
                 ),
                 const SizedBox(height: 20),
-                // Sign Up Link
+                // Login Link
                 TextButton(
                   onPressed: () {
-                    // Navigate to sign-up page
-                    print('Navigate to sign up');
-                    Navigator.pushReplacementNamed(context, '/signup');
+                    // Navigate to login page
+                    print('Navigate to login');
+                    Navigator.pushNamed(context, '/login');
                   },
-                  child: const Text('Don\'t have an account? Sign Up'),
+                  child: const Text('Already have an account? Login'),
                 ),
               ],
             ),
