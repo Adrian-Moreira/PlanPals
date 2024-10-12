@@ -25,7 +25,7 @@ class PlannerViewModel extends ChangeNotifier {
   Future<void> fetchAllPlanners() async {
     isLoading = true;
     notifyListeners(); // Notify listeners about the loading state
-    
+
     print('PLANNERVIEWMODEL: FETCHING ALL PLANNERS');
 
     try {
@@ -43,11 +43,12 @@ class PlannerViewModel extends ChangeNotifier {
   Future<void> fetchPlannersByUserId(String userId) async {
     isLoading = true;
     notifyListeners(); // Notify listeners about the loading state
-    
+
     print('Fetching Planners by userid:$userId)');
 
     try {
       planners = await _plannerService.fetchPlannersByUserId(userId);
+      print('PLANNERS: $planners');
       errorMessage = null; // Clear any previous error message
     } catch (e) {
       errorMessage = e.toString(); // Store error message
@@ -128,8 +129,10 @@ class PlannerViewModel extends ChangeNotifier {
   // Add a new destination to the planner
   Future<Planner> addPlanner(Planner planner) async {
     try {
+      print("PLANNERVIEWMODEL: ADDING PLANNER: $planner");
       // Call the service to add the planner
       Planner newPlanner = await _plannerService.addPlanner(planner);
+      print("PLANNERVIEWMODEL: ADDED PLANNER AFTER: $planner");
 
       // Add the newly created planner to the list
       planners.add(newPlanner);
@@ -141,15 +144,16 @@ class PlannerViewModel extends ChangeNotifier {
       return newPlanner;
     } catch (e) {
       // Handle the exception and throw an error with a meaningful message
-      throw Exception('Failed to add destination: $e');
+      throw Exception('Failed to add planner: $e');
     }
   }
 
   // Add a new destination to the planner
   Future<void> addDestination(String plannerId, Destination destination) async {
     try {
-      await _plannerService.addDestination(plannerId, destination);
-      destinations.add(destination); // Add to local state if successful
+      Destination newDestination =
+          await _plannerService.addDestination(plannerId, destination);
+      destinations.add(newDestination); // Add to local state if successful
       notifyListeners(); // Notify listeners about the change
     } catch (e) {
       // Handle error (e.g., show a message)
@@ -160,12 +164,23 @@ class PlannerViewModel extends ChangeNotifier {
   // Add a new transporation to the planner
   Future<void> addTransport(String plannerId, Transport transport) async {
     try {
-      await _plannerService.addTransport(plannerId, transport);
-      transports.add(transport); // Add to local state if successful
+      Transport newTransport =
+          await _plannerService.addTransport(plannerId, transport);
+      transports.add(newTransport); // Add to local state if successful
       notifyListeners(); // Notify listeners about the change
     } catch (e) {
       // Handle error (e.g., show a message)
       throw Exception('Failed to add destination: $e');
     }
+  }
+
+  void logout() {
+    planners = [];
+    transports = [];
+    destinations = [];
+    activities = [];
+    locations = [];
+    errorMessage = null;
+    notifyListeners();
   }
 }

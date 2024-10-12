@@ -27,21 +27,8 @@ class _PlannerFormState extends State<PlannerForm> {
   @override
   Widget build(BuildContext context) {
     // Use provider to access data of user currently logged in
-    final plannerViewModel = Provider.of<PlannerViewModel>(context);
+    final viewModel = Provider.of<PlannerViewModel>(context);
     final user = Provider.of<UserViewModel>(context).currentUser;
-
-    // return plannerViewModel.isLoading
-    //     ? const LoadingScreen()
-    //     : _buildPlannerForm(context, plannerViewModel, user);
-
-    return _buildPlannerForm(context, plannerViewModel, user!);
-  }
-
-  Widget _buildPlannerForm(
-      BuildContext context, PlannerViewModel plannerViewModel, User userModel) {
-    // Use provider to access data of user currently logged in
-    final user = userModel;
-    final viewModel = plannerViewModel;
 
     return Scaffold(
       appBar: AppBar(
@@ -134,7 +121,7 @@ class _PlannerFormState extends State<PlannerForm> {
 
                       Planner planner = Planner(
                           plannerId: '',
-                          createdBy: user.id,
+                          createdBy: user!.id,
                           startDate: _startDate!,
                           endDate: _endDate!,
                           name: _nameController.text,

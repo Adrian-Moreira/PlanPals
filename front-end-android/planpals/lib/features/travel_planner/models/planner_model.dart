@@ -1,3 +1,5 @@
+import 'package:planpals/shared/utils/date_utils.dart';
+
 class Planner {
   final String plannerId;
   final String createdBy;
@@ -26,26 +28,25 @@ class Planner {
   // Factory constructor to create a Planner from JSON
   factory Planner.fromJson(Map<String, dynamic> json) {
     return Planner(
-      plannerId: json['plannerId'],
-      createdBy: json['createdBy'],
+      plannerId: json['_id'] ?? '', // Map '_id' to 'plannerId'
+      createdBy: json['createdBy'] ?? '',
       startDate: DateTime.parse(json['startDate']),
       endDate: DateTime.parse(json['endDate']),
-      name: json['name'],
-      description: json['description'],
-      roUsers: List<String>.from(json['roUsers']),
-      rwUsers: List<String>.from(json['rwUsers']),
-      destinations: List<String>.from(json['destinations']),
-      transportations: List<String>.from(json['transportations']),
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      roUsers: List<String>.from(json['roUsers'] ?? []),
+      rwUsers: List<String>.from(json['rwUsers'] ?? []),
+      destinations: List<String>.from(json['destinations'] ?? []),
+      transportations: List<String>.from(json['transportations'] ?? []),
     );
   }
 
-  // Convert a Planner object to JSON
+  // Method to convert a Planner to JSON
   Map<String, dynamic> toJson() {
     return {
-      'plannerId': plannerId,
       'createdBy': createdBy,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': DateTimeFormat.formatToUtcIso(startDate),
+      'endDate': DateTimeFormat.formatToUtcIso(endDate),
       'name': name,
       'description': description,
       'roUsers': roUsers,
@@ -53,5 +54,21 @@ class Planner {
       'destinations': destinations,
       'transportations': transportations,
     };
+  }
+
+  @override
+  String toString() {
+    return 'Planner { '
+        'plannerId: $plannerId, '
+        'createdBy: $createdBy, '
+        'startDate: $startDate, '
+        'endDate: $endDate, '
+        'name: $name, '
+        'description: $description, '
+        'roUsers: $roUsers, '
+        'rwUsers: $rwUsers, '
+        'destinations: $destinations, '
+        'transportations: $transportations '
+        '}';
   }
 }

@@ -3,8 +3,8 @@ class Accommodation {
   final String destinationId;
   final String name;
   final String address;
-  final String checkInDate; // Date as a string
-  final String checkOutDate; // Date as a string
+  final DateTime checkInDate; // Date as a string
+  final DateTime checkOutDate; // Date as a string
 
   Accommodation({
     required this.accommodationId,
@@ -18,12 +18,12 @@ class Accommodation {
   // Factory method to create an Accommodation from a JSON map
   factory Accommodation.fromJson(Map<String, dynamic> json) {
     return Accommodation(
-      accommodationId: json['accommodationId'],
-      destinationId: json['destinationId'],
-      name: json['name'],
-      address: json['address'],
-      checkInDate: json['checkInDate'],
-      checkOutDate: json['checkOutDate'],
+      accommodationId: json['accommodationId'] ?? '',
+      destinationId: json['destinationId'] ?? '',
+      name: json['name'] ?? '',
+      address: json['address'] ?? '',
+      checkInDate: DateTime.parse(json['checkInDate']), // Parsing DateTime
+      checkOutDate: DateTime.parse(json['checkOutDate']), // Parsing DateTime
     );
   }
 
@@ -34,8 +34,8 @@ class Accommodation {
       'destinationId': destinationId,
       'name': name,
       'address': address,
-      'checkInDate': checkInDate,
-      'checkOutDate': checkOutDate,
+      'checkInDate': checkInDate.toIso8601String(),
+      'checkOutDate': checkOutDate.toIso8601String(),
     };
   }
 }
