@@ -7,41 +7,38 @@ class ApiService {
 
   // GET request
   Future<http.Response> get(String endpoint) async {
-    final url = Uri.parse('$baseUrl$endpoint'); // Construct the full URL
+    final url = Uri.parse('$baseUrl$endpoint');
 
     try {
-      final response = await http.get(url); // Make the GET request
-      print('RESPONSE STATUS: ${response.statusCode}'); // Log response status
-      print('Response body: ${response.body}'); // Log response body
+      final response = await http.get(url);
 
-      // Check for successful response
       if (response.statusCode == 200) {
-        return response; // Return the response if successful
+        return response;
       } else {
-        // Handle errors based on status codes (optional)
-        throw Exception('Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
+        throw Exception(
+            'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
-    } catch (error) {
-      // Log the error for debugging
-      print('Error occurred: $error');
+    } on Exception catch (error) {
       throw Exception('Failed to load data: $error');
     }
   }
 
   // POST request
-  Future<http.Response> post(String endpoint, Map<String, dynamic> data) async {
+  Future<http.Response> post(String endpoint, Map<String, dynamic> jsonData) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+
     try {
-      final url = Uri.parse('$baseUrl$endpoint');
+      print('jsonData: $jsonData');
       final response = await http.post(
         url,
-        body: json.encode(data),
+        body: jsonEncode(jsonData),
         headers: {
           'Content-Type': 'application/json',
         },
       );
 
-      // Check for successful response
       _handleResponse(response);
+
       return response;
     } catch (error) {
       throw Exception('Failed to post data: $error');
@@ -84,9 +81,10 @@ class ApiService {
 
   // Handle HTTP response and throw exceptions for error statuses
   void _handleResponse(http.Response response) {
-  if (response.statusCode < 200 || response.statusCode >= 300) {
-    // Handle error responses
-    throw Exception('Failed to load data: ${response.statusCode}');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      // Handle error responses
+      print(response.body);
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
   }
-}
 }

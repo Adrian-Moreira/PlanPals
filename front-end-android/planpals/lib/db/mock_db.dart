@@ -86,5 +86,5 @@ Destination(
   ),
   ];
 
-  static User user = User(id: '123', userName: 'bobby');
+  static User user = User(id: '123', userName: 'bobby', preferredName: 'bob');
 }

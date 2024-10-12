@@ -2,29 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateTimeFormat {
-
-  static String formatDateTime( DateTime dateTime ) {
+  static String formatDateTime(DateTime dateTime) {
     DateFormat formatter = DateFormat('MMM d, h:mm a');
     String formatted = formatter.format(dateTime);
     return formatted.trim();
   }
 
-  static String formatDate( DateTime datetime ) {
+  static String formatDate(DateTime datetime) {
     DateFormat formatter = DateFormat('MMM d');
     String formatted = formatter.format(datetime);
     return formatted.trim();
   }
 
-  static String formatTime( DateTime datetime ) {
+  static String formatTime(DateTime datetime) {
     DateFormat formatter = DateFormat('h:mm a');
     String formatted = formatter.format(datetime);
     return formatted.trim();
   }
+
+  static String formatToUtcIso(DateTime dateTime) {
+    // Convert DateTime to UTC and format it in ISO 8601, adding the 'Z' suffix
+    String isoString = dateTime.toUtc().toIso8601String();
+    return '${isoString.substring(0, 19)}Z'; // Trim milliseconds and add 'Z'
+  }
 }
 
-
 class DateTimeSelector {
-  static Future<DateTime?> selectDate(BuildContext context, DateTime? initialDate) async {
+  static Future<DateTime?> selectDate(
+      BuildContext context, DateTime? initialDate) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate ?? DateTime.now(),
@@ -34,7 +39,8 @@ class DateTimeSelector {
     return pickedDate;
   }
 
-  static Future<TimeOfDay?> selectTime(BuildContext context, TimeOfDay? initialTime) async {
+  static Future<TimeOfDay?> selectTime(
+      BuildContext context, TimeOfDay? initialTime) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: initialTime ?? TimeOfDay.now(),
@@ -52,6 +58,3 @@ class DateTimeSelector {
     );
   }
 }
-
-
-
