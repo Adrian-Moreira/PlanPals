@@ -11,19 +11,23 @@ Before you can run this project, make sure you have the following:
   - Install the **Flutter** and **Dart** extensions from the VS Code Marketplace.
 - **Android Emulator or Device**: Ensure you have a working Android emulator or a physical device connected.
 
-### Steps 1: Move to directory
+### Step 1: Move to directory
 
     cd PlanPals/front-end-android/planpals
 
-### Steps 2. Install Flutter Dependencies
+### Step 2. Install Flutter Dependencies
 
     flutter pub get
 
-### Steps 3. Set Up Android Device / Emulator
+### Step 3. Set Up Android Device / Emulator
 
-   - If you're using an emulator, make sure it's up and running.
-   - If using a physical device, ensure it is connected with USB debugging enabled.
+    - If you're using an emulator, make sure it's up and running.
+    - If using a physical device, make sure it's connected with USB debugging enabled.
 
-### Steps 4. Run the App
+### Step 4. Ensure the Server is Running
+
+    Make sure the backend server is running on your local machine.
+
+### Step 5. Run the App
 
     flutter run
