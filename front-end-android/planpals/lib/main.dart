@@ -13,7 +13,6 @@ import 'package:planpals/features/travel_planner/views/components/Forms/planner_
 import 'package:planpals/features/travel_planner/views/planner_details_view.dart';
 import 'package:planpals/features/travel_planner/views/planners_view.dart';
 import 'package:planpals/shared/components/invite_user_dialog.dart';
-import 'package:planpals/test.dart';
 import 'package:provider/provider.dart';
 
 

@@ -21,15 +21,25 @@ class _PlannersViewState extends State<PlannersView> {
     super.initState();
     // Fetch planners when the widget is first created
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
-      Provider.of<PlannerViewModel>(context, listen: false).fetchPlannersByUserId(user.id);
+      User user =
+          Provider.of<UserViewModel>(context, listen: false).currentUser!;
+      Provider.of<PlannerViewModel>(context, listen: false)
+          .fetchPlannersByUserId(user.id);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
-    User user = Provider.of<UserViewModel>(context).currentUser!;
+    User? user = Provider.of<UserViewModel>(context).currentUser;
+    // If you want to navigate to login when user is null:
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (user == null) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    });
+
     print('PLANNERSVIEW: USER: $user');
 
     return Scaffold(
