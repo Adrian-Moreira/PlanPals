@@ -1,5 +1,4 @@
 import 'dart:convert'; // Import for JSON encoding/decoding
-import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/location_model.dart';
@@ -109,7 +108,8 @@ class PlannerService {
   Future<void> addDestination(String plannerId, Destination destination) async {
     try {
       await _apiService.post(
-        '${Urls.travelPlanner}/$plannerId/destination', destination.toJson(),
+        '${Urls.travelPlanner}/$plannerId/destination',
+        destination.toJson(),
       );
     } catch (e) {
       throw Exception('Failed to add destination: $e');
@@ -120,7 +120,8 @@ class PlannerService {
   Future<void> addTransport(String plannerId, Transport transport) async {
     try {
       await _apiService.post(
-        '${Urls.travelPlanner}/$plannerId/transportation', transport.toJson(),
+        '${Urls.travelPlanner}/$plannerId/transportation',
+        transport.toJson(),
       );
     } catch (e) {
       throw Exception('Failed to add transportation: $e');

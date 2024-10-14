@@ -1,11 +1,9 @@
-import 'package:flutter/foundation.dart';
-
 class Destination {
   final String destinationId; // Unique identifier for the destination
-  final String plannerId;      // ID of the associated planner
-  final String name;           // Name of the destination
-  final DateTime startDate;    // Start date of the destination
-  final DateTime endDate;      // End date of the destination
+  final String plannerId; // ID of the associated planner
+  final String name; // Name of the destination
+  final DateTime startDate; // Start date of the destination
+  final DateTime endDate; // End date of the destination
   final List<String> activities; // List of associated activity IDs
   final List<String> accommodations; // List of associated accommodation IDs
 
@@ -40,7 +38,7 @@ class Destination {
       'plannerId': plannerId,
       'name': name,
       'startDate': startDate.toIso8601String(), // Convert DateTime to String
-      'endDate': endDate.toIso8601String(),     // Convert DateTime to String
+      'endDate': endDate.toIso8601String(), // Convert DateTime to String
       'activities': activities,
       'accommodations': accommodations,
     };

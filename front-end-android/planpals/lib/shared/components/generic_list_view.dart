@@ -35,7 +35,7 @@ class GenericListView<T> extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(headerIcon, size: 35),
-                    SizedBox(width: 15),
+                    const SizedBox(width: 15),
                     Text(headerTitle,
                         style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.bold)),
@@ -63,7 +63,7 @@ class GenericListView<T> extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(headerIcon, size: 35),
-                SizedBox(width: 15),
+                const SizedBox(width: 15),
                 Text(headerTitle,
                     style: const TextStyle(
                         fontSize: 25, fontWeight: FontWeight.bold)),

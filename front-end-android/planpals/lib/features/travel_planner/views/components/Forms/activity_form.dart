@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
-import 'package:planpals/features/travel_planner/validators/activity_validator.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
 
 class SimpleActivityForm extends StatefulWidget {
@@ -83,7 +82,8 @@ class _SimpleActivityFormState extends State<SimpleActivityForm> {
 
                     // Create an Activity object
                     final activity = Activity(
-                      activityId: '123', // Placeholder ID, you may want to generate or fetch this
+                      activityId:
+                          '123', // Placeholder ID, you may want to generate or fetch this
                       name: _activityNameController.text,
                       date: _selectedDate!.toIso8601String().split('T')[0],
                       time: _selectedDate!.toIso8601String().split('T')[1],
