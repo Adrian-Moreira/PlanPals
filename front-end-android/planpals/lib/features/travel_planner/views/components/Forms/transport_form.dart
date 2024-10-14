@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/db/mock_db.dart';
-import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:pp_service_kit/pp_service_kit.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/features/travel_planner/validators/transport_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
@@ -10,7 +10,10 @@ import 'package:provider/provider.dart';
 class TransportForm extends StatefulWidget {
   final String plannerId;
 
-  const TransportForm({super.key, required this.plannerId,});
+  const TransportForm({
+    super.key,
+    required this.plannerId,
+  });
 
   @override
   _TransportFormState createState() => _TransportFormState();
@@ -40,11 +43,11 @@ class _TransportFormState extends State<TransportForm> {
           key: _formKey,
           child: ListView(
             children: [
-
               // Arrival Airport Field
               TextFormField(
                 controller: _typeController,
-                decoration: const InputDecoration(labelText: 'Type of transportation'),
+                decoration:
+                    const InputDecoration(labelText: 'Type of transportation'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the type';
@@ -58,7 +61,8 @@ class _TransportFormState extends State<TransportForm> {
               // Transport Number Field
               TextFormField(
                 controller: _detailsController,
-                decoration: const InputDecoration(labelText: 'Transportation Details'),
+                decoration:
+                    const InputDecoration(labelText: 'Transportation Details'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the transportation details';
@@ -115,15 +119,15 @@ class _TransportFormState extends State<TransportForm> {
 
                     // Create a Transport object
                     final Transport newTransport = Transport(
-                      transportationId: '', 
-                      plannerId: '', 
-                      type: _typeController.text, 
-                      details: _detailsController.text, 
-                      departureTime: _departureDateTime!, 
-                      arrivalTime: _arrivalDateTime!
-                    );
+                        transportationId: '',
+                        plannerId: '',
+                        type: _typeController.text,
+                        details: _detailsController.text,
+                        departureTime: _departureDateTime!,
+                        arrivalTime: _arrivalDateTime!);
 
-                    Provider.of<PlannerViewModel>(context).addTransport(plannerId, newTransport);
+                    Provider.of<PlannerViewModel>(context)
+                        .addTransport(plannerId, newTransport);
 
                     // Close the form screen
                     Navigator.pop(context);

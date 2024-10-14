@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:planpals/features/travel_planner/services/planner_service.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
-import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:pp_service_kit/pp_service_kit.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/views/planner_details_view.dart';
 
@@ -29,7 +29,8 @@ class _PlannerFormState extends State<PlannerForm> {
     // final user = Provider.of<UserViewModel>(context).currentUser;
 
     PlannerService plannerService = PlannerService();
-    User user = User(id: '123', userName: 'bobby');
+    User user =
+        User(id: '123', userName: 'bobby', preferredName: 'brobert burberrian');
 
     // return plannerViewModel.isLoading
     //     ? const LoadingScreen()

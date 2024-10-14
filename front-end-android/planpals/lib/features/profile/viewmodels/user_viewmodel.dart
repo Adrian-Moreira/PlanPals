@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/features/profile/services/user_service.dart';
-import '../models/user_model.dart'; // Import your user model
+import 'package:planpals/shared/constants/constants.dart';
+import 'package:pp_service_kit/pp_service_kit.dart';
 
 class UserViewModel extends ChangeNotifier {
-  final UserService _userService = UserService();
+  final UserService _userService =
+      UserService(ApiClient(baseUrl: Urls.baseUrl));
 
   User? _user; // Cached user data
   bool _isLoading = false; // Loading state
@@ -20,7 +21,8 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners(); // Notify listeners for UI update
 
     try {
-      _user = await _userService.fetchUserById(userId); // Fetch user from repository
+      _user = await _userService
+          .getUserByUserName(userId); // Fetch user from repository
     } catch (error) {
       _errorMessage = error.toString(); // Set error message
     } finally {

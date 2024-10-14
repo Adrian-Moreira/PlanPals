@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/db/mock_db.dart';
-import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:pp_service_kit/pp_service_kit.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/destination_form.dart';
