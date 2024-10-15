@@ -19,14 +19,14 @@ class DestinationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-          title: Text(destination.name),
+          title: Text(destination.name, style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  'Arrival: ${DateTimeFormat.formatDateTime(destination.startDate)}'),
+                  'Departure: ${DateTimeFormat.formatDateTime(destination.startDate)}'),
               Text(
-                  'Departure: ${DateTimeFormat.formatDateTime(destination.endDate)}'),
+                  'Arrival: ${DateTimeFormat.formatDateTime(destination.endDate)}'),
             ],
           ),
           trailing: functional

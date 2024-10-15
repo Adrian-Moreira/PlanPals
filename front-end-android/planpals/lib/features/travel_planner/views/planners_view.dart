@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/db/mock_db.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
-import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/planner_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/planner_card.dart';
@@ -11,6 +9,8 @@ import 'package:planpals/shared/components/navigator_bar.dart';
 import 'package:provider/provider.dart';
 
 class PlannersView extends StatefulWidget {
+  const PlannersView({super.key});
+
   @override
   _PlannersViewState createState() => _PlannersViewState();
 }
@@ -31,16 +31,14 @@ class _PlannersViewState extends State<PlannersView> {
   @override
   Widget build(BuildContext context) {
     PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
-    User? user = Provider.of<UserViewModel>(context).currentUser;
-    // If you want to navigate to login when user is null:
 
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (user == null) {
-        Navigator.pushReplacementNamed(context, '/login');
-      }
-    });
+    return plannerViewModel.isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : _buildPlannerList(context);
+  }
 
-    print('PLANNERSVIEW: USER: $user');
+  Widget _buildPlannerList(BuildContext context) {
+    PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
 
     return Scaffold(
       appBar: const NavigatorAppBar(title: "Travel Planners"),

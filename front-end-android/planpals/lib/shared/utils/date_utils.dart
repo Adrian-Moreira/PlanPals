@@ -3,13 +3,13 @@ import 'package:intl/intl.dart';
 
 class DateTimeFormat {
   static String formatDateTime(DateTime dateTime) {
-    DateFormat formatter = DateFormat('MMM d, h:mm a');
+    DateFormat formatter = DateFormat('MMMM d, h:mm a');
     String formatted = formatter.format(dateTime);
     return formatted.trim();
   }
 
   static String formatDate(DateTime datetime) {
-    DateFormat formatter = DateFormat('MMM d');
+    DateFormat formatter = DateFormat('MMMM d');
     String formatted = formatter.format(datetime);
     return formatted.trim();
   }
@@ -17,6 +17,15 @@ class DateTimeFormat {
   static String formatTime(DateTime datetime) {
     DateFormat formatter = DateFormat('h:mm a');
     String formatted = formatter.format(datetime);
+    return formatted.trim();
+  }
+}
+
+class DateTimeToIso {
+
+  static String formatDate(DateTime dateTime) {
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(dateTime);
     return formatted.trim();
   }
 

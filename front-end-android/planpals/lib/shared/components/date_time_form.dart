@@ -21,8 +21,11 @@ class DateTimeForm extends StatelessWidget {
         DateTime? pickedDate =
             await DateTimeSelector.selectDate(context, initialDate);
         if (pickedDate != null) {
-          TimeOfDay? pickedTime = await DateTimeSelector.selectTime(
-              context, TimeOfDay.fromDateTime(initialDate ?? DateTime.now()));
+          TimeOfDay? pickedTime = await showTimePicker(
+              context: context, 
+              initialTime: TimeOfDay.fromDateTime(initialDate ?? DateTime.now()),
+              initialEntryMode: TimePickerEntryMode.input,
+              );
           if (pickedTime != null) {
             final selectedDateTime =
                 DateTimeSelector.combineDateTime(pickedDate, pickedTime);

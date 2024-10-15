@@ -29,8 +29,8 @@ class SignUpPage extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 40.0),
                   child: Image.asset(
                     'assets/images/logo.jpg',
-                    width: 100,
-                    height: 100,
+                    width: 150,
+                    height: 150,
                   ),
                 ),
                 // Username Field
@@ -135,7 +135,7 @@ class SignUpPage extends StatelessWidget {
                   onPressed: () {
                     // Navigate to login page
                     print('Navigate to login');
-                    Navigator.pushNamed(context, '/login');
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: const Text('Already have an account? Login'),
                 ),

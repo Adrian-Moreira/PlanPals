@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/db/mock_db.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
+import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/features/travel_planner/validators/transport_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
@@ -8,9 +9,9 @@ import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
 class TransportForm extends StatefulWidget {
-  final String plannerId;
+  final Planner planner;
 
-  const TransportForm({super.key, required this.plannerId,});
+  const TransportForm({super.key, required this.planner});
 
   @override
   _TransportFormState createState() => _TransportFormState();
@@ -19,8 +20,6 @@ class TransportForm extends StatefulWidget {
 class _TransportFormState extends State<TransportForm> {
   final _formKey = GlobalKey<FormState>();
 
-  User user = MockDataBase.user;
-
   final TextEditingController _typeController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
   DateTime? _departureDateTime;
@@ -28,7 +27,11 @@ class _TransportFormState extends State<TransportForm> {
 
   @override
   Widget build(BuildContext context) {
-    final String plannerId = widget.plannerId;
+    final PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
+    final User? user = Provider.of<UserViewModel>(context).currentUser;
+
+    final Planner planner = widget.planner;
+    final String plannerId = planner.plannerId;
 
     return Scaffold(
       appBar: AppBar(
@@ -99,7 +102,7 @@ class _TransportFormState extends State<TransportForm> {
 
               // Submit Button
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState?.validate() == true) {
                     // Validate custom date logic
                     final dateError = TransportValidator.validateDates(
@@ -114,16 +117,20 @@ class _TransportFormState extends State<TransportForm> {
                     }
 
                     // Create a Transport object
-                    final Transport newTransport = Transport(
-                      transportationId: '', 
-                      plannerId: '', 
-                      type: _typeController.text, 
-                      details: _detailsController.text, 
-                      departureTime: _departureDateTime!, 
-                      arrivalTime: _arrivalDateTime!
+                    Transport newTransport = Transport(
+                      createdBy: user!.id,
+                      type: _typeController.text,
+                      details: _detailsController.text,
+                      departureTime: _departureDateTime!.toUtc(),
+                      arrivalTime: _arrivalDateTime!.toUtc(), 
+                      plannerId: plannerId, 
+                      id: '', 
+                      vehicleId: '',
                     );
 
-                    Provider.of<PlannerViewModel>(context).addTransport(plannerId, newTransport);
+                    newTransport = await plannerViewModel.addTransport(plannerId, newTransport);
+
+                    planner.transportations.add(newTransport.id); // Add new transport's ID to planner
 
                     // Close the form screen
                     Navigator.pop(context);

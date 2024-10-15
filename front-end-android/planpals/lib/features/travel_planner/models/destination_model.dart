@@ -1,6 +1,8 @@
-import 'package:flutter/foundation.dart';
+
+import 'package:planpals/shared/utils/date_utils.dart';
 
 class Destination {
+  final String createdBy;      // ID of the user who created the destination
   final String destinationId; // Unique identifier for the destination
   final String plannerId;      // ID of the associated planner
   final String name;           // Name of the destination
@@ -11,6 +13,7 @@ class Destination {
 
   // Constructor
   Destination({
+    required this.createdBy,
     required this.destinationId,
     required this.plannerId,
     required this.name,
@@ -23,26 +26,39 @@ class Destination {
   // Factory method to create a Destination from JSON
   factory Destination.fromJson(Map<String, dynamic> json) {
     return Destination(
-      destinationId: json['destinationId'],
-      plannerId: json['plannerId'],
-      name: json['name'],
+      createdBy: json['createdBy'] ?? '',
+      destinationId: json['destinationId'] ?? '',
+      plannerId: json['plannerId'] ?? '',
+      name: json['name'] ?? '',
       startDate: DateTime.parse(json['startDate']),
       endDate: DateTime.parse(json['endDate']),
-      activities: List<String>.from(json['activities']),
-      accommodations: List<String>.from(json['accommodations']),
+      activities: List<String>.from(json['activities'] ?? []),
+      accommodations: List<String>.from(json['accommodations'] ?? []),
     );
   }
 
   // Method to convert a Destination to JSON
   Map<String, dynamic> toJson() {
     return {
+      'createdBy': createdBy,
       'destinationId': destinationId,
       'plannerId': plannerId,
       'name': name,
-      'startDate': startDate.toIso8601String(), // Convert DateTime to String
-      'endDate': endDate.toIso8601String(),     // Convert DateTime to String
+      'startDate': DateTimeToIso.formatToUtcIso(startDate), // Convert DateTime to String
+      'endDate': DateTimeToIso.formatToUtcIso(endDate),     // Convert DateTime to String
       'activities': activities,
       'accommodations': accommodations,
     };
+  }
+
+  @override
+  String toString() {
+    return 'Destination: $name\n'
+           'ID: $destinationId\n'
+           'Planner ID: $plannerId\n'
+           'Start Date: ${startDate.toLocal()}\n'
+           'End Date: ${endDate.toLocal()}\n'
+           'Activities: ${activities.isNotEmpty ? activities.join(', ') : 'None'}\n'
+           'Accommodations: ${accommodations.isNotEmpty ? accommodations.join(', ') : 'None'}';
   }
 }

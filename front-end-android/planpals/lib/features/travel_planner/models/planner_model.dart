@@ -45,8 +45,8 @@ class Planner {
   Map<String, dynamic> toJson() {
     return {
       'createdBy': createdBy,
-      'startDate': DateTimeFormat.formatToUtcIso(startDate),
-      'endDate': DateTimeFormat.formatToUtcIso(endDate),
+      'startDate': DateTimeToIso.formatToUtcIso(startDate),
+      'endDate': DateTimeToIso.formatToUtcIso(endDate),
       'name': name,
       'description': description,
       'roUsers': roUsers,

@@ -119,20 +119,23 @@ class _PlannerFormState extends State<PlannerForm> {
                         return;
                       }
 
-                      Planner planner = Planner(
+                      // Set description if empty
+                      _descriptionController.text = _descriptionController.text == '' ? "No Description" : _descriptionController.text;
+
+                      Planner newPlanner = Planner(
                           plannerId: '',
                           createdBy: user!.id,
                           startDate: _startDate!,
                           endDate: _endDate!,
                           name: _nameController.text,
                           description: _descriptionController.text,
-                          roUsers: [user.id],
+                          roUsers: [],
                           rwUsers: [user.id],
                           destinations: [],
                           transportations: []);
 
                       try {
-                        planner = await viewModel.addPlanner(planner);
+                        newPlanner = await viewModel.addPlanner(newPlanner);
                       } catch (e) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -143,7 +146,7 @@ class _PlannerFormState extends State<PlannerForm> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              PlannerDetailsView(travelPlanner: planner),
+                              PlannerDetailsView(travelPlanner: newPlanner),
                         ),
                       );
                     },

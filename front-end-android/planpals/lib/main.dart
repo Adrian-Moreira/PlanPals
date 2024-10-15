@@ -36,18 +36,21 @@ class MyApp extends StatelessWidget {
       ],
 
       child: SafeArea(
-        child: MaterialApp(
-          title: 'Travel Planner',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: MaterialApp(
+            title: 'Travel Planner',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            initialRoute: '/login', // Set the initial route to login
+            routes: {
+              '/home': (context) => HomePage(),
+              '/login': (context) => LoginPage(),
+              '/signup': (context) => SignUpPage(),
+              '/planners': (context) => const PlannersView(),
+            },
           ),
-          initialRoute: '/login', // Set the initial route to login
-          routes: {
-            '/home': (context) => HomePage(),
-            '/login': (context) => LoginPage(),
-            '/signup': (context) => SignUpPage(),
-            '/planners': (context) => PlannersView(),
-          },
         ),
       ),
     );

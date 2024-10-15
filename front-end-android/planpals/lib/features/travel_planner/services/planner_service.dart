@@ -1,23 +1,19 @@
 import 'dart:convert'; // Import for JSON encoding/decoding
-import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/location_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/shared/network/api_service.dart'; // api_service handles HTTP requests
-import 'package:planpals/shared/constants/constants.dart';
 import '../models/planner_model.dart';
 
 class PlannerService {
   final ApiService _apiService = ApiService();
-  String? _errorMessage;
 
   // Fetch the entire travel planner (flights, accommodations, activities)
   Future<List<Planner>> fetchAllPlanners() async {
     try {
       final response = await _apiService.get('/planner');
       final List<dynamic> jsonList = jsonDecode(response.body);
-      print('FETCHING:${response.body}');
 
       // Convert the JSON list into a List<Planner>
       return jsonList.map((json) => Planner.fromJson(json)).toList();
@@ -41,10 +37,10 @@ class PlannerService {
   }
 
   // Fetch all transportationis by planner ID
-  Future<List<Transport>> fetchAllTransports(String plannerId) async {
+  Future<List<Transport>> fetchAllTransportsByUserId(String plannerId, String userId) async {
     try {
       final response =
-          await _apiService.get('/planner/$plannerId/transportation');
+          await _apiService.get('/planner/$plannerId/transportation?userId=$userId');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => Transport.fromJson(json)).toList();
     } catch (e) {
@@ -54,9 +50,9 @@ class PlannerService {
   }
 
   // Fetch all destinations by planner ID
-  Future<List<Destination>> fetchAllDestinations(String plannerId) async {
+  Future<List<Destination>> fetchAllDestinationsByUserId(String plannerId, String userId) async {
     try {
-      final response = await _apiService.get('/planner/$plannerId/destination');
+      final response = await _apiService.get('/planner/$plannerId/destination?userId=$userId');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => Destination.fromJson(json)).toList();
     } catch (e) {
@@ -96,25 +92,19 @@ class PlannerService {
   // Add a new planner
   Future<Planner> addPlanner(Planner planner) async {
     try {
-      print('PLANNERSERVICE: ADDING PLANNER: $planner');
       final response = await _apiService.post('/planner', planner.toJson());
-      print('PLANNERSERVICE ResponseStatusCode: ${response.statusCode}');
-      print('PLANNERSERVICE Response: ${response.body}');
 
       if (response.statusCode != 201) {
         throw Exception('Failed to create the travel planner.');
       }
 
       final responseBody = jsonDecode(response.body);
-      print("PLANNERSERVICE: $responseBody");
       Planner newPlanner = Planner.fromJson(responseBody['data']);
-      print(newPlanner);
       return newPlanner;
     } catch (e) {
       throw Exception('Failed to create the travel planner: $e');
     }
   }
-
   // Add a new destination to a specific planner
   Future<Destination> addDestination(
       String plannerId, Destination destination) async {
@@ -127,6 +117,7 @@ class PlannerService {
       final responseBody = jsonDecode(response.body);
       return Destination.fromJson(responseBody['data']);
     } catch (e) {
+      print('Error: $e');
       throw Exception('Failed to add destination: $e');
     }
   }

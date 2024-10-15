@@ -8,17 +8,19 @@ class ApiService {
   // GET request
   Future<http.Response> get(String endpoint) async {
     final url = Uri.parse('$baseUrl$endpoint');
-
+    final http.Response response;
     try {
-      final response = await http.get(url);
+      response = await http.get(url);
 
       if (response.statusCode == 200) {
+        print("SUCCESS: ${response.body}");
         return response;
       } else {
+        print(response.body);
         throw Exception(
             'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
-    } on Exception catch (error) {
+    } catch (error) {
       throw Exception('Failed to load data: $error');
     }
   }

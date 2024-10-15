@@ -30,6 +30,8 @@ class ErrorMessage {
 
   static var nullPlanner = "No Travel Planner Available.";
 
+  static var nullUser;
+
 }
 
 class EndPoints {
