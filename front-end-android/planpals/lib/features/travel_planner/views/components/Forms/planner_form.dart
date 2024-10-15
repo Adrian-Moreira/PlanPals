@@ -3,7 +3,6 @@ import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
-import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/views/planner_details_view.dart';
 import 'package:provider/provider.dart';

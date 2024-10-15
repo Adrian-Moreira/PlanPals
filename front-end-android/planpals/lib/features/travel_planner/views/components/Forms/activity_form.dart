@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
-import 'package:planpals/features/travel_planner/validators/activity_validator.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
 
 class SimpleActivityForm extends StatefulWidget {

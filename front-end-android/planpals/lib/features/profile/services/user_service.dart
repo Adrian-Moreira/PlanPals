@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:planpals/shared/constants/constants.dart';
 import 'package:planpals/shared/network/api_service.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 
