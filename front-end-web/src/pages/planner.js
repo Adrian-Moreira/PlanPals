@@ -189,7 +189,7 @@ function Planner() {
         };
 
         fetchAccommodations();
-    }, [plannerId]);
+    }, [plannerId,destinations]);
 
     useEffect(() => {
         const fetchActivities = async () => {
@@ -207,7 +207,7 @@ function Planner() {
         };
 
         fetchActivities();
-    }, [plannerId]);
+    }, [plannerId,destinations]);
 
     return (
         <div className="Page-color">
