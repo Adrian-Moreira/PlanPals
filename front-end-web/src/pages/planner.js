@@ -13,6 +13,7 @@ import { BsFillPlusCircleFill } from "react-icons/bs";
 import { BsPencilFill } from "react-icons/bs";
 import { BsTrashFill } from "react-icons/bs";
 import { BsChatFill } from "react-icons/bs";
+import { BsFillPinMapFill } from "react-icons/bs";
 
 // const planner = 
 //     {
@@ -74,15 +75,15 @@ import { BsChatFill } from "react-icons/bs";
 //       }
 // ];
 
-const locations = [
-    {
-        "locationId": "loc001",
-        "activityId": "activity001",
-        "createdBy": "user123",
-        "name": "Prado Museum",
-        "address": "C. de Ruiz de Alarcón, 23, 28014 Madrid"
-      }
-];
+// const locations = [
+//     {
+//         "locationId": "loc001",
+//         "activityId": "activity001",
+//         "createdBy": "user123",
+//         "name": "Prado Museum",
+//         "address": "C. de Ruiz de Alarcón, 23, 28014 Madrid"
+//       }
+// ];
 
 // const votes = [
 //     {
@@ -93,14 +94,14 @@ const locations = [
 //       }
 // ];
 
-const comments = [
-    {
-        "commentId": "comment001",
-        "activityId": "activity001",
-        "createdBy": "user456",
-        "content": "Can't wait to visit!"
-      }
-];
+// const comments = [
+//     {
+//         "commentId": "comment001",
+//         "activityId": "activity001",
+//         "createdBy": "user456",
+//         "content": "Can't wait to visit!"
+//       }
+// ];
 
 function Planner() {
     const { plannerId, access } = useParams();
@@ -113,8 +114,8 @@ function Planner() {
     const [accommodations, setAccommodations] = useState([]);
     const [activities, setActivities] = useState([]);
 
-    // const [locations, setLocations] = useState([]);
-    // const [comments, setComments] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [comments, setComments] = useState([]);
     // const [votes, setVotes] = useState([]);
 
     useEffect(() => {
@@ -135,7 +136,7 @@ function Planner() {
         };
 
         fetchPlanners();
-    }, [userId]);
+    }, [userId,plannerId]);
 
     useEffect(() => {
         const fetchDestinations = async () => {
@@ -208,6 +209,54 @@ function Planner() {
 
         fetchActivities();
     }, [plannerId,destinations]);
+
+    useEffect(() => {
+        activities.forEach(activity => {
+            const fetchLocations = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${destinations[0].destinationId}/activity/${activity.activityId}/location`);
+                    console.log(response.data); // Log the response data to check structure
+                    if (response.data.success) {
+                        setLocations(prevLocations => ({
+                            ...prevLocations,
+                            [activity.activityId]: response.data.data, // Assuming data is a list of locations
+                        }));
+                    } else {
+                        console.error("Failed to fetch locations:", response.data.message);
+                    }
+                } catch (error) {
+                    console.error("Error fetching locations:", error);
+                }
+
+            };
+        
+            fetchLocations();
+        })
+    }, [plannerId,destinations,activities]);
+
+    useEffect(() => {
+        activities.forEach(activity => {
+            const fetchComments = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${destinations[0].destinationId}/activity/${activity.activityId}/comment`);
+                    console.log(response.data); // Log the response data to check structure
+                    if (response.data.success) {
+                        setComments(prevComments => ({
+                            ...prevComments,
+                            [activity.activityId]: response.data.data, // Assuming data is a list of locations
+                        }));
+                    } else {
+                        console.error("Failed to fetch comments:", response.data.message);
+                    }
+                } catch (error) {
+                    console.error("Error fetching comments:", error);
+                }
+
+            };
+        
+            fetchComments();
+        })
+    }, [plannerId,destinations,activities]);
 
     return (
         <div className="Page-color">
@@ -307,13 +356,20 @@ function Planner() {
                         <div className="Planner-item">{activity.time}</div>
                         
                         <p/>
-                        Locations:
-                        {locations.map((location) => (
-                            <div className="List-item"  key={location.locationId}>
-                                {location.name}
-                                <div className="Planner-item">{location.address}</div>
-                            </div>
-                        ))}
+
+                        <div className="List-header">
+                            <BsFillPinMapFill /> Locations:
+                        </div>
+                        {locations[activity.activityId] ? (
+                            locations[activity.activityId].map(location => (
+                                <div className="List-item"  key={location.locationId}>
+                                    {location.name}
+                                    <div className="Planner-item">{location.address}</div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="List-item">Loading locations...</div>
+                        )}
                         {!isReadOnly &&(
                             <div>
                                 <button className="Icon-button" disabled><BsFillPlusCircleFill /></button >
@@ -325,12 +381,16 @@ function Planner() {
                         <div className="List-header">
                             <BsChatFill /> Comments
                         </div>
-                        {comments.map((comment) => (
-                            <div className="List-item"  key={comment.commentId}>
-                                {comment.createdBy}
-                                <div className="Planner-item">{comment.content}</div>
-                            </div>
-                        ))}
+                        {comments[activity.activityId] ? (
+                            comments[activity.activityId].map(comment => (
+                                <div className="List-item"  key={comment.commentId}>
+                                    {comment.createdBy}
+                                    <div className="Planner-item">{comment.content}</div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="List-item">Loading comments...</div>
+                        )}
                         {!isReadOnly &&(
                             <div>
                                 <button className="Icon-button" disabled><BsFillPlusCircleFill /></button >
