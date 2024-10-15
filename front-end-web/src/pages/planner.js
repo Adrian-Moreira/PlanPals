@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../AuthContext'; // Import your Auth context to get user ID
+import axios from "axios"; // Import axios for API calls
 import { BiSolidPlane } from "react-icons/bi";
 import { BiSolidBed } from "react-icons/bi";
 import { BiCalendarEvent } from "react-icons/bi";
@@ -12,66 +14,65 @@ import { BsPencilFill } from "react-icons/bs";
 import { BsTrashFill } from "react-icons/bs";
 import { BsChatFill } from "react-icons/bs";
 
-const planner = 
-    {
-        "plannerId": "5",
-        "createdBy": "user123",
-        "startDate": "2023-10-01T00:00:00Z",
-        "endDate": "2023-10-10T00:00:00Z",
-        "name": "Trip to Spain",
-        "description": "Exploring Barcelona and Madrid",
-        "roUsers": ["user456"],
-        "rwUsers": ["user789"],
-        "destinations": ["dest001"],
-        "transportations": ["trans001"]
-      };
+// const planner = 
+//     {
+//         "plannerId": "5",
+//         "createdBy": "user123",
+//         "startDate": "2023-10-01T00:00:00Z",
+//         "endDate": "2023-10-10T00:00:00Z",
+//         "name": "Trip to Spain",
+//         "description": "Exploring Barcelona and Madrid",
+//         "roUsers": ["user456"],
+//         "rwUsers": ["user789"],
+//         "destinations": ["dest001"],
+//         "transportations": ["trans001"]
+//       };
 
-const destinations = [
-    {
-        "destinationId": "dest001",
-        "plannerId": "planner001",
-        "name": "Madrid",
-        "startDate": "2023-10-01",
-        "endDate": "2023-10-05",
-        "activities": ["activity001"],
-        "accommodations": ["accom001"]
-      }
-];
+// const destinations = 
+//     {
+//         "destinationId": "dest001",
+//         "plannerId": "planner001",
+//         "name": "Madrid",
+//         "startDate": "2023-10-01",
+//         "endDate": "2023-10-05",
+//         "activities": ["activity001"],
+//         "accommodations": ["accom001"]
+//       };
 
-const transportation = [
-    {
-        "transportationId": "trans001",
-        "plannerId": "planner001",
-        "type": "Flight",
-        "details": "Flight from NYC to Madrid",
-        "departureTime": "2023-10-01T08:00:00Z",
-        "arrivalTime": "2023-10-01T20:00:00Z"
-      }
-];
+// const transportation = [
+//     {
+//         "transportationId": "trans001",
+//         "plannerId": "planner001",
+//         "type": "Flight",
+//         "details": "Flight from NYC to Madrid",
+//         "departureTime": "2023-10-01T08:00:00Z",
+//         "arrivalTime": "2023-10-01T20:00:00Z"
+//       }
+// ];
 
-const accommodations = [
-    {
-        "accommodationId": "accom001",
-        "destinationId": "dest001",
-        "name": "Madrid Hotel",
-        "address": "123 Main St, Madrid",
-        "checkInDate": "2023-10-01",
-        "checkOutDate": "2023-10-05"
-      }
-];
+// const accommodations = [
+//     {
+//         "accommodationId": "accom001",
+//         "destinationId": "dest001",
+//         "name": "Madrid Hotel",
+//         "address": "123 Main St, Madrid",
+//         "checkInDate": "2023-10-01",
+//         "checkOutDate": "2023-10-05"
+//       }
+// ];
 
-const activities = [
-    {
-        "activityId": "activity001",
-        "destinationId": "dest001",
-        "name": "Visit Prado Museum",
-        "date": "2023-10-02",
-        "time": "10:00",
-        "locations": ["loc001"],
-        "votes": ["vote001"],
-        "comments": ["comment001"]
-      }
-];
+// const activities = [
+//     {
+//         "activityId": "activity001",
+//         "destinationId": "dest001",
+//         "name": "Visit Prado Museum",
+//         "date": "2023-10-02",
+//         "time": "10:00",
+//         "locations": ["loc001"],
+//         "votes": ["vote001"],
+//         "comments": ["comment001"]
+//       }
+// ];
 
 const locations = [
     {
@@ -104,23 +105,142 @@ const comments = [
 function Planner() {
     const { plannerId, access } = useParams();
     const isReadOnly = access === "ro";
+    const { userId } = useAuth(); // Get the logged-in user's ID from Auth context
+
+    const [planner, setPlanner] = useState([]);
+    const [destinations, setDestinations] = useState([]);
+    const [transportation, setTransportation] = useState([]);
+    const [accommodations, setAccommodations] = useState([]);
+    const [activities, setActivities] = useState([]);
+
+    // const [locations, setLocations] = useState([]);
+    // const [comments, setComments] = useState([]);
+    // const [votes, setVotes] = useState([]);
+
+    useEffect(() => {
+        const fetchPlanners = async () => {
+            console.log(userId);
+            if (!userId) return; // Exit if userId is not available
+            try {
+                const response = await axios.get(`http://localhost:8080/planner?userId=${userId}`);
+                console.log(response.data); // Log the response data to check structure
+                if (response.data.success) {
+                    setPlanner(response.data.data.find(item => item._id === plannerId)); // Ensure you're using the correct path to access the data
+                } else {
+                    console.error("Failed to fetch planners:", response.data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching planners:", error);
+            }
+        };
+
+        fetchPlanners();
+    }, [userId]);
+
+    useEffect(() => {
+        const fetchDestinations = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/planner/${plannerId}/destination`);
+                console.log(response.data); // Log the response data to check structure
+                if (response.data.success) {
+                    setDestinations(response.data.data); // Ensure you're using the correct path to access the data
+                } else {
+                    console.error("Failed to fetch destination:", response.data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching destination:", error);
+            }
+        };
+
+        fetchDestinations();
+    }, [plannerId]);
+
+    useEffect(() => {
+        const fetchTransportation = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/planner/${plannerId}/transportation`);
+                console.log(response.data); // Log the response data to check structure
+                if (response.data.success) {
+                    setTransportation(response.data.data); // Ensure you're using the correct path to access the data
+                } else {
+                    console.error("Failed to fetch transportation:", response.data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching transportation:", error);
+            }
+        };
+
+        fetchTransportation();
+    }, [plannerId]);
+
+    useEffect(() => {
+        const fetchAccommodations = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${destinations[0].destinationId}/accommodation`);
+                console.log(response.data); // Log the response data to check structure
+                if (response.data.success) {
+                    setAccommodations(response.data.data); // Ensure you're using the correct path to access the data
+                } else {
+                    console.error("Failed to fetch accommodations:", response.data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching accommodations:", error);
+            }
+        };
+
+        fetchAccommodations();
+    }, [plannerId]);
+
+    useEffect(() => {
+        const fetchActivities = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${destinations[0].destinationId}/activity`);
+                console.log(response.data); // Log the response data to check structure
+                if (response.data.success) {
+                    setActivities(response.data.data); // Ensure you're using the correct path to access the data
+                } else {
+                    console.error("Failed to fetch activities:", response.data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching activities:", error);
+            }
+        };
+
+        fetchActivities();
+    }, [plannerId]);
 
     return (
         <div className="Page-color">
-            <header className="Page-header">
-                <p>
-                    {planner.name}
-                </p>
-            
-            </header>
-
             <div className="List">
-                <div className="List-image-header">
-                    {destinations[0].name}
-                </div>
-                <div className="List-subheader">
-                    {destinations[0].startDate} to {destinations[0].endDate}
-                </div>
+            <div className="List-image-header">
+                {planner.name}
+            </div>
+            <div className="List-subheader">
+                {planner.description}
+                <p/>
+                {planner.startDate} to {planner.endDate}
+            </div>
+
+                {destinations && destinations.length > 0 ? (
+                    <div>
+                        <div className="List-image-header">
+                            {destinations[0].name}
+                        </div>
+                        <div className="List-subheader">
+                            {destinations[0].startDate} to {destinations[0].endDate}
+                        </div>
+                    </div>
+                ) : (
+                        <div className="List-image-header">
+                            Add Destination 
+                            {!isReadOnly &&(
+                                <span>
+                                    <button className="Icon-button" disabled><BsFillPlusCircleFill /></button >
+                                </span>
+                            )}
+                    </div>
+                )}
+                
 
                 <p/>
                 <div className="List-header">
@@ -194,6 +314,28 @@ function Planner() {
                                 <div className="Planner-item">{location.address}</div>
                             </div>
                         ))}
+                        {!isReadOnly &&(
+                            <div>
+                                <button className="Icon-button" disabled><BsFillPlusCircleFill /></button >
+                            </div>
+                        )}
+
+                        <p/>
+
+                        <div className="List-header">
+                            <BsChatFill /> Comments
+                        </div>
+                        {comments.map((comment) => (
+                            <div className="List-item"  key={comment.commentId}>
+                                {comment.createdBy}
+                                <div className="Planner-item">{comment.content}</div>
+                            </div>
+                        ))}
+                        {!isReadOnly &&(
+                            <div>
+                                <button className="Icon-button" disabled><BsFillPlusCircleFill /></button >
+                            </div>
+                        )}
 
                         {/* <div className="Planner-vote">
                             Vote Score:
@@ -218,20 +360,6 @@ function Planner() {
                 )}
                 
                 <p/>
-                <div className="List-header">
-                    <BsChatFill /> Comments
-                </div>
-                {comments.map((comment) => (
-                    <div className="List-item"  key={comment.commentId}>
-                        {comment.createdBy}
-                        <div className="Planner-item">{comment.content}</div>
-                    </div>
-                ))}
-                {!isReadOnly &&(
-                    <div>
-                        <button className="Icon-button" disabled><BsFillPlusCircleFill /></button >
-                    </div>
-                )}
 
             </div>
       </div>
