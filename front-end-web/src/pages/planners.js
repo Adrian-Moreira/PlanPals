@@ -113,7 +113,7 @@ const Planners = () => {
                 {plannerList.length > 0 ? (
                     plannerList.map((planner) => (
                         <div key={planner._id}>
-                            <Link className="List-button" to={`/planner/${planner._id}`}>
+                            <Link className="List-button" to={`/planner/rw/${planner._id}`}>
                                 {planner.name}
                             </Link>
                         </div>
