@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "main": "src/app.ts",
-  "bin": "src/app.ts",
+  "bin": "out/app.js",
   "scripts": {
     "build": "tsc",
-    "start": "nodemon out/app.js",
-    "debug": "nodemon --inspect=0.0.0.0:9229 out/app.js",
+    "start": "nodemon",
+    "debug": "nodemon --inspect=0.0.0.0:9229",
     "test": "jest"
   },
   "dependencies": {
