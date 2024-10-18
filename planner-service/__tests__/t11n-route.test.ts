@@ -18,7 +18,7 @@ let testPlanner2: any
 
 let testTransportation1: any
 
-describe('T11n API', () => {
+describe('Planner API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
@@ -161,7 +161,7 @@ describe('T11n API', () => {
     it('should return Not Found', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner2._id.toString()}/transportation?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/transportation?userId=${testUser4._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
