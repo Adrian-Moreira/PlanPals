@@ -1,16 +1,33 @@
-# planpals
-
-A new Flutter project.
-
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+Before you can run this project, make sure you have the following:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter SDK for Android**: [Download the Flutter SDK](https://flutter.dev/docs/get-started/install)
+- **Android Studio**: For running the app on Android devices/emulators.
+  - Install the **Flutter** and **Dart** plugins via Android Studio.
+- **Visual Studio Code** (Optional): You can use VS Code with the Flutter extension for development.
+  - Install the **Flutter** and **Dart** extensions from the VS Code Marketplace.
+- **Android Emulator or Device**: Ensure you have a working Android emulator or a physical device connected.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Step 1: Move to directory
+
+    cd PlanPals/front-end-android/planpals
+
+### Step 2. Install Flutter Dependencies
+
+    flutter pub get
+
+### Step 3. Set Up Android Device / Emulator
+
+    - If you're using an emulator, make sure it's up and running.
+    - If using a physical device, make sure it's connected with USB debugging enabled.
+
+### Step 4. Ensure the Server is Running
+
+    Make sure the backend server is running on your local machine.
+
+### Step 5. Run the App
+
+    flutter run

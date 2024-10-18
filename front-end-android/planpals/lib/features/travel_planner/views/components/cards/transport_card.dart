@@ -19,14 +19,14 @@ class TransportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-          title: Text(transport.type),
+          title: Text(transport.type, style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  'Arrival: ${DateTimeFormat.formatDateTime(transport.departureTime)}'),
+                  'Departure: ${DateTimeFormat.formatDateTime(transport.departureTime)}'),
               Text(
-                  'Departure: ${DateTimeFormat.formatDateTime(transport.arrivalTime)}'),
+                  'Arrival: ${DateTimeFormat.formatDateTime(transport.arrivalTime)}'),
             ],
           ),
           trailing: functional

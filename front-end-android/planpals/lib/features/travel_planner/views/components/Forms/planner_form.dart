@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/features/travel_planner/services/planner_service.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
+import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
-import 'package:pp_service_kit/pp_service_kit.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/views/planner_details_view.dart';
+import 'package:provider/provider.dart';
 
 class PlannerForm extends StatefulWidget {
   const PlannerForm({super.key});
@@ -25,25 +26,8 @@ class _PlannerFormState extends State<PlannerForm> {
   @override
   Widget build(BuildContext context) {
     // Use provider to access data of user currently logged in
-    // final plannerViewModel = Provider.of<PlannerViewModel>(context);
-    // final user = Provider.of<UserViewModel>(context).currentUser;
-
-    PlannerService plannerService = PlannerService();
-    User user =
-        User(id: '123', userName: 'bobby', preferredName: 'brobert burberrian');
-
-    // return plannerViewModel.isLoading
-    //     ? const LoadingScreen()
-    //     : _buildPlannerForm(context, plannerViewModel, user);
-
-    return _buildPlannerForm(context, plannerService, user);
-  }
-
-  Widget _buildPlannerForm(
-      BuildContext context, PlannerService plannerService, User userModel) {
-    // Use provider to access data of user currently logged in
-    final user = userModel;
-    final service = plannerService;
+    final viewModel = Provider.of<PlannerViewModel>(context);
+    final user = Provider.of<UserViewModel>(context).currentUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -134,20 +118,23 @@ class _PlannerFormState extends State<PlannerForm> {
                         return;
                       }
 
-                      Planner planner = Planner(
+                      // Set description if empty
+                      _descriptionController.text = _descriptionController.text == '' ? "No Description" : _descriptionController.text;
+
+                      Planner newPlanner = Planner(
                           plannerId: '',
-                          createdBy: user.id,
+                          createdBy: user!.id,
                           startDate: _startDate!,
                           endDate: _endDate!,
                           name: _nameController.text,
                           description: _descriptionController.text,
-                          roUsers: [user.id],
+                          roUsers: [],
                           rwUsers: [user.id],
                           destinations: [],
                           transportations: []);
 
                       try {
-                        await service.addPlanner(planner);
+                        newPlanner = await viewModel.addPlanner(newPlanner);
                       } catch (e) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -158,7 +145,7 @@ class _PlannerFormState extends State<PlannerForm> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              PlannerDetailsView(travelPlanner: planner),
+                              PlannerDetailsView(travelPlanner: newPlanner),
                         ),
                       );
                     },

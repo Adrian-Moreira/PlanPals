@@ -1,42 +1,58 @@
 class Transport {
-  final String transportationId;  // Unique identifier for the transportation
-  final String plannerId;          // ID of the associated planner
-  final String type;               // Type of transportation (e.g., Flight)
-  final String details;            // Details about the transportation
-  final DateTime departureTime;    // Departure time as DateTime
-  final DateTime arrivalTime;      // Arrival time as DateTime
+  final String createdBy;
+  final String id;           // Unique identifier for the travel item
+  final String plannerId;   // Identifier for the associated planner
+  final String type;        // Type of travel (e.g., Flight)
+  final String details;     // Details of the travel item
+  final String vehicleId;   // Vehicle identifier (e.g., flight number)
+  final DateTime departureTime; // Departure time
+  final DateTime arrivalTime;   // Arrival time
 
-  // Constructor
   Transport({
-    required this.transportationId,
+    required this.createdBy,
+    required this.id,
     required this.plannerId,
     required this.type,
     required this.details,
+    required this.vehicleId,
     required this.departureTime,
     required this.arrivalTime,
   });
 
-  // Factory method to create a Transport instance from JSON
+  // Factory method to create a Transport from JSON
   factory Transport.fromJson(Map<String, dynamic> json) {
     return Transport(
-      transportationId: json['transportationId'],
-      plannerId: json['plannerId'],
-      type: json['type'],
-      details: json['details'],
+      createdBy: json['createdBy'] ?? '',
+      id: json['_id'] ?? '',
+      plannerId: json['plannerId'] ?? '',
+      type: json['type'] ?? '',
+      details: json['details'] ?? '',
+      vehicleId: json['vehicleId'] ?? '',
       departureTime: DateTime.parse(json['departureTime']),
       arrivalTime: DateTime.parse(json['arrivalTime']),
     );
   }
 
-  // Method to convert Transport instance to JSON
+  // Method to convert a Transport to JSON
   Map<String, dynamic> toJson() {
     return {
-      'transportationId': transportationId,
+      'createdBy': createdBy,
+      '_id': id,
       'plannerId': plannerId,
       'type': type,
       'details': details,
+      'vehicleId': vehicleId,
       'departureTime': departureTime.toIso8601String(),
       'arrivalTime': arrivalTime.toIso8601String(),
     };
+  }
+
+  @override
+  String toString() {
+    return 'TravelItem(id: $id, plannerId: $plannerId, type: $type, '
+           'details: $details, vehicleId: $vehicleId, '
+           'departureTime: ${departureTime.toIso8601String()}, '
+           'arrivalTime: ${arrivalTime.toIso8601String()}),'
+           'createdBy: $createdBy';
   }
 }

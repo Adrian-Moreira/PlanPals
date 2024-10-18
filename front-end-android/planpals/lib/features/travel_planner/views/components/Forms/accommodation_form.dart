@@ -108,8 +108,8 @@ class _AccommodationFormState extends State<AccommodationForm> {
                       accommodationId: '',
                       name: _nameController.text,
                       address: _addressController.text,
-                      checkInDate: _checkIn!.toIso8601String().split('T')[0],
-                      checkOutDate: _checkOut!.toIso8601String().split('T')[1], 
+                      checkInDate: _checkIn!,
+                      checkOutDate: _checkOut!, 
                       destinationId: '',
                     );
 

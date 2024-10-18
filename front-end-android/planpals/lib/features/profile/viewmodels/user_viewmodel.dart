@@ -14,22 +14,43 @@ class UserViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading; // Get loading state
   String? get errorMessage => _errorMessage; // Get error message
 
-  // Fetch user details by user ID
-  Future<void> fetchUserDetails(String userId) async {
+  // Fetch user details by userName
+  /// Fetches a user by their username.
+  Future<void> fetchUserByUserName(String userName) async {
     _isLoading = true;
-    _errorMessage = null; // Reset error message
-    notifyListeners(); // Notify listeners for UI update
+    _errorMessage = null;
+    notifyListeners();
 
     try {
-      _user = await _userService
-          .getUserByUserName(userId); // Fetch user from repository
-    } catch (error) {
-      _errorMessage = error.toString(); // Set error message
+      print("USERVIEWMODEL: FETCHING USER: $userName");
+      _user = await _userService.fetchUserByUserName(userName);
+      print('USERVIEWMODEL: FETCHED USER: $_user');
+    } on Exception catch (error) {
+      _errorMessage = error.toString();
     } finally {
-      _isLoading = false; // Loading finished
-      notifyListeners(); // Notify listeners for UI update
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  // Create a function for user login
+  // Add a new destination to the planner
+  Future<void> addUser(User user) async {
+    try {
+      print("USERVIEWMODEL: ADDING USER: $user");
+      // Call the service to add the planner
+      _user = await _userService.addUser(user);
+      print("USERVIEWMODEL: ADDED USER AFTER: $user");
+
+      // Notify listeners about the change in state
+      notifyListeners();
+    } catch (e) {
+      // Handle the exception and throw an error with a meaningful message
+      throw Exception('Failed to add destination: $e');
+    }
+  }
+
+  void logout() {
+    _user = null;
+    notifyListeners();
+  }
 }

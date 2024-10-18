@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
+import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
 class DestinationForm extends StatefulWidget {
-  final String plannerId;
+  final Planner planner;
 
-  const DestinationForm({super.key, required this.plannerId});
+  const DestinationForm({super.key, required this.planner});
 
   @override
   DestinationFormState createState() => DestinationFormState();
@@ -23,7 +26,12 @@ class DestinationFormState extends State<DestinationForm> {
 
   @override
   Widget build(BuildContext context) {
-    final String plannerId = widget.plannerId;
+    final PlannerViewModel plannerViewModel =
+        Provider.of<PlannerViewModel>(context, listen: false);
+    final User? user = Provider.of<UserViewModel>(context).currentUser;
+
+    final Planner planner = widget.planner;
+    final String plannerId = planner.plannerId;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,11 +62,11 @@ class DestinationFormState extends State<DestinationForm> {
               // Start Date field
               DateTimeForm(
                 initialDate: _startDate,
-                labelText: 'Departure Date and Time',
-                placeholder: 'Set Departure Date andTime',
-                dateTimeSelected: (selectedDateTime) {
+                labelText: 'Departure Date',
+                placeholder: 'Set Departure Date',
+                dateTimeSelected: (selectedDate) {
                   setState(() {
-                    _startDate = selectedDateTime;
+                    _startDate = selectedDate;
                   });
                 },
               ),
@@ -68,11 +76,11 @@ class DestinationFormState extends State<DestinationForm> {
               // End Date field
               DateTimeForm(
                 initialDate: _endDate,
-                labelText: 'Arrival Date and Time',
-                placeholder: 'Set Arrival Date and Time',
-                dateTimeSelected: (selectedDateTime) {
+                labelText: 'Arrival Date',
+                placeholder: 'Set Arrival Date',
+                dateTimeSelected: (selectedDate) {
                   setState(() {
-                    _endDate = selectedDateTime;
+                    _endDate = selectedDate;
                   });
                 },
               ),
@@ -81,7 +89,7 @@ class DestinationFormState extends State<DestinationForm> {
 
               // Submit Button
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState?.validate() == true) {
                     // Validate custom date logic
                     final dateError =
@@ -93,17 +101,19 @@ class DestinationFormState extends State<DestinationForm> {
                       return;
                     }
 
-                    final Destination newDestination = Destination(
+                    Destination newDestination = Destination(
+                        createdBy: user!.id,
                         destinationId: '',
-                        plannerId: '',
+                        plannerId: plannerId,
                         name: _nameController.text,
                         startDate: _startDate!,
                         endDate: _endDate!,
                         activities: [],
                         accommodations: []);
 
-                    Provider.of<PlannerViewModel>(context)
-                        .addDestination(plannerId, newDestination);
+                    newDestination = await plannerViewModel.addDestination(plannerId, newDestination);
+                    
+                    planner.destinations.add(newDestination.destinationId); // Add destination ID to planner
 
                     // Close the form screen
                     Navigator.pop(context);

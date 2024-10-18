@@ -7,32 +7,40 @@ class ApiService {
 
   // GET request
   Future<http.Response> get(String endpoint) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+    final http.Response response;
     try {
-      final url = Uri.parse('$baseUrl$endpoint');
-      final response = await http.get(url);
+      response = await http.get(url);
 
-      // Check for successful response
-      _handleResponse(response);
-      return response;
+      if (response.statusCode == 200) {
+        print("SUCCESS: ${response.body}");
+        return response;
+      } else {
+        print(response.body);
+        throw Exception(
+            'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
+      }
     } catch (error) {
       throw Exception('Failed to load data: $error');
     }
   }
 
   // POST request
-  Future<http.Response> post(String endpoint, Map<String, dynamic> data) async {
+  Future<http.Response> post(String endpoint, Map<String, dynamic> jsonData) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+
     try {
-      final url = Uri.parse('$baseUrl$endpoint');
+      print('jsonData: $jsonData');
       final response = await http.post(
         url,
-        body: json.encode(data),
+        body: jsonEncode(jsonData),
         headers: {
           'Content-Type': 'application/json',
         },
       );
 
-      // Check for successful response
       _handleResponse(response);
+
       return response;
     } catch (error) {
       throw Exception('Failed to post data: $error');
@@ -75,8 +83,10 @@ class ApiService {
 
   // Handle HTTP response and throw exceptions for error statuses
   void _handleResponse(http.Response response) {
-    if (response.statusCode != 200) {
-      throw Exception('Error: ${response.statusCode} - ${response.body}');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      // Handle error responses
+      print(response.body);
+      throw Exception('Failed to load data: ${response.statusCode}');
     }
   }
 }
