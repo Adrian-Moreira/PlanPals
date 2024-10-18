@@ -1,4 +1,4 @@
-import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:pp_service_kit/pp_service_kit.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
@@ -47,44 +47,42 @@ class MockDataBase {
     ),
   ];
 
-  static List<Transport> transports = [
-    
-
-  ];
+  static List<Transport> transports = [];
 
   static List<Destination> destinations = [
     Destination(
-    destinationId: 'dest001',
-    plannerId: 'planner001',
-    name: 'Madrid',
-    startDate: DateTime.parse('2023-10-01'),
-    endDate: DateTime.parse('2023-10-05'),
-    activities: ['activity001', 'activity002'],
-    accommodations: ['accom001', 'accom002'],
-  ),
+      destinationId: 'dest001',
+      plannerId: 'planner001',
+      name: 'Madrid',
+      startDate: DateTime.parse('2023-10-01'),
+      endDate: DateTime.parse('2023-10-05'),
+      activities: ['activity001', 'activity002'],
+      accommodations: ['accom001', 'accom002'],
+    ),
 
-  // Instance 2
- Destination(
-    destinationId: 'dest002',
-    plannerId: 'planner002',
-    name: 'Paris',
-    startDate: DateTime.parse('2023-11-10'),
-    endDate: DateTime.parse('2023-11-15'),
-    activities: ['activity003', 'activity004'],
-    accommodations: ['accom003', 'accom004'],
-  ),
+    // Instance 2
+    Destination(
+      destinationId: 'dest002',
+      plannerId: 'planner002',
+      name: 'Paris',
+      startDate: DateTime.parse('2023-11-10'),
+      endDate: DateTime.parse('2023-11-15'),
+      activities: ['activity003', 'activity004'],
+      accommodations: ['accom003', 'accom004'],
+    ),
 
-  // Instance 3
-Destination(
-    destinationId: 'dest003',
-    plannerId: 'planner003',
-    name: 'Tokyo',
-    startDate: DateTime.parse('2024-01-20'),
-    endDate: DateTime.parse('2024-01-25'),
-    activities: ['activity005'],
-    accommodations: ['accom005'],
-  ),
+    // Instance 3
+    Destination(
+      destinationId: 'dest003',
+      plannerId: 'planner003',
+      name: 'Tokyo',
+      startDate: DateTime.parse('2024-01-20'),
+      endDate: DateTime.parse('2024-01-25'),
+      activities: ['activity005'],
+      accommodations: ['accom005'],
+    ),
   ];
 
-  static User user = User(id: '123', userName: 'bobby');
+  static User user =
+      User(id: '123', userName: 'bobby', preferredName: 'brobert burberrian');
 }

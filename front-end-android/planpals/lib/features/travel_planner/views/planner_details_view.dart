@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/db/mock_db.dart';
-import 'package:planpals/features/profile/models/user_model.dart';
-import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
+import 'package:pp_service_kit/pp_service_kit.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
-import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/destination_form.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/transport_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/destination_card.dart';
@@ -15,7 +13,6 @@ import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/invite_user_dialog.dart';
 import 'package:planpals/shared/constants/constants.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
-import 'package:provider/provider.dart';
 
 class PlannerDetailsView extends StatelessWidget {
   final Planner travelPlanner;
@@ -38,27 +35,32 @@ class PlannerDetailsView extends StatelessWidget {
             : _buildPlanner(context, travelPlanner);
   }
 
-  Widget _buildPlanner(
-      BuildContext context, Planner planner) {
-
+  Widget _buildPlanner(BuildContext context, Planner planner) {
     // User? user = Provider.of<UserViewModel>(context).currentUser;
     User user = MockDataBase.user;
     // PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
     // plannerViewModel.fetchAllDestinations(planner.plannerId);
     // plannerViewModel.fetchAllTransports(planner.plannerId);
 
-    List<Transport> transports = [Transport(transportationId: '', plannerId: '', type: 'Flight', details: 'Flight to someehere', departureTime: DateTime.now(), arrivalTime: DateTime.now())];
+    List<Transport> transports = [
+      Transport(
+          transportationId: '',
+          plannerId: '',
+          type: 'Flight',
+          details: 'Flight to someehere',
+          departureTime: DateTime.now(),
+          arrivalTime: DateTime.now())
+    ];
     List<Destination> destinations = MockDataBase.destinations;
-    
+
     // bool functional = travelPlanner.rwUsers.contains(user!.id);
     bool functional = true;
 
     return Scaffold(
       appBar: AppBar(
-        
         actions: <Widget>[
           PopupMenuButton<String>(
-            icon: Icon(Icons.menu),
+            icon: const Icon(Icons.menu),
             onSelected: (String result) {
               // Handle menu item selection
               print('Selected: $result');
@@ -113,7 +115,7 @@ class PlannerDetailsView extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  InviteUserDialog()), // navigate to travel planners
+                                  const InviteUserDialog()), // navigate to travel planners
                         );
                       },
                       icon: const Icon(
@@ -139,8 +141,8 @@ class PlannerDetailsView extends StatelessWidget {
                     ),
                     title: Text(
                         '${travelPlanner.endDate.difference(travelPlanner.startDate).inDays} Days'),
-                    subtitle:
-                        Text('${travelPlanner.destinations.length} destinations'),
+                    subtitle: Text(
+                        '${travelPlanner.destinations.length} destinations'),
                   ),
                   ListTile(
                     leading: Container(
@@ -170,12 +172,10 @@ class PlannerDetailsView extends StatelessWidget {
                     ),
                     onAdd: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DestinationForm(
-                              plannerId: planner.plannerId
-                              )
-                      ));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DestinationForm(
+                                  plannerId: planner.plannerId)));
                     },
                     headerTitle: "Destinations",
                     headerIcon: Icons.landscape,
@@ -199,10 +199,11 @@ class PlannerDetailsView extends StatelessWidget {
                     ),
                     onAdd: () {
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TransportForm(plannerId: travelPlanner.plannerId,)
-                      ));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TransportForm(
+                                    plannerId: travelPlanner.plannerId,
+                                  )));
                     },
                     headerTitle: "Transportations",
                     headerIcon: Icons.emoji_transportation,

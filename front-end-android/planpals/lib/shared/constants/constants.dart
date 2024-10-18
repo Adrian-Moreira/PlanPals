@@ -1,6 +1,6 @@
 class Urls {
-  static const String baseUrl = 'https:localhost';
-  
+  static const String baseUrl = 'http://localhost:8080';
+
   // Travel planner URLs
   static const String travelPlanner = '$baseUrl/planner';
   static const String flights = '$baseUrl/planner/flights';
@@ -9,7 +9,7 @@ class Urls {
 
   // Shopping list URLs
   static const String shoppingList = '$baseUrl/shoppinglist';
-  
+
   // To-do list URLs
   static const String todoList = '$baseUrl/todolist';
 
@@ -17,14 +17,11 @@ class Urls {
   static const String users = '$baseUrl/users';
 }
 
-
 class ErrorMessage {
-
   // Travel planner Error Messages
   static const String nullTravelPlanner = "No Travel Planner Available.";
 
   static var nullPlanner = "No Travel Planner Available.";
-
 }
 
 class EndPoints {

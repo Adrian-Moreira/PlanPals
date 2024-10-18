@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/db/mock_db.dart';
-import 'package:planpals/features/profile/models/user_model.dart';
-import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
@@ -14,10 +11,10 @@ class DestinationForm extends StatefulWidget {
   const DestinationForm({super.key, required this.plannerId});
 
   @override
-  _DestinationFormState createState() => _DestinationFormState();
+  DestinationFormState createState() => DestinationFormState();
 }
 
-class _DestinationFormState extends State<DestinationForm> {
+class DestinationFormState extends State<DestinationForm> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
@@ -26,7 +23,6 @@ class _DestinationFormState extends State<DestinationForm> {
 
   @override
   Widget build(BuildContext context) {
-
     final String plannerId = widget.plannerId;
 
     return Scaffold(
@@ -42,7 +38,8 @@ class _DestinationFormState extends State<DestinationForm> {
               // Destination Number Field
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Destination Name'),
+                decoration:
+                    const InputDecoration(labelText: 'Destination Name'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the destination name';
@@ -87,8 +84,8 @@ class _DestinationFormState extends State<DestinationForm> {
                 onPressed: () {
                   if (_formKey.currentState?.validate() == true) {
                     // Validate custom date logic
-                    final dateError = PlannerValidator.validateDates(
-                        _startDate, _endDate);
+                    final dateError =
+                        PlannerValidator.validateDates(_startDate, _endDate);
                     if (dateError != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(dateError)),
@@ -97,16 +94,16 @@ class _DestinationFormState extends State<DestinationForm> {
                     }
 
                     final Destination newDestination = Destination(
-                      destinationId: '', 
-                      plannerId: '', 
-                      name: _nameController.text, 
-                      startDate: _startDate!, 
-                      endDate: _endDate!, 
-                      activities: [], 
-                      accommodations: []
-                    );
+                        destinationId: '',
+                        plannerId: '',
+                        name: _nameController.text,
+                        startDate: _startDate!,
+                        endDate: _endDate!,
+                        activities: [],
+                        accommodations: []);
 
-                    Provider.of<PlannerViewModel>(context).addDestination(plannerId, newDestination);
+                    Provider.of<PlannerViewModel>(context)
+                        .addDestination(plannerId, newDestination);
 
                     // Close the form screen
                     Navigator.pop(context);

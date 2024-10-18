@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/db/mock_db.dart';
-import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/planner_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/planner_card.dart';
@@ -8,13 +6,12 @@ import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:provider/provider.dart';
 
 class PlannersView extends StatelessWidget {
-  PlannersView({super.key});
+  const PlannersView({super.key});
 
   // final List<Planner> plannerList = MockDataBase.planners;
 
   @override
   Widget build(BuildContext context) {
-
     PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
     // plannerViewModel.fetchPlannersByUserId('507f1f77bcf8cd799439011');
 
@@ -44,9 +41,11 @@ class PlannersView extends StatelessWidget {
             onPressed: () {
               // navigate to the add planner screen
               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const PlannerForm()),  // navigate to travel planners
-                );
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const PlannerForm()), // navigate to travel planners
+              );
             }, // Add button icon
             tooltip: 'Add Travel Planner',
             child: const Icon(Icons.add, size: 50.0),
