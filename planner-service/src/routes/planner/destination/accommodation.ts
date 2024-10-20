@@ -1,17 +1,23 @@
 import express from 'express'
-import {
-  getAccommodationsByDestinationId,
-  createAccommodation,
-  getAccommodationById,
-  updateAccommodation,
-  deleteAccommodation,
-} from '../../../controllers/accommodationController'
+import AccommodationValidator from '../../../controllers/accommodation'
 
 export const accommodationRouter = express.Router({ mergeParams: true })
 
-accommodationRouter.get('/', getAccommodationsByDestinationId)
-accommodationRouter.post('/', createAccommodation)
+accommodationRouter.get(
+  '/',
+  AccommodationValidator.getAccommodationsByDestinationId,
+)
+accommodationRouter.post('/', AccommodationValidator.createAccommodation)
 
-accommodationRouter.get('/:accommodationId', getAccommodationById)
-accommodationRouter.patch('/:accommodationId', updateAccommodation)
-accommodationRouter.delete('/:accommodationId', deleteAccommodation)
+accommodationRouter.get(
+  '/:accommodationId',
+  AccommodationValidator.getAccommodationById,
+)
+accommodationRouter.patch(
+  '/:accommodationId',
+  AccommodationValidator.updateAccommodation,
+)
+accommodationRouter.delete(
+  '/:accommodationId',
+  AccommodationValidator.deleteAccommodation,
+)

@@ -1,22 +1,25 @@
 import express from 'express'
 import { activityRouter } from './activity/activity'
 import { accommodationRouter } from './accommodation'
-import {
-  createDestination,
-  getDestinationsByPlannerId,
-  getDestinationById,
-  updateDestination,
-  deleteDestination,
-} from '../../../controllers/destinationController'
+import DestinationValidator from '../../../controllers/destination'
 
 export const destinationRouter = express.Router({ mergeParams: true })
 
-destinationRouter.get('/', getDestinationsByPlannerId)
-destinationRouter.post('/', createDestination)
+destinationRouter.get('/', DestinationValidator.getDestinationsByPlannerId)
+destinationRouter.post('/', DestinationValidator.createDestination)
 
-destinationRouter.get('/:destinationId', getDestinationById)
-destinationRouter.patch('/:destinationId', updateDestination)
-destinationRouter.delete('/:destinationId', deleteDestination)
+destinationRouter.get(
+  '/:destinationId',
+  DestinationValidator.getDestinationById,
+)
+destinationRouter.patch(
+  '/:destinationId',
+  DestinationValidator.updateDestination,
+)
+destinationRouter.delete(
+  '/:destinationId',
+  DestinationValidator.deleteDestination,
+)
 
 destinationRouter.use('/:destinationId/accommodation', accommodationRouter)
 destinationRouter.use('/:destinationId/activity', activityRouter)

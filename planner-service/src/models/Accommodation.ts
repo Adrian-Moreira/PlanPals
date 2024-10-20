@@ -7,6 +7,11 @@ import { CommentModel } from './Comment'
 
 const AccommodationMongoSchema = new Schema<Accommodation>(
   {
+    destinationId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Destination',
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -70,6 +75,8 @@ AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
 
 export const AccommodationSchema = z.object({
   _id: ObjectIdSchema,
+
+  destinationId: ObjectIdSchema,
 
   createdAt: z.string().datetime(),
   createdBy: ObjectIdSchema,

@@ -1,17 +1,11 @@
 import express from 'express'
-import {
-  createLocation,
-  getLocationsByActivityId,
-  getLocationById,
-  updateLocation,
-  deleteLocation,
-} from '../../../../controllers/locationController'
+import LocationValidator from '../../../../controllers/location'
 
 export const locationRouter = express.Router({ mergeParams: true })
 
-locationRouter.get('/', getLocationsByActivityId)
-locationRouter.post('/', createLocation)
+locationRouter.get('/', LocationValidator.getLocationsByActivityId)
+locationRouter.post('/', LocationValidator.createLocation)
 
-locationRouter.get('/:locationId', getLocationById)
-locationRouter.put('/:locationId', updateLocation)
-locationRouter.delete('/:locationId', deleteLocation)
+locationRouter.get('/:locationId', LocationValidator.getLocationById)
+locationRouter.patch('/:locationId', LocationValidator.updateLocation)
+locationRouter.delete('/:locationId', LocationValidator.deleteLocation)

@@ -1,23 +1,13 @@
 import express from 'express'
-import {
-  createActivity,
-  getActivitiesByDestinationId,
-  getActivityById,
-  updateActivity,
-  deleteActivity,
-} from '../../../../controllers/activityController'
-import { commentRouter } from './comment'
-import { voteRouter } from './vote'
+import ActivityValidator from '../../../../controllers/activity'
 import { locationRouter } from './location'
 export const activityRouter = express.Router({ mergeParams: true })
 
-activityRouter.get('/', getActivitiesByDestinationId)
-activityRouter.post('/', createActivity)
+activityRouter.get('/', ActivityValidator.getActivitiesByDestinationId)
+activityRouter.post('/', ActivityValidator.createActivity)
 
-activityRouter.get('/:activityId', getActivityById)
-activityRouter.patch('/:activityId', updateActivity)
-activityRouter.delete('/:activityId', deleteActivity)
+activityRouter.get('/:activityId', ActivityValidator.getActivityById)
+activityRouter.patch('/:activityId', ActivityValidator.updateActivity)
+activityRouter.delete('/:activityId', ActivityValidator.deleteActivity)
 
 activityRouter.use('/:activityId/location', locationRouter)
-activityRouter.use('/:activityId/vote', voteRouter)
-activityRouter.use('/:activityId/comment', commentRouter)

@@ -8,6 +8,12 @@ export const ObjectIdSchema = z
     message: 'Invalid ObjectId',
   })
 
+export const ObjectIdStringSchema = z
+  .string()
+  .refine((val) => Types.ObjectId.isValid(val), {
+    message: 'Invalid ObjectId',
+  }).transform((val) => new Types.ObjectId(val))
+
 const PlannerMongoSchema = new Schema<Planner>(
   {
     createdBy: {

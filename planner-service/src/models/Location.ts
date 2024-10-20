@@ -79,5 +79,3 @@ export const LocationModel = mongoose.model<Location>(
   LocationMongoSchema,
 )
 export type Location = z.infer<typeof LocationSchema>
-export type ReadOnlyLocation = z.infer<typeof ReadOnlyLocationSchema>
-export type ImmutableLocation = z.infer<typeof ImmutableLocationSchema>
