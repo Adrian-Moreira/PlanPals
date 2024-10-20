@@ -75,7 +75,7 @@ class LoginPage extends StatelessWidget {
                     if (_formKey.currentState?.validate() == true) {
                       // Fetch the user by username and wait for the result
                       await userViewModel
-                          .fetchUserByUserName(_usernameController.text);
+                          .login(_usernameController.text);
 
                       // Check if the user has been fetched successfully
                       if (userViewModel.currentUser != null) {
