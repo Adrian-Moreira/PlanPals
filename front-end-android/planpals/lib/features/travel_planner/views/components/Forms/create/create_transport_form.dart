@@ -8,16 +8,16 @@ import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.da
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
-class TransportForm extends StatefulWidget {
+class CreateTransportForm extends StatefulWidget {
   final Planner planner;
 
-  const TransportForm({super.key, required this.planner});
+  const CreateTransportForm({super.key, required this.planner});
 
   @override
-  _TransportFormState createState() => _TransportFormState();
+  _CreateTransportFormState createState() => _CreateTransportFormState();
 }
 
-class _TransportFormState extends State<TransportForm> {
+class _CreateTransportFormState extends State<CreateTransportForm> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _typeController = TextEditingController();
@@ -105,15 +105,12 @@ class _TransportFormState extends State<TransportForm> {
                 onPressed: () async {
                   if (_formKey.currentState?.validate() == true) {
                     // Validate custom date logic
-                    final dateError = TransportValidator.validateDates(
-                        _departureDateTime, _arrivalDateTime);
+                    String? dateError = TransportValidator.validateDates(_departureDateTime, _arrivalDateTime);
                     if (dateError != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(dateError)),
                       );
                       return;
-
-                      // Handle logic stuffs
                     }
 
                     // Create a Transport object
@@ -128,7 +125,7 @@ class _TransportFormState extends State<TransportForm> {
                       vehicleId: '',
                     );
 
-                    newTransport = await plannerViewModel.addTransport(plannerId, newTransport);
+                    newTransport = await plannerViewModel.addTransport(newTransport);
 
                     planner.transportations.add(newTransport.id); // Add new transport's ID to planner
 
@@ -143,5 +140,12 @@ class _TransportFormState extends State<TransportForm> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _typeController.dispose();
+    _detailsController.dispose();
+    super.dispose();
   }
 }

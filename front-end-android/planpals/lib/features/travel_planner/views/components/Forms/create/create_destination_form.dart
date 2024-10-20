@@ -8,16 +8,16 @@ import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.da
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
-class DestinationForm extends StatefulWidget {
+class CreateDestinationForm extends StatefulWidget {
   final Planner planner;
 
-  const DestinationForm({super.key, required this.planner});
+  const CreateDestinationForm({super.key, required this.planner});
 
   @override
-  _DestinationFormState createState() => _DestinationFormState();
+  _CreateDestinationFormState createState() => _CreateDestinationFormState();
 }
 
-class _DestinationFormState extends State<DestinationForm> {
+class _CreateDestinationFormState extends State<CreateDestinationForm> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
@@ -111,7 +111,7 @@ class _DestinationFormState extends State<DestinationForm> {
                         activities: [],
                         accommodations: []);
 
-                    newDestination = await plannerViewModel.addDestination(plannerId, newDestination);
+                    newDestination = await plannerViewModel.addDestination(newDestination);
                     
                     planner.destinations.add(newDestination.destinationId); // Add destination ID to planner
 
@@ -126,5 +126,11 @@ class _DestinationFormState extends State<DestinationForm> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
   }
 }
