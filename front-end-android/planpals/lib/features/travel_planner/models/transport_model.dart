@@ -1,12 +1,12 @@
 class Transport {
   final String createdBy;
-  final String id;           // Unique identifier for the travel item
-  final String plannerId;   // Identifier for the associated planner
-  final String type;        // Type of travel (e.g., Flight)
-  final String details;     // Details of the travel item
-  final String vehicleId;   // Vehicle identifier (e.g., flight number)
-  final DateTime departureTime; // Departure time
-  final DateTime arrivalTime;   // Arrival time
+  final String id; // Unique identifier for the travel item
+  final String plannerId; // Identifier for the associated planner
+  String type; // Type of travel (e.g., Flight)
+  String details; // Details of the travel item
+  final String vehicleId; // Vehicle identifier (e.g., flight number)
+  DateTime departureTime; // Departure time
+  DateTime arrivalTime; // Arrival time
 
   Transport({
     required this.createdBy,
@@ -50,9 +50,16 @@ class Transport {
   @override
   String toString() {
     return 'TravelItem(id: $id, plannerId: $plannerId, type: $type, '
-           'details: $details, vehicleId: $vehicleId, '
-           'departureTime: ${departureTime.toIso8601String()}, '
-           'arrivalTime: ${arrivalTime.toIso8601String()}),'
-           'createdBy: $createdBy';
+        'details: $details, vehicleId: $vehicleId, '
+        'departureTime: ${departureTime.toIso8601String()}, '
+        'arrivalTime: ${arrivalTime.toIso8601String()}),'
+        'createdBy: $createdBy';
+  }
+
+  void update(Transport updatedTransport) {
+    type = updatedTransport.type;
+    details = updatedTransport.details;
+    departureTime = updatedTransport.departureTime;
+    arrivalTime = updatedTransport.arrivalTime;
   }
 }

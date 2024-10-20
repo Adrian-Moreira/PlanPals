@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/features/travel_planner/validators/transport_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
@@ -38,6 +40,7 @@ class _UpdateTransportFormState extends State<UpdateTransportForm> {
   @override
   Widget build(BuildContext context) {
     final PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
+    final User user = Provider.of<UserViewModel>(context).currentUser!;
     final Transport transport = widget.transport;
 
     return Scaffold(
@@ -121,17 +124,19 @@ class _UpdateTransportFormState extends State<UpdateTransportForm> {
                       return;
                     }
 
-                    // remove transport from provider
-                    plannerViewModel.transports.remove(transport);
-
-                    // update transport
-                    transport.type = _typeController.text;
-                    transport.details = _detailsController.text;
-                    transport.departureTime = _departureDateTime!;
-                    transport.arrivalTime = _arrivalDateTime!;
+                    // Creted an updated transport
+                    Transport updatedTransport = Transport(
+                      createdBy: transport.createdBy, 
+                      id: transport.id, 
+                      plannerId: transport.plannerId, 
+                      type: _typeController.text, 
+                      details: _detailsController.text, 
+                      vehicleId: transport.vehicleId, 
+                      departureTime: _departureDateTime!, 
+                      arrivalTime: _arrivalDateTime!,);
 
                     // request update
-                    plannerViewModel.updateTransport(transport);
+                    plannerViewModel.updateTransport(updatedTransport, user.id);
 
                     // Close the form screen
                     Navigator.pop(context);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/update/update_transport_form.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class TransportCard extends StatelessWidget {
@@ -35,7 +36,13 @@ class TransportCard extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit),
-                      onPressed: onEdit, // Handle the edit logic
+                      onPressed: () {
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(builder: (context) => UpdateTransportForm(transport: transport)));
+                      }, // Handle the edit logic
+                      tooltip: 'Edit',
+                      
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),

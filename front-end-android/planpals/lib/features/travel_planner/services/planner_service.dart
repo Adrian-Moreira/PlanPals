@@ -9,6 +9,10 @@ import '../models/planner_model.dart';
 class PlannerService {
   final ApiService _apiService = ApiService();
 
+  // ------------------------------------------
+  // FETCHERS
+  // ------------------------------------------
+
   // Fetch the entire travel planner (flights, accommodations, activities)
   Future<List<Planner>> fetchAllPlanners() async {
     try {
@@ -89,6 +93,10 @@ class PlannerService {
     }
   }
 
+  // ------------------------------------------
+  // ADDERS
+  // ------------------------------------------
+
   // Add a new planner
   Future<Planner> addPlanner(Planner planner) async {
     try {
@@ -135,4 +143,56 @@ class PlannerService {
       throw Exception('Failed to add transportation: $e');
     }
   }
+
+
+  // ------------------------------------------
+  // UPDATERS
+  // ------------------------------------------
+
+  Future<Planner> updatePlanner(Planner planner, String userId) async {
+    try {
+      final response = await _apiService.patch(
+        '/planner/${planner.plannerId}',
+        planner.toJson(),
+      );
+
+      final responseBody = jsonDecode(response.body);
+      return Planner.fromJson(responseBody['data']);
+    } catch (e) {
+      throw Exception('Failed to update the travel planner: $e');
+    }
+  }
+
+  Future<Destination> updateDestination(Destination destination, String userId) async {
+    try {
+      print('UPDATING DESTINATION: $destination');
+      final response = await _apiService.patch(
+        '/planner/${destination.plannerId}/destination/${destination.destinationId}?userId=$userId',
+        destination.toJson(),
+      );
+
+      final responseBody = jsonDecode(response.body);
+      return Destination.fromJson(responseBody['data']);
+    } catch (e) {
+      throw Exception('Failed to update the destination: $e');
+    }
+  }
+
+  Future<Transport> updateTransport(Transport transport, String userId) async {
+    try {
+      final response = await _apiService.patch(
+        '/planner/${transport.plannerId}/transportation/${transport.id}?userId=$userId',
+        transport.toJson(),
+      );
+
+      final responseBody = jsonDecode(response.body);
+      return Transport.fromJson(responseBody['data']);
+    } catch (e) {
+      throw Exception('Failed to update the transportation: $e');
+    }
+  }
+
+  // ------------------------------------------
+  // DELETERS
+  // ------------------------------------------
 }

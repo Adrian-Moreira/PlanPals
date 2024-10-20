@@ -1,13 +1,12 @@
-
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class Destination {
-  final String createdBy;      // ID of the user who created the destination
+  final String createdBy; // ID of the user who created the destination
   final String destinationId; // Unique identifier for the destination
-  final String plannerId;      // ID of the associated planner
-  final String name;           // Name of the destination
-  final DateTime startDate;    // Start date of the destination
-  final DateTime endDate;      // End date of the destination
+  final String plannerId; // ID of the associated planner
+  String name; // Name of the destination
+  DateTime startDate; // Start date of the destination
+  DateTime endDate; // End date of the destination
   final List<String> activities; // List of associated activity IDs
   final List<String> accommodations; // List of associated accommodation IDs
 
@@ -27,7 +26,7 @@ class Destination {
   factory Destination.fromJson(Map<String, dynamic> json) {
     return Destination(
       createdBy: json['createdBy'] ?? '',
-      destinationId: json['destinationId'] ?? '',
+      destinationId: json['_id'] ?? '',
       plannerId: json['plannerId'] ?? '',
       name: json['name'] ?? '',
       startDate: DateTime.parse(json['startDate']),
@@ -44,8 +43,10 @@ class Destination {
       'destinationId': destinationId,
       'plannerId': plannerId,
       'name': name,
-      'startDate': DateTimeToIso.formatToUtcIso(startDate), // Convert DateTime to String
-      'endDate': DateTimeToIso.formatToUtcIso(endDate),     // Convert DateTime to String
+      'startDate':
+          DateTimeToIso.formatToUtcIso(startDate), // Convert DateTime to String
+      'endDate':
+          DateTimeToIso.formatToUtcIso(endDate), // Convert DateTime to String
       'activities': activities,
       'accommodations': accommodations,
     };
@@ -54,11 +55,17 @@ class Destination {
   @override
   String toString() {
     return 'Destination: $name\n'
-           'ID: $destinationId\n'
-           'Planner ID: $plannerId\n'
-           'Start Date: ${startDate.toLocal()}\n'
-           'End Date: ${endDate.toLocal()}\n'
-           'Activities: ${activities.isNotEmpty ? activities.join(', ') : 'None'}\n'
-           'Accommodations: ${accommodations.isNotEmpty ? accommodations.join(', ') : 'None'}';
+        'ID: $destinationId\n'
+        'Planner ID: $plannerId\n'
+        'Start Date: ${startDate.toLocal()}\n'
+        'End Date: ${endDate.toLocal()}\n'
+        'Activities: ${activities.isNotEmpty ? activities.join(', ') : 'None'}\n'
+        'Accommodations: ${accommodations.isNotEmpty ? accommodations.join(', ') : 'None'}';
+  }
+
+  void update(Destination updatedDestination) {
+    name = updatedDestination.name;
+    startDate = updatedDestination.startDate;
+    endDate = updatedDestination.endDate;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/update/update_destination_form.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class DestinationCard extends StatelessWidget {
@@ -19,7 +20,8 @@ class DestinationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-          title: Text(destination.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(destination.name,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -35,7 +37,15 @@ class DestinationCard extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit),
-                      onPressed: onEdit, // Handle the edit logic
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UpdateDestinationForm(
+                                    destination: destination,
+                                  )),
+                        );
+                      }, // Handle the edit logic
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),

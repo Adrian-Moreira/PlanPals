@@ -27,6 +27,11 @@ class PlannerViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading; // Get loading state
   String? get errorMessage => _errorMessage; // Get error message
 
+
+  // ----------------------------------------
+  // FETCHERS
+  // ----------------------------------------
+
   // Fetch all planners by user ID
   Future<void> fetchAllPlanners() async {
     _isLoading = true;
@@ -140,6 +145,10 @@ class PlannerViewModel extends ChangeNotifier {
     }
   }
 
+  // ----------------------------------------
+  // ADDERS
+  // ----------------------------------------
+
   // Add a new destination to the planner
   Future<Planner> addPlanner(Planner planner) async {
     _isLoading = true;
@@ -206,6 +215,83 @@ class PlannerViewModel extends ChangeNotifier {
     }
     return newTransport;
   }
+
+
+  // ----------------------------------------
+  // UPDATERS
+  // ----------------------------------------
+
+  Future<Planner> updatePlanner(Planner planner, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    Planner updatedPlanner = planner;
+    try {
+      updatedPlanner = await _plannerService.updatePlanner(updatedPlanner, userId);
+      _planners
+          .firstWhere((planner) => planner.plannerId == updatedPlanner.plannerId)
+          .update(updatedPlanner); // Update local state if successful
+    } catch (e) {
+      _errorMessage = 'Failed to update planner: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+    return updatedPlanner;
+  }
+
+  Future<Destination> updateDestination(Destination destination, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    Destination updatedDestination = destination;
+    try {
+      updatedDestination =
+          await _plannerService.updateDestination(updatedDestination, userId);
+      _destinations
+          .firstWhere((destination) =>
+              destination.destinationId == updatedDestination.destinationId)
+          .update(updatedDestination); // Update local state if successful
+    } catch (e) {
+      _errorMessage = 'Failed to update destination: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+    return updatedDestination;
+  }
+
+  Future<Transport> updateTransport(Transport transport, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    Transport updatedTransport = transport;
+    try {
+      updatedTransport =
+          await _plannerService.updateTransport(updatedTransport, userId);
+      _transports
+          .firstWhere((transport) =>
+              transport.id == updatedTransport.id)  
+          .update(updatedTransport); // Update local state if successful
+    } catch (e) {
+      _errorMessage = 'Failed to update transportation: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+    return updatedTransport;
+  }
+
+
+  // ----------------------------------------
+  // DELETERS
+  // ----------------------------------------
+
+
+
 
   void logout() {
     _planners = [];

@@ -41,6 +41,8 @@ class ApiService {
 
       _handleResponse(response);
 
+      print("POSTING: Status Code: ${response.statusCode}");
+
       return response;
     } catch (error) {
       throw Exception('Failed to post data: $error');
@@ -48,10 +50,11 @@ class ApiService {
   }
 
   // PUT request
-  Future<http.Response> put(String endpoint, Map<String, dynamic> data) async {
+
+  Future<http.Response> patch(String endpoint, Map<String, dynamic> data) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      final response = await http.put(
+      final response = await http.patch(
         url,
         body: json.encode(data),
         headers: {

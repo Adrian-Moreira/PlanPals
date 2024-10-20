@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
@@ -38,6 +40,7 @@ class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
   @override
   Widget build(BuildContext context) {
     final PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context, listen: false);
+    final User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
     final Destination destination = widget.destination;
 
     return Scaffold(
@@ -108,16 +111,19 @@ class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
                       return;
                     }
 
-                    // remove destination from list of destinations in provider
-                    plannerViewModel.destinations.remove(destination);
+                    // Create an updated destination
+                    Destination updatedDestination = Destination(
+                      createdBy: destination.createdBy, 
+                      destinationId: destination.destinationId, 
+                      plannerId: destination.plannerId, 
+                      name: _nameController.text, 
+                      startDate: _startDate!, 
+                      endDate: _endDate!, 
+                      activities: destination.activities, 
+                      accommodations: destination.accommodations);
 
                     // Update the destination
-                    destination.name = _nameController.text;
-                    destination.startDate = _startDate!;
-                    destination.endDate = _endDate!;
-
-                    // request provider to update destination
-                    plannerViewModel.updateDestination(destination);
+                    await plannerViewModel.updateDestination(updatedDestination, user.id);
 
                     // Close the form screen
                     Navigator.pop(context);
