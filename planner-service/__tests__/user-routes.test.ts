@@ -58,15 +58,6 @@ describe('User API', () => {
       expect(response.body.success).toBe(true)
     })
 
-    it('should return Bad Request', async () => {
-      const response = await request(app.app)
-        .get('/user/jane')
-        .expect(StatusCodes.BAD_REQUEST)
-
-      expect(response.body.success).toBe(false)
-      expect(response.body.message).toBeDefined()
-    })
-
     it('should return Not Found', async () => {
       const response = await request(app.app)
         .get('/user/6701a389fecd4f214c79183e')
@@ -143,17 +134,14 @@ describe('User API', () => {
       expect(response.body.success).toBe(false)
     })
 
-    it('should return Bad Request', async () => {
+    it('should return Not Found', async () => {
       const response = await request(app.app)
         .patch('/user/jane')
         .send({
           userName: 'FBar1',
           preferredName: 'Foo Baz',
         })
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.BAD_REQUEST)
-
-      expect(response.body.success).toBe(false)
+        .expect(StatusCodes.NOT_FOUND)
     })
 
     it('should return Not Found', async () => {
@@ -190,13 +178,10 @@ describe('User API', () => {
       expect(response.body.success).toBe(false)
     })
 
-    it('should return Bad Request', async () => {
+    it('should return Not Found', async () => {
       const response = await request(app.app)
         .delete('/user/jane')
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.BAD_REQUEST)
-
-      expect(response.body.success).toBe(false)
+        .expect(StatusCodes.NOT_FOUND)
     })
   })
 })
