@@ -49,7 +49,7 @@ class Transport {
 
   @override
   String toString() {
-    return 'TravelItem(id: $id, plannerId: $plannerId, type: $type, '
+    return 'Transport(id: $id, plannerId: $plannerId, type: $type, '
         'details: $details, vehicleId: $vehicleId, '
         'departureTime: ${departureTime.toIso8601String()}, '
         'arrivalTime: ${arrivalTime.toIso8601String()}),'

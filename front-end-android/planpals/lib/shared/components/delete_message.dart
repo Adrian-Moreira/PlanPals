@@ -20,7 +20,7 @@ class DeleteMessage extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            onDelete;
+            onDelete();
             print('Yes pressed');
             Navigator.pop(context); // Close the dialog
           },

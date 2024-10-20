@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
+import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/update/update_destination_form.dart';
+import 'package:planpals/shared/components/delete_message.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
+import 'package:provider/provider.dart';
 
 class DestinationCard extends StatelessWidget {
   final Destination destination;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
   final bool functional;
 
   const DestinationCard(
       {super.key,
       required this.destination,
-      required this.onEdit,
-      required this.onDelete,
       required this.functional});
 
   @override
   Widget build(BuildContext context) {
+    PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context, listen: false);
+    User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
+
+
     return Card(
       child: ListTile(
           title: Text(destination.name,
@@ -49,7 +54,20 @@ class DestinationCard extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
-                      onPressed: onDelete, // Handle the delete logic
+                      onPressed: () {
+                        showDialog(
+                          context: context, 
+                          builder: (context) => DeleteMessage(
+                            onDelete: () {
+
+                              print("DELETING DESTINATION: $destination");
+
+                              // Delete the destination
+                              plannerViewModel.deleteDestination(destination, user.id);
+
+                            },
+                          ));
+                      }, // Handle the delete logic
                     ),
                   ],
                 )

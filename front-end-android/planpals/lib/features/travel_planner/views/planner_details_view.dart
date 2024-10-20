@@ -183,8 +183,6 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                   itemList: destinations,
                   itemBuilder: (destination) => DestinationCard(
                     destination: destination,
-                    onEdit: () {},
-                    onDelete: () {},
                     functional: functional,
                   ),
                   onAdd: () {
@@ -210,8 +208,6 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                   itemList: transportations,
                   itemBuilder: (transport) => TransportCard(
                     transport: transport,
-                    onEdit: () {},
-                    onDelete: () {},
                     functional: functional,
                   ),
                   onAdd: () {

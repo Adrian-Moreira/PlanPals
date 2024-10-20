@@ -195,4 +195,29 @@ class PlannerService {
   // ------------------------------------------
   // DELETERS
   // ------------------------------------------
+
+  Future<void> deletePlanner(Planner planner, String userId) async {
+    try {
+      await _apiService.delete('/planner/${planner.plannerId}?userId=$userId');
+    } catch (e) {
+      throw Exception('Failed to delete the travel planner: $e');
+    }
+  }
+
+  Future<void> deleteDestination(Destination destination, String userId) async {  
+    try {
+      await _apiService.delete('/planner/${destination.plannerId}/destination/${destination.destinationId}?userId=$userId');
+    } catch (e) {
+      throw Exception('Failed to delete the destination: $e');
+    }
+  }
+
+  Future<void> deleteTransport(Transport transport, String userId) async {
+    try {
+      await _apiService.delete('/planner/${transport.plannerId}/transportation/${transport.id}?userId=$userId');
+    } catch (e) {
+      throw Exception('Failed to delete the transportation: $e');
+    }
+  }
+
 }

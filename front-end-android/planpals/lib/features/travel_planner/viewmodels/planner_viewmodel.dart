@@ -291,6 +291,54 @@ class PlannerViewModel extends ChangeNotifier {
   // ----------------------------------------
 
 
+  Future<void> deletePlanner(Planner planner, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    try {
+      await _plannerService.deletePlanner(planner, userId);
+      _planners.remove(planner); // Remove from local state if successful
+    } catch (e) {
+      _errorMessage = 'Failed to delete planner: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+  }
+
+  Future<void> deleteDestination(Destination destination, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    try {
+      await _plannerService.deleteDestination(destination, userId);
+      _destinations.remove(destination); // Remove from local state if successful
+    } catch (e) {
+      _errorMessage = 'Failed to delete destination: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+  }
+
+  Future<void> deleteTransport(Transport transport, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    try {
+      await _plannerService.deleteTransport(transport, userId);
+      _transports.remove(transport); // Remove from local state if successful
+    } catch (e) {
+      _errorMessage = 'Failed to delete transportation: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+  }
+
 
 
   void logout() {
