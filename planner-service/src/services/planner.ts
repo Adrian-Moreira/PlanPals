@@ -4,6 +4,8 @@ import { MalformedRequestException } from '../exceptions/MalformedRequestExcepti
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { UserModel } from '../models/User'
+import { NextFunction, Request, Response } from 'express'
+import assert from 'assert'
 
 export const createPlannerService = async ({
   createdBy,
@@ -292,3 +294,108 @@ export const deletePlannerService = async ({
     })
   }
 }
+
+/**
+ * Verify that a planner with the given ID exists in the database. If not, throw
+ * a RecordNotFoundException with the planner ID and record type of 'planner'.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next function in the middleware chain.
+ */
+function verifyPlannerExists(req: Request, res: Response, next: NextFunction) {
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { plannerId } = req.body.out
+  const targetPlanner = PlannerModel.findOne({ _id: plannerId })
+  if (!targetPlanner) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
+    })
+    next(req.body.err)
+  } else {
+    req.body.out = { ...req.body.out, targetPlanner }
+  }
+  next()
+}
+
+/**
+ * Verify that the user can edit the planner. If the user is not allowed to
+ * edit the planner, a RecordNotFoundException is thrown with the planner ID
+ * and record type of 'planner'.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next function in the middleware chain.
+ */
+function verifyUserCanEditPlanner(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  let { plannerId, createdBy, userId, targetPlanner } = req.body.out
+  userId ||= createdBy // Assuming either userId or createdBy is provided
+  assert(userId || createdBy, 'User ID is required')
+  if (
+    !targetPlanner.rwUsers.includes(userId) &&
+    !targetPlanner.createdBy?.equals(userId)
+  ) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
+    })
+    next(req.body.err)
+  } else {
+    req.body.out = { ...req.body.out, targetPlanner }
+  }
+  next()
+}
+
+/**
+ * Verify that the user can view the planner. If the user is not allowed to
+ * view the planner, a RecordNotFoundException is thrown with the planner ID
+ * and record type of 'planner'.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next function in the middleware chain.
+ */
+function verifyUserCanViewPlanner(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  let { plannerId, createdBy, userId, targetPlanner } = req.body.out
+  userId ||= createdBy // Assuming either userId or createdBy is provided
+  assert(userId || createdBy, 'User ID is required')
+  if (
+    !targetPlanner.roUsers.includes(userId) &&
+    !targetPlanner.rwUsers.includes(userId) &&
+    !targetPlanner.createdBy?.equals(userId)
+  ) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: plannerId,
+    })
+    next(req.body.err)
+  } else {
+    req.body.out = { ...req.body.out, targetPlanner }
+  }
+  next()
+}
+
+const PlannerService = {
+  verifyPlannerExists,
+  verifyUserCanEditPlanner,
+  verifyUserCanViewPlanner,
+}
+
+export default PlannerService

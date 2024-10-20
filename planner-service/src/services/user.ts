@@ -1,9 +1,9 @@
 import { Types } from 'mongoose'
-import { RecordConflictException } from '../exceptions/RecordConflictException'
-import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { BasicUser, User, UserModel } from '../models/User'
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import { RecordConflictException } from '../exceptions/RecordConflictException'
+import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
+import { BasicUser, UserModel } from '../models/User'
 
 /**
  * Creates a new user document in the database.
@@ -19,7 +19,10 @@ const createUserDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const newUser: BasicUser = req.body.data as BasicUser
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const newUser: BasicUser = req.body.out as BasicUser
   const userCreated = await UserModel.create(newUser).catch(() => {
     req.body.err = new RecordConflictException({
       requestType: 'createUser',
@@ -27,7 +30,7 @@ const createUserDocument = async (
     })
     next(req.body.err)
   })
-  req.body.data = userCreated
+  req.body.result = userCreated
   req.body.status = StatusCodes.CREATED
   next()
 }
@@ -46,7 +49,10 @@ const updateUserDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const updatedUser = req.body.data as {
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const updatedUser = req.body.out as {
     userId: Types.ObjectId
     userName: string
     preferredName: string
@@ -71,16 +77,18 @@ const updateUserDocument = async (
     })
     next(req.body.err)
   })
+
   if (!userUpdated) {
     req.body.err = new RecordNotFoundException({
       recordType: 'User',
       recordId: updatedUser.userId.toString(),
     })
     next(req.body.err)
-  } else {
-    req.body.data = userUpdated
-    req.body.status = StatusCodes.OK
   }
+
+  req.body.result = userUpdated
+  req.body.status = StatusCodes.OK
+
   next()
 }
 
@@ -98,7 +106,10 @@ const deleteUserDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { userId }: { userId: Types.ObjectId } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { userId }: { userId: Types.ObjectId } = req.body.out
   const userDeleted = await UserModel.findOneAndDelete({ _id: userId })
   if (!userDeleted) {
     req.body.err = new RecordNotFoundException({
@@ -106,10 +117,11 @@ const deleteUserDocument = async (
       recordId: userId.toString(),
     })
     next(req.body.err)
-  } else {
-    req.body.data = userDeleted
-    req.body.status = StatusCodes.OK
   }
+
+  req.body.result = userDeleted
+  req.body.status = StatusCodes.OK
+
   next()
 }
 
@@ -127,7 +139,10 @@ const getUserDocumentById = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { userId }: { userId: Types.ObjectId } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { userId }: { userId: Types.ObjectId } = req.body.out
   const user = await UserModel.findOne({ _id: userId })
   if (!user) {
     req.body.err = new RecordNotFoundException({
@@ -136,7 +151,7 @@ const getUserDocumentById = async (
     })
     next(req.body.err)
   } else {
-    req.body.data = user
+    req.body.result = user
     req.body.status = StatusCodes.OK
   }
   next()
@@ -156,7 +171,10 @@ const getUserDocumentByName = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const { userName }: { userName: string } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { userName }: { userName: string } = req.body.out
   const user = await UserModel.findOne({ userName })
   if (!user) {
     req.body.err = new RecordNotFoundException({
@@ -165,7 +183,7 @@ const getUserDocumentByName = async (
     })
     next(req.body.err)
   } else {
-    req.body.data = user
+    req.body.result = user
     req.body.status = StatusCodes.OK
   }
   next()

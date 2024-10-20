@@ -50,7 +50,7 @@ function mkRequestParser<T>(
     await schema
       .parseAsync(req)
       .then((value: any) => {
-        req.body.data = { ...value.body, ...value.params, ...value.query }
+        req.body.out = { ...value.body, ...value.params, ...value.query }
         next()
       })
       .catch((error: any) => {
@@ -84,7 +84,7 @@ function mkRequestParsers(
   schemas: Record<string, z.ZodSchema<any>>,
 ): Record<
   string,
-  (req: Request, res: Response, next: NextFunction) => Promise<any>
+  (req: Request, res: Response, next: NextFunction) => Promise<void>
 > {
   return Object.fromEntries(
     Object.entries(schemas).map(([key, schema]) => [
@@ -179,10 +179,10 @@ async function mkSuccessResponse<T>(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  if (req.body.err || !req.body.data) {
+  if (req.body.err || !req.body.result) {
     next(req.body.err)
   }
-  res.status(req.body.status).json(mkSuccessJSON<T>(req.body.data))
+  res.status(req.body.status).json(mkSuccessJSON<T>(req.body.result))
   next()
 }
 

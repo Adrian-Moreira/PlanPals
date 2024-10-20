@@ -3,7 +3,6 @@ import { ObjectIdSchema, PlannerModel } from './Planner'
 import mongoose, { Schema } from 'mongoose'
 import { ActivityModel } from './Activity'
 import { AccommodationModel } from './Accommodation'
-import { CommentModel } from './Comment'
 
 const DestinationMongoSchema = new Schema<Destination>(
   {
@@ -20,12 +19,6 @@ const DestinationMongoSchema = new Schema<Destination>(
     endDate: {
       type: String,
       required: true,
-    },
-
-    comments: {
-      type: [Schema.Types.ObjectId],
-      required: true,
-      ref: 'Comment',
     },
 
     name: {
@@ -70,9 +63,6 @@ DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
       destination.accommodations.forEach(async (a: { _id: any }) => {
         await AccommodationModel.findOneAndDelete({ _id: a._id })
       })
-      destination.comments.forEach(async (c: { _id: any }) => {
-        await CommentModel.findOneAndDelete({ _id: c._id })
-      })
     }
 
     next()
@@ -90,8 +80,6 @@ export const DestinationSchema = z.object({
 
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
-
-  comments: z.array(ObjectIdSchema),
 
   name: z.string(),
   activities: z.array(ObjectIdSchema),

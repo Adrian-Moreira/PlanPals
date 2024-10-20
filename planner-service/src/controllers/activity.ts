@@ -5,18 +5,23 @@ import { ObjectIdStringSchema } from '../models/Planner'
 const ActivityRouteSchema = {
   createActivity: ReqAttrSchema.extend({
     params: z.object({
+      plannerId: ObjectIdStringSchema,
       destinationId: ObjectIdStringSchema,
     }),
     body: z.object({
       createdBy: ObjectIdStringSchema,
       name: z.string(),
-      locations: z.array(ObjectIdStringSchema),
+      location: z.string().optional(),
       startDate: z.string().datetime().or(z.date()),
       duration: z.number(),
+    }),
+    query: z.object({
+      userId: ObjectIdStringSchema,
     }),
   }),
   getActivityById: ReqAttrSchema.extend({
     params: z.object({
+      plannerId: ObjectIdStringSchema,
       destinationId: ObjectIdStringSchema,
       activityId: ObjectIdStringSchema,
     }),
@@ -26,14 +31,16 @@ const ActivityRouteSchema = {
   }),
   getActivitiesByDestinationId: ReqAttrSchema.extend({
     params: z.object({
+      plannerId: ObjectIdStringSchema,
       destinationId: ObjectIdStringSchema,
     }),
     query: z.object({
       userId: ObjectIdStringSchema,
-    })
+    }),
   }),
   updateActivity: ReqAttrSchema.extend({
     params: z.object({
+      plannerId: ObjectIdStringSchema,
       destinationId: ObjectIdStringSchema,
       activityId: ObjectIdStringSchema,
     }),
@@ -41,6 +48,7 @@ const ActivityRouteSchema = {
       name: z.string().optional(),
       startDate: z.string().datetime().or(z.date()).optional(),
       duration: z.number().optional(),
+      location: z.string().optional(),
     }),
     query: z.object({
       userId: ObjectIdStringSchema,
@@ -48,6 +56,7 @@ const ActivityRouteSchema = {
   }),
   deleteActivity: ReqAttrSchema.extend({
     params: z.object({
+      plannerId: ObjectIdStringSchema,
       destinationId: ObjectIdStringSchema,
       activityId: ObjectIdStringSchema,
     }),

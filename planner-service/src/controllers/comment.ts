@@ -20,6 +20,9 @@ const CommentRouteSchema = {
     query: z.object({
       userId: ObjectIdStringSchema,
     }),
+    params: z.object({
+      commentId: ObjectIdStringSchema,
+    }),
   }),
   getCommentsByObjectId: ReqAttrSchema.extend({
     query: z.object({

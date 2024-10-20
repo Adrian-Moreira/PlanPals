@@ -21,7 +21,10 @@ const upVote = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { objectId, type, userId } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { objectId, type, userId } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
   })
@@ -41,7 +44,7 @@ const upVote = async (
     )
   }
   await existingVotes.save()
-  req.body.data = existingVotes
+  req.body.result = existingVotes
   req.body.status = StatusCodes.OK
   next()
 }
@@ -64,7 +67,10 @@ const downVote = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { objectId, type, userId } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { objectId, type, userId } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
   })
@@ -84,17 +90,33 @@ const downVote = async (
     )
   }
   await existingVotes.save()
-  req.body.data = existingVotes
+  req.body.result = existingVotes
   req.body.status = StatusCodes.OK
   next()
 }
 
+/**
+ * Removes a vote from an object in the planner with the given objectId and type.
+ *
+ * If the given user has already downvoted the object, this endpoint will remove
+ * the downvote. If the user has upvoted the object, this endpoint will remove the
+ * upvote.
+ *
+ * @param req - The incoming request from the client.
+ * @param res - The response to the client.
+ * @param next - The next function in the middleware chain.
+ *
+ * @throws {RecordNotFoundException} If the object does not exist.
+ */
 const removeVote = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { objectId, type, userId } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { objectId, type, userId } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
   })
@@ -117,18 +139,33 @@ const removeVote = async (
       )
     }
     await existingVotes.save()
-    req.body.data = existingVotes
+    req.body.result = existingVotes
     req.body.status = StatusCodes.OK
   }
   next()
 }
 
+/**
+ * Retrieves the votes for an object in the planner with the given objectId and type.
+ *
+ * If the vote document does not exist, this endpoint will create a new vote document
+ * with an empty array of upvotes and downvotes.
+ *
+ * @param req - The incoming request from the client.
+ * @param res - The response to the client.
+ * @param next - The next function in the middleware chain.
+ *
+ * @throws {RecordNotFoundException} If the object does not exist.
+ */
 const getVotesByObjectId = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { objectId, type } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { objectId, type } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
   })
@@ -139,17 +176,33 @@ const getVotesByObjectId = async (
       downVotes: [],
     })
   }
-  req.body.data = existingVotes
+  req.body.result = existingVotes
   req.body.status = StatusCodes.OK
   next()
 }
 
+/**
+ * Checks if a user has voted on an object in the planner with the given objectId and type.
+ *
+ * If the vote document does not exist, this endpoint will return a 404 error.
+ *
+ * @param req - The incoming request from the client.
+ * @param res - The response to the client.
+ * @param next - The next function in the middleware chain.
+ *
+ * @returns {Promise<void>}
+ *
+ * @throws {RecordNotFoundException} If the vote document does not exist.
+ */
 const isUserVoted = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { objectId, type, userId } = req.body.data
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  const { objectId, type, userId } = req.body.out
   const existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
   })
@@ -163,7 +216,7 @@ const isUserVoted = async (
     const voteDoc = await existingVotes.populate(['upVotes', 'downVotes'])
     const upVoted = voteDoc.upVotes.some((id) => id.equals(userId))
     const downVoted = voteDoc.downVotes.some((id) => id.equals(userId))
-    req.body.data = { upVoted, downVoted }
+    req.body.result = { upVoted, downVoted }
     req.body.status = StatusCodes.OK
   }
   next()
