@@ -96,11 +96,11 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                       style: const TextStyle(fontSize: 18)),
                   trailing: IconButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                InviteUserDialog()), // navigate to travel planners
+                      showDialog(
+                        context: context,
+                        builder: (context) => InviteUserDialog(
+                          // TODO: Add invite functionality
+                        )
                       );
                     },
                     icon: const Icon(
@@ -149,8 +149,8 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${widget.travelPlanner.destinations.length} Destinations'),
-                          Text('${widget.travelPlanner.transportations.length} Transportations'), 
+                          Text('${destinations.length} Destinations'),
+                          Text('${transportations.length} Transportations'), 
                         ]),
                 ),
                 ListTile(
