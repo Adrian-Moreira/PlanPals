@@ -106,11 +106,10 @@ class PlannerService {
     }
   }
   // Add a new destination to a specific planner
-  Future<Destination> addDestination(
-      String plannerId, Destination destination) async {
+  Future<Destination> addDestination(Destination destination) async {
     try {
       final response = await _apiService.post(
-        '/planner/$plannerId/destination',
+        '/planner/${destination.plannerId}/destination',
         destination.toJson(),
       );
 
@@ -123,10 +122,10 @@ class PlannerService {
   }
 
   // Add a new transportation to a specific planner
-  Future<Transport> addTransport(String plannerId, Transport transport) async {
+  Future<Transport> addTransport(Transport transport) async {
     try {
       final response = await _apiService.post(
-        '/planner/$plannerId/transportation',
+        '/planner/${transport.plannerId}/transportation',
         transport.toJson(),
       );
 

@@ -160,8 +160,7 @@ class PlannerViewModel extends ChangeNotifier {
   }
 
   // Add a new destination to the planner
-  Future<Destination> addDestination(
-      String plannerId, Destination destination) async {
+  Future<Destination> addDestination(Destination destination) async {
     _isLoading = true;
     _errorMessage = null; // Reset error message
     notifyListeners();
@@ -170,7 +169,7 @@ class PlannerViewModel extends ChangeNotifier {
     try {
       print("PLANNERVIEWMODEL: ADDING DESTINATION: $newDestination");
       newDestination =
-          await _plannerService.addDestination(plannerId, newDestination);
+          await _plannerService.addDestination(newDestination);
       _destinations.add(newDestination); // Add to local state if successful
             print("PLANNERVIEWMODEL: ADDED DESTINATION: $newDestination");
 
@@ -185,7 +184,7 @@ class PlannerViewModel extends ChangeNotifier {
   }
 
   // Add a new transporation to the planner
-  Future<Transport> addTransport(String plannerId, Transport transport) async {
+  Future<Transport> addTransport(Transport transport) async {
     _isLoading = true;
     _errorMessage = null; // Reset error message
     notifyListeners();
@@ -194,7 +193,7 @@ class PlannerViewModel extends ChangeNotifier {
     try {
       print("PLANNERVIEWMODEL: ADDING TRANSPORT: $newTransport");
       newTransport =
-          await _plannerService.addTransport(plannerId, newTransport);
+          await _plannerService.addTransport(newTransport);
 
       print('PLANNERVIEWMODEL: ADDED TRANSPORT: $newTransport');
       _transports.add(newTransport); // Add to local state if successful

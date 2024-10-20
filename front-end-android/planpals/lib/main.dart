@@ -9,7 +9,6 @@ import 'package:planpals/features/travel_planner/models/activity_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
-import 'package:planpals/features/travel_planner/views/components/Forms/planner_form.dart';
 import 'package:planpals/features/travel_planner/views/planner_details_view.dart';
 import 'package:planpals/features/travel_planner/views/planners_view.dart';
 import 'package:planpals/shared/components/invite_user_dialog.dart';

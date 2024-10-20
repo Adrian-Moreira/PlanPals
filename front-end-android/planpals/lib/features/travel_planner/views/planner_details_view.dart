@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/create/create_destination_form.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/create/create_transport_form.dart';
 import 'package:provider/provider.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
-import 'package:planpals/features/travel_planner/views/components/Forms/destination_form.dart';
-import 'package:planpals/features/travel_planner/views/components/Forms/transport_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/destination_card.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/transport_card.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
@@ -192,7 +192,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                DestinationForm(planner: planner)));
+                                CreateDestinationForm(planner: planner)));
                   },
                   headerTitle: "Destinations",
                   headerIcon: Icons.landscape,
@@ -218,7 +218,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => TransportForm(
+                            builder: (context) => CreateTransportForm(
                                   planner: planner,
                                 )));
                   },

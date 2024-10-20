@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
-import 'package:planpals/features/travel_planner/views/components/Forms/planner_form.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/create/create_planner_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/planner_card.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/navigator_bar.dart';
@@ -63,7 +63,7 @@ class _PlannersViewState extends State<PlannersView> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PlannerForm()),
+                MaterialPageRoute(builder: (context) => const CreatePlannerForm()),
               );
             },
             tooltip: 'Add Travel Planner',
