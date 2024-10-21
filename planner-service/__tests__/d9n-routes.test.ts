@@ -20,7 +20,7 @@ let testDestination1: any
 let testDestination2: any
 let testDestination3: any
 
-describe.skip('D9n API', () => {
+describe('D9n API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
@@ -370,10 +370,10 @@ describe.skip('D9n API', () => {
     })
 
     it('should return OK and delete destination', async () => {
+      const reqStr = `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`
+      console.log(reqStr)
       const response = await request(app.app)
-        .delete(
-          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`,
-        )
+        .delete(reqStr)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 

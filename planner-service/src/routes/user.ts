@@ -23,6 +23,7 @@ userRouter.get(
 userRouter.get(
   '/:userId([0-9a-fA-F]{24})',
   UserValidator.userId,
+  UserService.verifyUserExists,
   UserService.getUserDocumentById,
   RequestUtils.mkSuccessResponse<User>,
   RequestUtils.mkErrorResponse,
@@ -30,6 +31,7 @@ userRouter.get(
 userRouter.patch(
   '/:userId([0-9a-fA-F]{24})',
   UserValidator.updateUser,
+  UserService.verifyUserExists,
   UserService.updateUserDocument,
   RequestUtils.mkSuccessResponse<User>,
   RequestUtils.mkErrorResponse,
@@ -37,6 +39,7 @@ userRouter.patch(
 userRouter.delete(
   '/:userId([0-9a-fA-F]{24})',
   UserValidator.userId,
+  UserService.verifyUserExists,
   UserService.deleteUserDocument,
   RequestUtils.mkSuccessResponse<User>,
   RequestUtils.mkErrorResponse,

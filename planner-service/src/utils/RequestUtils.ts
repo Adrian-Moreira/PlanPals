@@ -156,6 +156,7 @@ async function mkErrorResponse(
         })
         break
       default:
+        console.error(err)
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
           success: false,
           message: 'Sum Ting Wong',

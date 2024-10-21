@@ -18,7 +18,7 @@ let testPlanner2: any
 
 let testTransportation1: any
 
-describe.skip('Planner API', () => {
+describe('Planner API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })

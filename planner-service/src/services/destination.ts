@@ -13,7 +13,7 @@ import { Types } from 'mongoose'
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-function verifyDestinationExists(
+async function verifyDestinationExists(
   req: Request,
   res: Response,
   next: NextFunction,
@@ -22,7 +22,9 @@ function verifyDestinationExists(
     next(req.body.err)
   }
   const { destinationId, targetPlanner } = req.body.out
-  const targetDestination = DestinationModel.findOne({ _id: destinationId })
+  const targetDestination = await DestinationModel.findOne({
+    _id: destinationId,
+  })
   if (!targetDestination) {
     req.body.err = new RecordNotFoundException({
       recordType: 'destination',
@@ -105,12 +107,25 @@ const updateDestinationDocument = async (
 
   const { targetDestination, name, startDate, endDate } = req.body.out
 
-  targetDestination.name ||= name
-  targetDestination.startDate ||= startDate
-  targetDestination.endDate ||= endDate
-  targetDestination.save()
+  const savedDestination = await DestinationModel.findOneAndUpdate(
+    { _id: targetDestination._id },
+    {
+      name,
+      startDate,
+      endDate,
+    },
+    { new: true },
+  )
 
-  req.body.result = targetDestination as Destination
+  if (!savedDestination) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'destination',
+      recordId: targetDestination._id,
+    })
+    next(req.body.err)
+  }
+
+  req.body.result = savedDestination
   req.body.status = StatusCodes.OK
 
   next()
@@ -141,9 +156,9 @@ const deleteDestinationDocument = async (
   )
   targetPlanner.save()
 
-  DestinationModel.findOneAndDelete({ _id: targetDestination._id })
+  await DestinationModel.findOneAndDelete({ _id: targetDestination._id })
     .then(() => {
-      req.body.result = targetDestination as Destination
+      req.body.result = targetDestination
       req.body.status = StatusCodes.OK
     })
     .catch(() => {
@@ -175,7 +190,7 @@ const getDestinationDocumentById = async (
     next(req.body.err)
   }
   const { targetDestination } = req.body.out
-  req.body.result = targetDestination as Destination
+  req.body.result = targetDestination
   req.body.status = StatusCodes.OK
   next()
 }
@@ -200,9 +215,10 @@ const getDestinationDocumentsByPlannerId = async (
 
   const { targetPlanner } = req.body.out
 
-  const resultDestinations: Destination[] = await targetPlanner.destinations.map((did: Types.ObjectId) =>
-    DestinationModel.findOne({ _id: did }),
-  )
+  const resultDestinations: Destination[] =
+    await targetPlanner.destinations.map(async (did: Types.ObjectId) => {
+      return await DestinationModel.findById(did)
+    })
 
   if (resultDestinations.length === 0) {
     req.body.err = new RecordNotFoundException({
@@ -211,7 +227,7 @@ const getDestinationDocumentsByPlannerId = async (
     })
     next(req.body.err)
   }
-  req.body.result = resultDestinations as Destination[]
+  req.body.result = resultDestinations
   req.body.status = StatusCodes.OK
   next()
 }

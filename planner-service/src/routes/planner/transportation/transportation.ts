@@ -28,7 +28,7 @@ transportationRouter.post(
 )
 
 transportationRouter.get(
-  '/:transportationId',
+  '/:transportationId([0-9a-fA-F]{24})',
   TransportationValidator.getTransportationById,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
@@ -39,7 +39,7 @@ transportationRouter.get(
 )
 
 transportationRouter.patch(
-  '/:transportationId',
+  '/:transportationId([0-9a-fA-F]{24})',
   TransportationValidator.updateTransportation,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,
@@ -50,7 +50,7 @@ transportationRouter.patch(
 )
 
 transportationRouter.delete(
-  '/:transportationId',
+  '/:transportationId([0-9a-fA-F]{24})',
   TransportationValidator.deleteTransportation,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,

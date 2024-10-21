@@ -80,6 +80,8 @@ const createTransportationDocument = async (
     .then((transportation) => {
       targetPlanner.transportations.push(transportation._id)
       targetPlanner.save()
+
+      return transportation
     })
     .catch((err) => {
       req.body.err = new RecordConflictException({
@@ -124,9 +126,9 @@ const updateTransportationDocument = async (
   targetTransportation.departureTime ||= departureTime
   targetTransportation.arrivalTime ||= arrivalTime
   targetTransportation.vehicleId ||= vehicleId
-  targetTransportation.save()
+  const updatedTransportation = await targetTransportation.save()
 
-  req.body.result = targetTransportation
+  req.body.result = updatedTransportation
   req.body.status = StatusCodes.OK
 
   next()
@@ -220,11 +222,10 @@ const getTransportationDocumentsByPlannerId = async (
     next(req.body.err)
   }
   const { targetPlanner } = req.body.out
-  const resultTransportations: Transport[] = await targetPlanner.transportations.map(
-    async (tid: Types.ObjectId) => {
+  const resultTransportations: Transport[] =
+    await targetPlanner.transportations.map(async (tid: Types.ObjectId) => {
       return await TransportModel.findById(tid)
-    },
-  )
+    })
 
   if (resultTransportations.length === 0) {
     req.body.err = new RecordNotFoundException({

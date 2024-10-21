@@ -28,7 +28,7 @@ activityRouter.post(
   RequestUtils.mkErrorResponse,
 )
 activityRouter.get(
-  '/:activityId',
+  '/:activityId([0-9a-fA-F]{24})',
   ActivityValidator.getActivityById,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
@@ -39,7 +39,7 @@ activityRouter.get(
   RequestUtils.mkErrorResponse,
 )
 activityRouter.patch(
-  '/:activityId',
+  '/:activityId([0-9a-fA-F]{24})',
   ActivityValidator.updateActivity,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,
@@ -50,7 +50,7 @@ activityRouter.patch(
   RequestUtils.mkErrorResponse,
 )
 activityRouter.delete(
-  '/:activityId',
+  '/:activityId([0-9a-fA-F]{24})',
   ActivityValidator.deleteActivity,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,

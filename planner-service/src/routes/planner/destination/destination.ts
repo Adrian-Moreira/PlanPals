@@ -29,7 +29,7 @@ destinationRouter.post(
 )
 
 destinationRouter.get(
-  '/:destinationId',
+  '/:destinationId([0-9a-fA-F]{24})',
   DestinationValidator.getDestinationById,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
@@ -39,7 +39,7 @@ destinationRouter.get(
   RequestUtils.mkErrorResponse
 )
 destinationRouter.patch(
-  '/:destinationId',
+  '/:destinationId([0-9a-fA-F]{24})',
   DestinationValidator.updateDestination,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
@@ -49,7 +49,7 @@ destinationRouter.patch(
   RequestUtils.mkErrorResponse
 )
 destinationRouter.delete(
-  '/:destinationId',
+  '/:destinationId([0-9a-fA-F]{24})',
   DestinationValidator.deleteDestination,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
@@ -59,5 +59,5 @@ destinationRouter.delete(
   RequestUtils.mkErrorResponse
 )
 
-destinationRouter.use('/:destinationId/accommodation', accommodationRouter)
-destinationRouter.use('/:destinationId/activity', activityRouter)
+destinationRouter.use('/:destinationId([0-9a-fA-F]{24})/accommodation', accommodationRouter)
+destinationRouter.use('/:destinationId([0-9a-fA-F]{24})/activity', activityRouter)

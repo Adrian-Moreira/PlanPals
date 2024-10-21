@@ -5,6 +5,33 @@ import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { BasicUser, UserModel } from '../models/User'
 
+const verifyUserExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
+  if (req.body.err) {
+    next(req.body.err)
+  }
+  let {
+    userId,
+    createdBy,
+  }: { userId: Types.ObjectId; createdBy: Types.ObjectId } = req.body.out
+  userId ||= createdBy // Assuming either userId or createdBy is provided
+  const user = await UserModel.findOne({ _id: userId })
+  if (!user) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'User',
+      recordId: userId.toString(),
+    })
+    next(req.body.err)
+  }
+
+  req.body.out = { ...req.body.out, targetUser: user }
+
+  next()
+}
+
 /**
  * Creates a new user document in the database.
  *
@@ -52,16 +79,13 @@ const updateUserDocument = async (
   if (req.body.err) {
     next(req.body.err)
   }
-  const updatedUser = req.body.out as {
-    userId: Types.ObjectId
-    userName: string
-    preferredName: string
-  }
+  const { targetUser, userName, preferredName } = req.body.out
+
   const userUpdated = await UserModel.findOneAndUpdate(
-    { _id: updatedUser.userId },
+    { _id: targetUser._id },
     {
-      userName: updatedUser.userName,
-      preferredName: updatedUser.preferredName,
+      userName,
+      preferredName,
     },
     {
       new: true,
@@ -69,11 +93,7 @@ const updateUserDocument = async (
   ).catch((err) => {
     req.body.err = new RecordConflictException({
       requestType: 'updateUser',
-      conflict:
-        'User with name ' +
-        updatedUser.userName +
-        ' already exists ' +
-        err.message,
+      conflict: 'User with name ' + userName + ' already exists ' + err.message,
     })
     next(req.body.err)
   })
@@ -81,7 +101,7 @@ const updateUserDocument = async (
   if (!userUpdated) {
     req.body.err = new RecordNotFoundException({
       recordType: 'User',
-      recordId: updatedUser.userId.toString(),
+      recordId: targetUser._id.toString(),
     })
     next(req.body.err)
   }
@@ -109,12 +129,12 @@ const deleteUserDocument = async (
   if (req.body.err) {
     next(req.body.err)
   }
-  const { userId }: { userId: Types.ObjectId } = req.body.out
-  const userDeleted = await UserModel.findOneAndDelete({ _id: userId })
+  const { targetUser } = req.body.out
+  const userDeleted = await UserModel.findOneAndDelete({ _id: targetUser._id })
   if (!userDeleted) {
     req.body.err = new RecordNotFoundException({
       recordType: 'User',
-      recordId: userId.toString(),
+      recordId: targetUser._id.toString(),
     })
     next(req.body.err)
   }
@@ -142,18 +162,9 @@ const getUserDocumentById = async (
   if (req.body.err) {
     next(req.body.err)
   }
-  const { userId }: { userId: Types.ObjectId } = req.body.out
-  const user = await UserModel.findOne({ _id: userId })
-  if (!user) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'User',
-      recordId: userId.toString(),
-    })
-    next(req.body.err)
-  } else {
-    req.body.result = user
-    req.body.status = StatusCodes.OK
-  }
+  const { targetUser } = req.body.out
+  req.body.result = targetUser
+  req.body.status = StatusCodes.OK
   next()
 }
 
@@ -190,6 +201,7 @@ const getUserDocumentByName = async (
 }
 
 const UserService = {
+  verifyUserExists,
   createUserDocument,
   updateUserDocument,
   deleteUserDocument,

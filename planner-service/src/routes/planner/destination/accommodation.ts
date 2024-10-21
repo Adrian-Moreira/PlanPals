@@ -29,7 +29,7 @@ accommodationRouter.post(
   RequestUtils.mkErrorResponse,
 )
 accommodationRouter.get(
-  '/:accommodationId',
+  '/:accommodationId([0-9a-fA-F]{24})',
   AccommodationValidator.getAccommodationById,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
@@ -40,7 +40,7 @@ accommodationRouter.get(
   RequestUtils.mkErrorResponse,
 )
 accommodationRouter.patch(
-  '/:accommodationId',
+  '/:accommodationId([0-9a-fA-F]{24})',
   AccommodationValidator.updateAccommodation,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,
@@ -51,7 +51,7 @@ accommodationRouter.patch(
   RequestUtils.mkErrorResponse,
 )
 accommodationRouter.delete(
-  '/:accommodationId',
+  '/:accommodationId([0-9a-fA-F]{24})',
   AccommodationValidator.deleteAccommodation,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,

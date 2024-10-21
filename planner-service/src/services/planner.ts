@@ -1,298 +1,187 @@
-import { Types } from 'mongoose'
-import { ObjectIdSchema, PlannerModel, PlannerSchema } from '../models/Planner'
-import { MalformedRequestException } from '../exceptions/MalformedRequestException'
+import { PlannerModel } from '../models/Planner'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { RecordConflictException } from '../exceptions/RecordConflictException'
-import { UserModel } from '../models/User'
 import { NextFunction, Request, Response } from 'express'
 import assert from 'assert'
+import { StatusCodes } from 'http-status-codes'
 
-export const createPlannerService = async ({
-  createdBy,
-  startDate,
-  endDate,
-  roUsers,
-  rwUsers,
-  name,
-  description,
-  destinations,
-  transportations,
-  invites,
-}: any): Promise<any> => {
-  const newPlanner = {
-    createdBy: createdBy ? new Types.ObjectId(createdBy as string) : undefined,
-    startDate,
-    endDate,
-    roUsers: roUsers
-      ? roUsers.map((userId: string) => new Types.ObjectId(userId))
-      : [],
-    rwUsers: rwUsers
-      ? rwUsers.map((userId: string) => new Types.ObjectId(userId))
-      : [],
+/**
+ * Creates a new planner document in the database.
+ *
+ * @param {Request} req - The incoming request from the client.
+ * @param {Response} res - The response to the client.
+ * @param {NextFunction} next - The next function in the middleware chain.
+ *
+ * @throws {RecordNotFoundException} If the user does not exist.
+ */
+export const createPlannerDocument = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const {
+    createdBy,
     name,
     description,
-    destinations: destinations
-      ? destinations.map((destId: string) => new Types.ObjectId(destId))
-      : [],
-    transportations: transportations
-      ? transportations.map((transId: string) => new Types.ObjectId(transId))
-      : [],
-    invites: invites
-      ? invites.map((invId: string) => new Types.ObjectId(invId))
-      : [],
-  }
+    startDate,
+    endDate,
+    roUsers,
+    rwUsers,
+    destinations,
+    transportations,
+    invites,
+  } = req.body.out
+  const planner = new PlannerModel({
+    createdBy,
+    name,
+    description,
+    startDate,
+    endDate,
+    roUsers,
+    rwUsers,
+    destinations,
+    transportations,
+    invites,
+  })
+  await planner.save()
 
-  if (!newPlanner.createdBy || !newPlanner.name) {
-    throw new MalformedRequestException({
-      requestType: 'createPlanner',
-      requestBody: 'Invalid request body ' + JSON.stringify(newPlanner),
-    })
-  }
-
-  if (!(await UserModel.exists({ _id: newPlanner.createdBy }))) {
-    throw new RecordNotFoundException({
-      recordType: 'user',
-      recordId: 'No user found with ID ' + newPlanner.createdBy,
-    })
-  }
-
-  await PlannerSchema.pick({
-    createdBy: true,
-    startDate: true,
-    endDate: true,
-    roUsers: true,
-    rwUsers: true,
-    name: true,
-    destinations: true,
-    transportations: true,
-    description: true,
-    invites: true,
-  }).parseAsync(newPlanner)
-
-  return await PlannerModel.create(newPlanner)
+  req.body.result = planner
+  req.body.status = StatusCodes.CREATED
+  next()
 }
 
-export const getPlannerByIdService = async ({
-  plannerId,
-  userId,
-}: any): Promise<any> => {
-  const userObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(userId as string),
+
+/**
+ * Updates an existing planner document in the database.
+ *
+ * @param {Request} req - The incoming request from the client.
+ * @param {Response} res - The response to the client.
+ * @param {NextFunction} next - The next function in the middleware chain.
+ *
+ * @throws {RecordNotFoundException} If the planner does not exist.
+ */
+export const updatePlannerDocument = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const { targetPlanner, name, description, startDate, endDate } = req.body.out
+
+  const savedPlanner = await PlannerModel.findOneAndUpdate(
+    { _id: targetPlanner._id },
+    {
+      name,
+      description,
+      startDate,
+      endDate,
+    },
+    { new: true }
   )
 
-  const plannerObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(plannerId as string),
-  )
-
-  const planner = await PlannerModel.findOne({ _id: plannerObjectId })
-  if (!planner)
-    throw new RecordNotFoundException({
-      recordType: 'planner',
-      recordId: plannerId,
-    })
-
-  if (
-    planner.roUsers.includes(userId) ||
-    planner.rwUsers.includes(userId) ||
-    planner.createdBy.equals(userObjectId)
-  ) {
-    return planner.populate([
-      'createdBy',
-      'roUsers',
-      'rwUsers',
-      'destinations',
-      'transportations',
-      'invites',
-    ])
-  } else {
-    throw new RecordNotFoundException({
-      recordType: 'planner',
-      recordId: plannerId,
-    })
-  }
-}
-
-export const getPlannersByUserIdService = async ({
-  userId,
-}: any): Promise<any> => {
-  const id = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(userId as string),
-  )
-
-  const planners = await PlannerModel.find({ createdBy: id })
-
-  if (!planners || planners.length === 0)
-    throw new RecordNotFoundException({
-      recordType: 'planner',
-      recordId: 'No planners found for the given user ID ' + userId,
-    })
-
-  return planners
-}
-
-export const getPlannersByAccessService = async ({
-  userId,
-  access,
-}: any): Promise<any> => {
-  const id = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(userId as string),
-  )
-
-  if (access == 'ro') {
-    return await PlannerModel.find({ roUsers: id }).catch(() => {
-      throw new MalformedRequestException({
-        requestType: 'getPlannersByAccess',
-        requestBody: 'Invalid ObjectId format',
-      })
-    })
-  } else if (access == 'rw') {
-    return await PlannerModel.find({ rwUsers: id }).catch(() => {
-      throw new MalformedRequestException({
-        requestType: 'getPlannersByAccess',
-        requestBody: 'Invalid ObjectId format',
-      })
-    })
-  } else {
-    throw new MalformedRequestException({
-      requestType: 'getPlannersByAccess',
-      requestBody: 'Invalid access type',
-    })
-  }
-}
-
-interface PlannerInviteParams {
-  plannerId: string
-  userId: string
-  listOfUserIdWithRole: [{ _id: string; access: 'ro' | 'rw' }]
-}
-
-export const inviteIntoPlannerService = async ({
-  plannerId,
-  userId,
-  listOfUserIdWithRole,
-}: PlannerInviteParams): Promise<any> => {
-  const plannerObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(plannerId),
-  )
-  const userObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(userId),
-  )
-
-  const planner = await PlannerModel.findById(plannerObjectId)
-  if (!planner) {
-    throw new RecordNotFoundException({
+  if (!savedPlanner) {
+    req.body.err = new RecordNotFoundException({
       recordType: 'Planner',
-      message: 'Planner not found',
+      recordId: targetPlanner._id.toString(),
     })
+    next(req.body.err)
   }
+  req.body.result = savedPlanner
+  req.body.status = StatusCodes.OK
+  next()
+}
 
-  if (!planner.rwUsers.includes(userObjectId))
-    throw new Error('User is not a RW in the planner')
+  /**
+   * Deletes a planner document given a planner ID.
+   *
+   * @param req - The request object.
+   * @param res - The response object.
+   * @param next - The next function in the middleware chain.
+   * @returns {Promise<void>} - A promise that resolves when the middleware chain
+   *     has been exhausted.
+   */
+export const deletePlannerDocument = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const { targetPlanner } = req.body.out
+  const planner = await PlannerModel.findOneAndDelete({
+    _id: targetPlanner._id,
+  })
+  req.body.result = planner
+  req.body.status = StatusCodes.OK
+  next()
+}
 
-  for (const { _id, access } of listOfUserIdWithRole) {
-    const toBeAdded = await ObjectIdSchema.parseAsync(new Types.ObjectId(_id))
+  /**
+   * Retrieves all planner documents for a given user ID.
+   *
+   * @param req - The request object.
+   * @param res - The response object.
+   * @param next - The next function in the middleware chain.
+   * @returns {Promise<void>} - A promise that resolves when the middleware chain
+   *     has been exhausted.
+   */
+export const getPlannerDocumentsByUserId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const { targetUser, access } = req.body.out
 
-    if (
-      toBeAdded.equals(userObjectId) ||
-      planner.rwUsers.includes(toBeAdded) ||
-      planner.roUsers.includes(toBeAdded)
-    ) {
-      throw new RecordConflictException({
-        requestType: 'inviteIntoPlanner',
-        conflict: 'User is already invited in the planner',
-      })
+  let resultPlanners
+
+  if (access) {
+    switch (access) {
+      case 'rw':
+        resultPlanners = await PlannerModel.find({ rwUsers: targetUser._id })
+        break
+      case 'ro':
+        resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })
+        break
+      default:
+        req.body.err = new RecordNotFoundException({
+          recordType: 'planner',
+          recordId: targetUser._id,
+        })
+        next(req.body.err)
     }
-
-    if (access === 'ro') {
-      planner.roUsers.push(toBeAdded)
-    } else if (access === 'rw') {
-      planner.rwUsers.push(toBeAdded)
-    }
-
-    return await planner.save()
+  } else {
+    resultPlanners = await PlannerModel.find({ createdBy: targetUser._id })
   }
+
+  if (!resultPlanners || resultPlanners.length === 0) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: targetUser._id,
+    })
+    next(req.body.err)
+  }
+  req.body.result = resultPlanners
+  req.body.status = StatusCodes.OK
+  next()
 }
 
-export const updatePlannerService = async ({
-  plannerId,
-  userId,
-  startDate,
-  endDate,
-  name,
-  description,
-}: any): Promise<any> => {
-  const plannerObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(plannerId as string),
-  )
-
-  const targetPlanner = await PlannerModel.findById(plannerObjectId)
-  if (!targetPlanner)
-    throw new RecordNotFoundException({
-      recordType: 'planner',
-      recordId: plannerId,
-    })
-
-  if (
-    targetPlanner.rwUsers.includes(userId) ||
-    targetPlanner.createdBy.equals(new Types.ObjectId(userId as string))
-  ) {
-    return await PlannerModel.findByIdAndUpdate(
-      plannerObjectId,
-      {
-        startDate: startDate || targetPlanner.startDate,
-        endDate: endDate || targetPlanner.endDate,
-        name: name || targetPlanner.name,
-        description: description || targetPlanner.description,
-      },
-      { new: true },
-    ).catch((err) => {
-      throw new MalformedRequestException({
-        requestType: 'updatePlanner',
-        requestBody: 'Invalid Planner ObjectId format ' + err.message,
-      })
-    })
-  } else {
-    throw new RecordNotFoundException({
-      recordType: 'Planner',
-      recordId: plannerId,
-    })
+/**
+ * Retrieves a planner document by planner ID.
+ *
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next function in the middleware chain.
+ * @returns {Promise<void>} - A promise that resolves when the middleware chain
+ *     has been exhausted.
+ */
+export const getPlannerDocumentByPlannerId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  if (req.body.err) {
+    next(req.body.err)
   }
-}
-
-export const deletePlannerService = async ({
-  plannerId,
-  userId,
-}: any): Promise<any> => {
-  const plannerObjectId = await ObjectIdSchema.parseAsync(
-    new Types.ObjectId(plannerId as string),
-  )
-
-  const targetPlanner = await PlannerModel.findById(plannerObjectId)
-  if (!targetPlanner)
-    throw new RecordNotFoundException({
-      recordType: 'planner',
-      recordId: plannerId,
-    })
-
-  if (targetPlanner.createdBy.equals(new Types.ObjectId(userId as string))) {
-    return await PlannerModel.findByIdAndDelete(plannerObjectId).then(
-      (deletePlanner) => {
-        if (!deletePlanner) {
-          throw new RecordNotFoundException({
-            recordType: 'Planner',
-            recordId: plannerId,
-          })
-        }
-
-        return deletePlanner
-      },
-    )
-  } else {
-    throw new RecordNotFoundException({
-      recordType: 'Planner',
-      recordId: plannerId,
-    })
-  }
+  const { targetPlanner } = req.body.out
+  req.body.result = targetPlanner
+  req.body.status = StatusCodes.OK
+  next()
 }
 
 /**
@@ -303,12 +192,12 @@ export const deletePlannerService = async ({
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-function verifyPlannerExists(req: Request, res: Response, next: NextFunction) {
+async function verifyPlannerExists(req: Request, res: Response, next: NextFunction) {
   if (req.body.err) {
     next(req.body.err)
   }
   const { plannerId } = req.body.out
-  const targetPlanner = PlannerModel.findOne({ _id: plannerId })
+  const targetPlanner = await PlannerModel.findOne({ _id: plannerId })
   if (!targetPlanner) {
     req.body.err = new RecordNotFoundException({
       recordType: 'planner',
@@ -341,6 +230,7 @@ function verifyUserCanEditPlanner(
   let { plannerId, createdBy, userId, targetPlanner } = req.body.out
   userId ||= createdBy // Assuming either userId or createdBy is provided
   assert(userId || createdBy, 'User ID is required')
+  assert(targetPlanner, 'Planner is required')
   if (
     !targetPlanner.rwUsers.includes(userId) &&
     !targetPlanner.createdBy?.equals(userId)
@@ -396,6 +286,11 @@ const PlannerService = {
   verifyPlannerExists,
   verifyUserCanEditPlanner,
   verifyUserCanViewPlanner,
+  createPlannerDocument,
+  updatePlannerDocument,
+  deletePlannerDocument,
+  getPlannerDocumentsByUserId,
+  getPlannerDocumentByPlannerId,
 }
 
 export default PlannerService
