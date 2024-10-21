@@ -1,7 +1,8 @@
 import mongoose, { Mongoose } from 'mongoose'
 import config from '.'
 
-export const mongoURI = config.database.connectionString || 'mongodb://localhost:27017'
+export const mongoURI =
+  config.database.connectionString || 'mongodb://localhost:27017'
 export let db: Mongoose
 /**
  * Connects to MongoDB using Mongoose.

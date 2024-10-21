@@ -15,29 +15,24 @@ const DestinationMongoSchema = new Schema<Destination>(
       type: String,
       required: true,
     },
-
     endDate: {
       type: String,
       required: true,
     },
-
     name: {
       type: String,
       required: true,
     },
-
     activities: {
       type: [Schema.Types.ObjectId],
       required: true,
       ref: 'Activity',
     },
-
     accommodations: {
       type: [Schema.Types.ObjectId],
       required: true,
       ref: 'Accommodation',
     },
-
     plannerId: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -46,30 +41,6 @@ const DestinationMongoSchema = new Schema<Destination>(
   },
   { _id: true, timestamps: true },
 )
-
-DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
-  try {
-    const query = this.getQuery()
-    const destination = await this.model.findOne(query)
-
-    if (destination) {
-      await PlannerModel.findByIdAndUpdate(
-        { _id: destination.plannerId },
-        { $pull: { destinations: destination._id } },
-      )
-      destination.activities.forEach(async (a: { _id: any }) => {
-        await ActivityModel.findOneAndDelete({ _id: a._id })
-      })
-      destination.accommodations.forEach(async (a: { _id: any }) => {
-        await AccommodationModel.findOneAndDelete({ _id: a._id })
-      })
-    }
-
-    next()
-  } catch (error) {
-    next(error as Error)
-  }
-})
 
 export const DestinationSchema = z.object({
   _id: ObjectIdSchema,

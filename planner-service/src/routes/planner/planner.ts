@@ -17,11 +17,13 @@ plannerRouter.get(
   RequestUtils.mkSuccessResponse<Planner[]>,
   RequestUtils.mkErrorResponse,
 )
-plannerRouter.post('/', PlannerValidator.createPlanner,
+plannerRouter.post(
+  '/',
+  PlannerValidator.createPlanner,
   UserService.verifyUserExists,
   PlannerService.createPlannerDocument,
   RequestUtils.mkSuccessResponse<Planner>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 plannerRouter.get(
   '/:plannerId([0-9a-fA-F]{24})',

@@ -14,7 +14,7 @@ transportationRouter.get(
   PlannerService.verifyUserCanViewPlanner,
   TransportationService.getTransportationDocumentsByPlannerId,
   RequestUtils.mkSuccessResponse<Transport[]>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 
 transportationRouter.post(
@@ -24,7 +24,7 @@ transportationRouter.post(
   PlannerService.verifyUserCanEditPlanner,
   TransportationService.createTransportationDocument,
   RequestUtils.mkSuccessResponse<Transport>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 
 transportationRouter.get(
@@ -35,7 +35,7 @@ transportationRouter.get(
   TransportationService.verifyTransportationExists,
   TransportationService.getTransportationDocumentById,
   RequestUtils.mkSuccessResponse<Transport>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 
 transportationRouter.patch(
@@ -46,7 +46,7 @@ transportationRouter.patch(
   TransportationService.verifyTransportationExists,
   TransportationService.updateTransportationDocument,
   RequestUtils.mkSuccessResponse<Transport>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 
 transportationRouter.delete(
@@ -57,5 +57,5 @@ transportationRouter.delete(
   TransportationService.verifyTransportationExists,
   TransportationService.deleteTransportationDocument,
   RequestUtils.mkSuccessResponse<Transport>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )

@@ -39,7 +39,7 @@ const CommentsMongoSchema = new Schema<Comments>(
   {
     _id: false,
     timestamps: false,
-  }
+  },
 )
 
 export const CommentSchema = z.object({

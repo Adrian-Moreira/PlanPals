@@ -20,7 +20,7 @@ const ActivityMongoSchema = new Schema<Activity>(
       required: true,
     },
 
-    location : {
+    location: {
       type: String,
     },
 
@@ -42,24 +42,6 @@ const ActivityMongoSchema = new Schema<Activity>(
   },
   { _id: true, timestamps: true },
 )
-
-ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
-  try {
-    const query = this.getQuery()
-    const activity = await this.model.findOne(query)
-
-    if (activity) {
-      await DestinationModel.findByIdAndUpdate(
-        { _id: activity.destinationId },
-        { $pull: { activities: activity._id } },
-      )
-    }
-
-    next()
-  } catch (error) {
-    next(error as Error)
-  }
-})
 
 export const ActivitySchema = z.object({
   _id: ObjectIdSchema,

@@ -210,9 +210,10 @@ const getAccommodationDocumentsByDestinationId = async (
 
   const { targetDestination } = req.body.out
 
-  const resultAccommodations: Accommodation[] = await targetDestination.accommodation.map(
-    (aid: Types.ObjectId) => AccommodationModel.findOne({ _id: aid }),
-  )
+  const resultAccommodations: Accommodation[] =
+    await targetDestination.accommodation.map((aid: Types.ObjectId) =>
+      AccommodationModel.findOne({ _id: aid }),
+    )
 
   req.body.result = resultAccommodations
   req.body.status = StatusCodes.OK

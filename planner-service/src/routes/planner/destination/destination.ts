@@ -16,7 +16,7 @@ destinationRouter.get(
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.getDestinationDocumentsByPlannerId,
   RequestUtils.mkSuccessResponse<Destination[]>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 destinationRouter.post(
   '/',
@@ -25,7 +25,7 @@ destinationRouter.post(
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.createDestinationDocument,
   RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 
 destinationRouter.get(
@@ -36,7 +36,7 @@ destinationRouter.get(
   DestinationService.verifyDestinationExists,
   DestinationService.getDestinationDocumentById,
   RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 destinationRouter.patch(
   '/:destinationId([0-9a-fA-F]{24})',
@@ -46,7 +46,7 @@ destinationRouter.patch(
   DestinationService.verifyDestinationExists,
   DestinationService.updateDestinationDocument,
   RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 destinationRouter.delete(
   '/:destinationId([0-9a-fA-F]{24})',
@@ -56,8 +56,14 @@ destinationRouter.delete(
   DestinationService.verifyDestinationExists,
   DestinationService.deleteDestinationDocument,
   RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 
-destinationRouter.use('/:destinationId([0-9a-fA-F]{24})/accommodation', accommodationRouter)
-destinationRouter.use('/:destinationId([0-9a-fA-F]{24})/activity', activityRouter)
+destinationRouter.use(
+  '/:destinationId([0-9a-fA-F]{24})/accommodation',
+  accommodationRouter,
+)
+destinationRouter.use(
+  '/:destinationId([0-9a-fA-F]{24})/activity',
+  activityRouter,
+)

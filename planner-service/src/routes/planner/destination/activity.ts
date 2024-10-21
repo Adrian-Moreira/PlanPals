@@ -15,7 +15,7 @@ activityRouter.get(
   DestinationService.verifyDestinationExists,
   ActivityService.getActivitiyDocumentsByDestinationId,
   RequestUtils.mkSuccessResponse<Activity[]>,
-  RequestUtils.mkErrorResponse
+  RequestUtils.mkErrorResponse,
 )
 activityRouter.post(
   '/',

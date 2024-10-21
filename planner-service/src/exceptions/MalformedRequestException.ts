@@ -1,4 +1,3 @@
-// planner-service/src/exceptions/MalformedRequestException.ts`
 import { StatusCodes } from 'http-status-codes'
 import { BaseException } from './BaseException'
 

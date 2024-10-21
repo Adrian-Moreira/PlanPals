@@ -39,24 +39,6 @@ const TransportMongoSchema = new Schema<Transport>(
   },
 )
 
-TransportMongoSchema.pre('findOneAndDelete', async function (next) {
-  try {
-    const query = this.getQuery()
-    const transport = await this.model.findOne(query)
-
-    if (transport) {
-      await PlannerModel.findByIdAndUpdate(
-        { _id: transport.plannerId },
-        { $pull: { transportations: transport._id } },
-      )
-    }
-
-    next()
-  } catch (error) {
-    next(error as Error)
-  }
-})
-
 export const TransportSchema = z.object({
   _id: ObjectIdSchema,
 

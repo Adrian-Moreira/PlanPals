@@ -49,7 +49,6 @@ export const createPlannerDocument = async (
   next()
 }
 
-
 /**
  * Updates an existing planner document in the database.
  *
@@ -74,7 +73,7 @@ export const updatePlannerDocument = async (
       startDate,
       endDate,
     },
-    { new: true }
+    { new: true },
   )
 
   if (!savedPlanner) {
@@ -89,15 +88,15 @@ export const updatePlannerDocument = async (
   next()
 }
 
-  /**
-   * Deletes a planner document given a planner ID.
-   *
-   * @param req - The request object.
-   * @param res - The response object.
-   * @param next - The next function in the middleware chain.
-   * @returns {Promise<void>} - A promise that resolves when the middleware chain
-   *     has been exhausted.
-   */
+/**
+ * Deletes a planner document given a planner ID.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function in the middleware chain.
+ * @returns {Promise<void>} - A promise that resolves when the middleware chain
+ *     has been exhausted.
+ */
 export const deletePlannerDocument = async (
   req: Request,
   res: Response,
@@ -112,15 +111,15 @@ export const deletePlannerDocument = async (
   next()
 }
 
-  /**
-   * Retrieves all planner documents for a given user ID.
-   *
-   * @param req - The request object.
-   * @param res - The response object.
-   * @param next - The next function in the middleware chain.
-   * @returns {Promise<void>} - A promise that resolves when the middleware chain
-   *     has been exhausted.
-   */
+/**
+ * Retrieves all planner documents for a given user ID.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function in the middleware chain.
+ * @returns {Promise<void>} - A promise that resolves when the middleware chain
+ *     has been exhausted.
+ */
 export const getPlannerDocumentsByUserId = async (
   req: Request,
   res: Response,
@@ -192,7 +191,11 @@ export const getPlannerDocumentByPlannerId = async (
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-async function verifyPlannerExists(req: Request, res: Response, next: NextFunction) {
+async function verifyPlannerExists(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   if (req.body.err) {
     next(req.body.err)
   }

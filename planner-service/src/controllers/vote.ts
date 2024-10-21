@@ -40,7 +40,7 @@ const VoteRouteSchema = {
     params: z.object({
       userId: ObjectIdStringSchema,
     }),
-  })
+  }),
 }
 
 const VoteValidator = RequestUtils.mkParsers(VoteRouteSchema)

@@ -19,17 +19,14 @@ const AccommodationMongoSchema = new Schema<Accommodation>(
       type: String,
       required: true,
     },
-
     endDate: {
       type: String,
       required: true,
     },
-
     name: {
       type: String,
       required: true,
     },
-
     location: {
       type: String,
     },
@@ -39,24 +36,6 @@ const AccommodationMongoSchema = new Schema<Accommodation>(
     timestamps: true,
   },
 )
-
-AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
-  try {
-    const query = this.getQuery()
-    const accommodation = await this.model.findOne(query)
-
-    if (accommodation) {
-      await DestinationModel.findByIdAndUpdate(
-        { _id: accommodation.destinationId },
-        { $pull: { accommodations: accommodation._id } },
-      )
-    }
-
-    next()
-  } catch (error) {
-    next(error as Error)
-  }
-})
 
 export const AccommodationSchema = z.object({
   _id: ObjectIdSchema,
