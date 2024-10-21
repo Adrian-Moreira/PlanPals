@@ -64,7 +64,7 @@ const createAccommodationDocument = async (
   const { targetDestination, createdBy, name, location, startDate, endDate } =
     req.body.out
 
-  await AccommodationModel.create({
+  const createdAccommodation = await AccommodationModel.create({
     createdBy,
     destinationId: targetDestination._id,
     name,
@@ -72,20 +72,23 @@ const createAccommodationDocument = async (
     startDate,
     endDate,
   })
-    .then((accommodation) => {
+    .then(async (accommodation) => {
       targetDestination.accommodation.push(accommodation._id)
-      targetDestination.save()
+      await targetDestination.save()
 
-      req.body.result = accommodation
-      req.body.status = StatusCodes.CREATED
+      return accommodation
     })
-    .catch(() => {
+    .catch((err) => {
       req.body.err = new RecordConflictException({
         requestType: 'create',
-        conflict: 'Accommodation already exists',
+        conflict: 'Accommodation already exists ' + JSON.stringify(err),
       })
+      console.log(req.body.err)
       next(req.body.err)
     })
+
+  req.body.result = createdAccommodation
+  req.body.status = StatusCodes.CREATED
 
   next()
 }
@@ -114,9 +117,9 @@ const updateAccommodationDocument = async (
   targetAccommodation.location ||= location
   targetAccommodation.startDate ||= startDate
   targetAccommodation.endDate ||= endDate
-  targetAccommodation.save()
+  const updatedAccommodation = await targetAccommodation.save()
 
-  req.body.result = targetAccommodation
+  req.body.result = updatedAccommodation
   req.body.status = StatusCodes.OK
 
   next()
@@ -145,7 +148,7 @@ const deleteAccommodationDocument = async (
   targetDestination.accommodation = targetDestination.accommodation.filter(
     (aid: Types.ObjectId) => !aid.equals(targetAccommodation._id),
   )
-  targetDestination.save()
+  await targetDestination.save()
 
   const deletedAccommodation = await AccommodationModel.findOneAndDelete({
     _id: targetAccommodation._id,
@@ -211,9 +214,9 @@ const getAccommodationDocumentsByDestinationId = async (
   const { targetDestination } = req.body.out
 
   const resultAccommodations: Accommodation[] =
-    await targetDestination.accommodation.map((aid: Types.ObjectId) =>
-      AccommodationModel.findOne({ _id: aid }),
-    )
+    await targetDestination.accommodation.map(async (aid: Types.ObjectId) => {
+      return await AccommodationModel.findOne({ _id: aid })
+    })
 
   req.body.result = resultAccommodations
   req.body.status = StatusCodes.OK

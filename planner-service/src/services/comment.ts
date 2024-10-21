@@ -122,7 +122,7 @@ const removeCommentDocument = async (
   )
   await commentsDocument.save()
 
-  req.body.result = await CommentModel.findByIdAndDelete(commentId)
+  req.body.result = await CommentModel.findOneAndDelete({ _id: commentId })
   req.body.status = StatusCodes.OK
   next()
 }
@@ -149,8 +149,10 @@ const getCommentsByObjectId = async (
     next(req.body.err)
   }
   const { commentsDocument } = req.body.out
-  const comments = commentsDocument.comments.map((comment: Types.ObjectId) =>
-    CommentModel.findById(comment),
+  const comments = commentsDocument.comments.map(
+    async (comment: Types.ObjectId) => {
+      return await CommentModel.findById(comment)
+    },
   )
   if (!comments || comments.length === 0) {
     req.body.err = new RecordNotFoundException({

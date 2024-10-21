@@ -60,7 +60,7 @@ const createActivityDocument = async (
   const { targetDestination, name, startDate, duration, location, createdBy } =
     req.body.out
 
-  await ActivityModel.create({
+  const createdActivity = await ActivityModel.create({
     createdBy,
     destinationId: targetDestination._id,
     name,
@@ -68,12 +68,10 @@ const createActivityDocument = async (
     duration,
     location,
   })
-    .then((activity) => {
+    .then(async (activity) => {
       targetDestination.activities.push(activity._id)
-      targetDestination.save()
-
-      req.body.result = activity
-      req.body.status = StatusCodes.CREATED
+      await targetDestination.save()
+      return activity
     })
     .catch(() => {
       req.body.err = new RecordConflictException({
@@ -82,6 +80,9 @@ const createActivityDocument = async (
       })
       next(req.body.err)
     })
+
+  req.body.result = createdActivity
+  req.body.status = StatusCodes.CREATED
 
   next()
 }
@@ -111,9 +112,9 @@ const updateActivityDocument = async (
   targetActivity.startDate ||= startDate
   targetActivity.duration ||= duration
   targetActivity.location ||= location
-  targetActivity.save()
+  const updatedActivity = await targetActivity.save()
 
-  req.body.result = targetActivity
+  req.body.result = updatedActivity
   req.body.status = StatusCodes.OK
 
   next()
@@ -138,12 +139,12 @@ const deleteActivityDocument = async (
   }
 
   const { targetActivity, targetDestination } = req.body.out
-  await ActivityModel.deleteOne({ _id: targetActivity._id })
-    .then((a) => {
+  await ActivityModel.findByIdAndDelete({ _id: targetActivity._id })
+    .then(async (a) => {
       targetDestination.activities = targetDestination.activities.filter(
         (aid: Types.ObjectId) => aid.equals(targetActivity._id),
       )
-      targetDestination.save()
+      await targetDestination.save()
 
       req.body.result = a
       req.body.status = StatusCodes.OK
@@ -205,7 +206,9 @@ const getActivitiyDocumentsByDestinationId = async (
   const { targetDestination } = req.body.out
 
   const resultActivities: Activity[] = await targetDestination.activities.map(
-    (aid: Types.ObjectId) => ActivityModel.findOne({ _id: aid }),
+    async (aid: Types.ObjectId) => {
+      return await ActivityModel.findOne({ _id: aid })
+    },
   )
 
   if (resultActivities.length === 0) {

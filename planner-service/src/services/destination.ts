@@ -34,7 +34,7 @@ async function verifyDestinationExists(
   }
   if (!targetPlanner.destinations.includes(destinationId)) {
     targetPlanner.destinations.push(destinationId)
-    targetPlanner.save()
+    await targetPlanner.save()
   }
   req.body.out = { ...req.body.out, targetDestination }
   next()
@@ -154,7 +154,7 @@ const deleteDestinationDocument = async (
   targetPlanner.destinations = targetPlanner.destinations.filter(
     (did: Types.ObjectId) => did.equals(targetDestination._id),
   )
-  targetPlanner.save()
+  await targetPlanner.save()
 
   await DestinationModel.findOneAndDelete({ _id: targetDestination._id })
     .then(() => {

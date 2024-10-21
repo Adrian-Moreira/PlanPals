@@ -77,9 +77,9 @@ const createTransportationDocument = async (
     arrivalTime,
     vehicleId,
   })
-    .then((transportation) => {
+    .then(async (transportation) => {
       targetPlanner.transportations.push(transportation._id)
-      targetPlanner.save()
+      await targetPlanner.save()
 
       return transportation
     })
@@ -157,7 +157,7 @@ const deleteTransportationDocument = async (
   targetPlanner.transportations = targetPlanner.transportations.filter(
     (tid: Types.ObjectId) => tid.equals(targetTransportation._id),
   )
-  targetPlanner.save()
+  await targetPlanner.save()
 
   const deletedTransportation = await TransportModel.findOneAndDelete({
     _id: targetTransportation._id,
