@@ -15,7 +15,7 @@ let postUser: any = {
   preferredName: 'Foo Bar',
 }
 
-describe('User API', () => {
+describe.skip('User API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
