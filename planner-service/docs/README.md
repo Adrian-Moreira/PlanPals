@@ -142,7 +142,6 @@ Introduction: to be generated
   | `rwUsers`      | array of strings | No       | IDs of read-write users.         |
   | `destinations` | array of strings | No       | List of destination IDs.         |
   | `transportations` | array of strings | No    | List of transportation IDs.      |
-  | `invites`      | array of strings | No       | List of invited user IDs.        |
 
 - **Response:**
 
@@ -219,35 +218,6 @@ Introduction: to be generated
 - **Response:**
 
   Returns confirmation of deletion.
-
-### Invite Users to Planner
-
-- **URL:** `/planner/:plannerId/invite`
-- **Method:** `POST`
-- **Description:** Invites users to the planner.
-- **Path Parameters:**
-
-  | Parameter   | Type   | Required | Description                   |
-  | ----------- | ------ | -------- | ----------------------------- |
-  | `plannerId` | string | Yes      | The planner's ID.             |
-
-- **Request Body:**
-
-  | Field                   | Type                     | Required | Description                                 |
-  | ----------------------- | ------------------------ | -------- | ------------------------------------------- |
-  | `userId`                | string                   | Yes      | ID of the user sending the invites.         |
-  | `listOfUserIdWithRole`  | array of objects         | Yes      | List of users to invite with their roles.   |
-
-  Each object in `listOfUserIdWithRole`:
-
-  | Field   | Type   | Required | Description                         |
-  | ------- | ------ | -------- | ----------------------------------- |
-  | `userId`| string | Yes      | ID of the user to invite.           |
-  | `role`  | string | Yes      | Role to assign (`'ro'` or `'rw'`).  |
-
-- **Response:**
-
-  Returns the updated planner object with the invited users.
 
 ---
 
