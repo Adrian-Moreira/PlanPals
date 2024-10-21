@@ -13,7 +13,8 @@ describe.skip('Comment API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL || 'mongodb://localhost:27017'
     app = new PlanPals({ dbURI: mongoURI })
-    await app.startServer()
+    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
+    await app.startServer(port)
 
     // Create a test user
     testUser = await UserModel.create({

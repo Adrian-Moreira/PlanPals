@@ -22,7 +22,8 @@ describe('Planner API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
-    await app.startServer()
+    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
+    await app.startServer(port)
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})

@@ -73,9 +73,9 @@ class PlanPals {
     this.app.use(errorHandler)
   }
 
-  public async startServer(): Promise<void> {
+  public async startServer(overridePort: number | null): Promise<void> {
     await connectToMongoDB(this.dbURI)
-    this.server.listen(port, () => {
+    this.server.listen(overridePort || port, () => {
       console.log(`PP erected on port ${port}`)
     })
   }
@@ -92,7 +92,7 @@ if (require.main === module) {
   process.on('SIGINT', () => pp.stopServer())
   process.on('SIGTERM', () => pp.stopServer())
 
-  pp.startServer()
+  pp.startServer(port)
 }
 
 export default PlanPals
