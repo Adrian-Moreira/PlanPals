@@ -11,8 +11,8 @@ RUN npm install -g nodemon
 
 RUN npm install -g typescript
 
+RUN npm install -g ts-node
+
 COPY . .
 
-RUN tsc
-
-CMD [ "node", "out/app.js" ]
+CMD [ "ts-node", "src/app.ts" ]

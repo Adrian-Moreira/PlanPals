@@ -10,7 +10,7 @@ services:
       - DATABASE_CONNECTIONSTRING=mongodb://mongo:27017/planner
     volumes:
       - ./:/code
-    command: npm run start
+    command: sh -c "npm i && npm run start"
 
   mongo:
     image: mongo:8
