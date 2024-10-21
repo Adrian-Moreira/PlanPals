@@ -86,8 +86,8 @@ describe('Planner API', () => {
     testPlanner = await testPlanner.save()
   })
 
-  afterAll(() => {
-    app.stopServer()
+  afterAll(async () => {
+    await app.stopServer()
   })
 
   describe('perform GET from /transportation with plannerId', () => {

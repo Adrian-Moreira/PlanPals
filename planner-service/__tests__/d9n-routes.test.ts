@@ -97,8 +97,8 @@ describe('D9n API', () => {
     testPlanner2 = await testPlanner2.save()
   })
 
-  afterAll(() => {
-    app.stopServer()
+  afterAll(async () => {
+    await app.stopServer()
   })
 
   describe('perform GET from /destination with plannerId', () => {

@@ -25,8 +25,8 @@ describe('User API', () => {
     testUser = await UserSchema.parseAsync(testUser.toObject())
   })
 
-  afterAll(() => {
-    app.stopServer()
+  afterAll(async () => {
+    await app.stopServer()
   })
 
   describe('perform GET from /user', () => {

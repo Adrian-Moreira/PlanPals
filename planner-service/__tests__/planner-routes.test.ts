@@ -47,8 +47,8 @@ describe('Planner API', () => {
     testPlanner = await PlannerSchema.parseAsync(testPlanner.toObject())
   })
 
-  afterAll(() => {
-    app.stopServer()
+  afterAll(async () => {
+    await app.stopServer()
   })
 
   describe('perform GET from /planner with userId', () => {
