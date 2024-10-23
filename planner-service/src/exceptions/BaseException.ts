@@ -1,4 +1,4 @@
-import { debug } from "./debug"
+import { debug } from './debug'
 
 export interface BaseExceptionParams {
   name: string
@@ -16,7 +16,7 @@ export class BaseException extends Error {
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, BaseException)
     }
-    
+
     // debug('baseException', {
     //   exceptionClassName: name,
     //   exceptionFault: status,

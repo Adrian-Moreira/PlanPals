@@ -4,11 +4,6 @@ import { ObjectIdSchema } from './Planner'
 
 const CommentMongoSchema = new Schema<Comment>(
   {
-    plannerId: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'Planner',
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -22,10 +17,6 @@ const CommentMongoSchema = new Schema<Comment>(
       type: String,
       required: true,
     },
-    votes: {
-      type: Number,
-      default: 0,
-    },
   },
   {
     _id: true,
@@ -33,15 +24,37 @@ const CommentMongoSchema = new Schema<Comment>(
   },
 )
 
+const CommentsMongoSchema = new Schema<Comments>(
+  {
+    objectId: {
+      id: { type: Schema.Types.ObjectId, required: true },
+      collection: { type: String, required: true },
+    },
+    comments: {
+      type: [Schema.Types.ObjectId],
+      required: true,
+      ref: 'Comment',
+    },
+  },
+  {
+    _id: false,
+    timestamps: false,
+  },
+)
+
 export const CommentSchema = z.object({
   _id: ObjectIdSchema,
-  plannerId: ObjectIdSchema,
   createdAt: z.string().datetime(),
-  createdBy: ObjectIdSchema,
   updatedAt: z.string().datetime(),
+
+  createdBy: ObjectIdSchema,
   title: z.string().min(1, 'Title is required'),
   content: z.string().min(1, 'Content is required'),
-  votes: z.number().min(0).optional(),
+})
+
+export const CommentsSchema = z.object({
+  objectId: z.object({ id: ObjectIdSchema, collection: z.string() }),
+  comments: z.array(ObjectIdSchema),
 })
 
 export const CommentModel = mongoose.model<Comment>(
@@ -49,4 +62,11 @@ export const CommentModel = mongoose.model<Comment>(
   CommentMongoSchema,
 )
 
+export const CommentsModel = mongoose.model<Comments>(
+  'Comments',
+  CommentsMongoSchema,
+)
+
 export type Comment = z.infer<typeof CommentSchema>
+
+export type Comments = z.infer<typeof CommentsSchema>

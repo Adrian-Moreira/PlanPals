@@ -24,7 +24,8 @@ describe('D9n API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
-    await app.startServer()
+    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
+    await app.startServer(port)
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
@@ -97,8 +98,8 @@ describe('D9n API', () => {
     testPlanner2 = await testPlanner2.save()
   })
 
-  afterAll(() => {
-    app.stopServer()
+  afterAll(async () => {
+    await app.stopServer()
   })
 
   describe('perform GET from /destination with plannerId', () => {
@@ -370,10 +371,10 @@ describe('D9n API', () => {
     })
 
     it('should return OK and delete destination', async () => {
+      const reqStr = `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`
+      console.log(reqStr)
       const response = await request(app.app)
-        .delete(
-          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`,
-        )
+        .delete(reqStr)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 

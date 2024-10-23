@@ -1,7 +1,6 @@
 import { z } from 'zod'
-import { ObjectIdSchema, PlannerModel } from './Planner'
 import mongoose, { Schema } from 'mongoose'
-import { CommentModel } from './Comment'
+import { ObjectIdSchema, PlannerModel } from './Planner'
 
 const TransportMongoSchema = new Schema<Transport>(
   {
@@ -33,36 +32,12 @@ const TransportMongoSchema = new Schema<Transport>(
       type: String,
       required: true,
     },
-    comments: {
-      type: [Schema.Types.ObjectId],
-      required: true,
-      ref: 'Comment',
-    },
   },
-  { _id: true, timestamps: true },
+  {
+    _id: true,
+    timestamps: true,
+  },
 )
-
-TransportMongoSchema.pre('findOneAndDelete', async function (next) {
-  try {
-    const query = this.getQuery()
-    const transport = await this.model.findOne(query)
-
-    if (transport) {
-      await PlannerModel.findByIdAndUpdate(
-        { _id: transport.plannerId },
-        { $pull: { transportations: transport._id } },
-      )
-
-      transport.comments.forEach(async (c: { _id: any }) => {
-        await CommentModel.findOneAndDelete({ _id: c._id })
-      })
-    }
-
-    next()
-  } catch (error) {
-    next(error as Error)
-  }
-})
 
 export const TransportSchema = z.object({
   _id: ObjectIdSchema,
@@ -75,8 +50,6 @@ export const TransportSchema = z.object({
 
   departureTime: z.string().datetime(),
   arrivalTime: z.string().datetime(),
-
-  comments: z.array(ObjectIdSchema),
 
   details: z.string().optional(),
 

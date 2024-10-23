@@ -3,7 +3,6 @@ import { ObjectIdSchema, PlannerModel } from './Planner'
 import mongoose, { Schema } from 'mongoose'
 import { ActivityModel } from './Activity'
 import { AccommodationModel } from './Accommodation'
-import { CommentModel } from './Comment'
 
 const DestinationMongoSchema = new Schema<Destination>(
   {
@@ -16,35 +15,24 @@ const DestinationMongoSchema = new Schema<Destination>(
       type: String,
       required: true,
     },
-
     endDate: {
       type: String,
       required: true,
     },
-
-    comments: {
-      type: [Schema.Types.ObjectId],
-      required: true,
-      ref: 'Comment',
-    },
-
     name: {
       type: String,
       required: true,
     },
-
     activities: {
       type: [Schema.Types.ObjectId],
       required: true,
       ref: 'Activity',
     },
-
     accommodations: {
       type: [Schema.Types.ObjectId],
       required: true,
       ref: 'Accommodation',
     },
-
     plannerId: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -53,33 +41,6 @@ const DestinationMongoSchema = new Schema<Destination>(
   },
   { _id: true, timestamps: true },
 )
-
-DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
-  try {
-    const query = this.getQuery()
-    const destination = await this.model.findOne(query)
-
-    if (destination) {
-      await PlannerModel.findByIdAndUpdate(
-        { _id: destination.plannerId },
-        { $pull: { destinations: destination._id } },
-      )
-      destination.activities.forEach(async (a: { _id: any }) => {
-        await ActivityModel.findOneAndDelete({ _id: a._id })
-      })
-      destination.accommodations.forEach(async (a: { _id: any }) => {
-        await AccommodationModel.findOneAndDelete({ _id: a._id })
-      })
-      destination.comments.forEach(async (c: { _id: any }) => {
-        await CommentModel.findOneAndDelete({ _id: c._id })
-      })
-    }
-
-    next()
-  } catch (error) {
-    next(error as Error)
-  }
-})
 
 export const DestinationSchema = z.object({
   _id: ObjectIdSchema,
@@ -90,8 +51,6 @@ export const DestinationSchema = z.object({
 
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
-
-  comments: z.array(ObjectIdSchema),
 
   name: z.string(),
   activities: z.array(ObjectIdSchema),
