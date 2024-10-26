@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
-import { Destination, DestinationModel } from '../models/Destination'
+import { DestinationModel } from '../models/Destination'
 import { Types } from 'mongoose'
 
 /**
@@ -216,8 +216,8 @@ const getDestinationDocumentsByPlannerId = async (
   const { targetPlanner } = req.body.out
 
   const resultDestinations = targetPlanner.destinations.map(
-    async (did: Types.ObjectId) => {
-      return await DestinationModel.findById(did)
+    (did: Types.ObjectId) => {
+      return DestinationModel.findById(did)
     },
   )
 

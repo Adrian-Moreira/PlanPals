@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { Types } from 'mongoose'
-import { Accommodation, AccommodationModel } from '../models/Accommodation'
+import { AccommodationModel } from '../models/Accommodation'
 
 /**
  * Verifies that an accommodation with the given ID exists in the database. If not,
@@ -212,13 +212,14 @@ const getAccommodationDocumentsByDestinationId = async (
 
   const { targetDestination } = req.body.out
 
-  const resultAccommodations: Accommodation[] =
-    await targetDestination.accommodations.map(async (aid: Types.ObjectId) => {
-      return await AccommodationModel.findById(aid)
-    })
+  const resultAccommodations = targetDestination.accommodations.map(
+    (aid: Types.ObjectId) => {
+      return AccommodationModel.findById(aid)
+    },
+  )
 
   req.body.result = await Promise.all(resultAccommodations).then((results) =>
-    results.filter((dest) => dest !== null),
+    results.filter((acc) => acc !== null),
   )
   req.body.status = StatusCodes.OK
 

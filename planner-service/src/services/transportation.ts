@@ -223,19 +223,13 @@ const getTransportationDocumentsByPlannerId = async (
   }
   const { targetPlanner } = req.body.out
   const resultTransportations: Transport[] =
-    await targetPlanner.transportations.map(async (tid: Types.ObjectId) => {
-      return await TransportModel.findById(tid)
-    })
+    await targetPlanner.transportations.map((tid: Types.ObjectId) =>
+      TransportModel.findById(tid),
+    )
 
-  if (resultTransportations.length === 0) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'transportation',
-      recordId: targetPlanner._id,
-    })
-    next(req.body.err)
-  }
-
-  req.body.result = resultTransportations
+  req.body.result = await Promise.all(resultTransportations).then((results) =>
+    results.filter((transportation) => transportation !== null),
+  )
   req.body.status = StatusCodes.OK
   next()
 }

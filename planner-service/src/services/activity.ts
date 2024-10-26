@@ -198,28 +198,22 @@ const getActivitiyDocumentsByDestinationId = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
+): Promise<void> => {
   if (req.body.err) {
     next(req.body.err)
   }
 
   const { targetDestination } = req.body.out
 
-  const resultActivities: Activity[] = await targetDestination.activities.map(
-    async (aid: Types.ObjectId) => {
-      return await ActivityModel.findOne({ _id: aid })
+  const resultActivities: Activity[] = targetDestination.activities.map(
+    (aid: Types.ObjectId) => {
+      return ActivityModel.findOne({ _id: aid })
     },
   )
 
-  if (resultActivities.length === 0) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'activity',
-      recordId: targetDestination._id,
-    })
-    next(req.body.err)
-  }
-
-  req.body.result = resultActivities
+  req.body.result = await Promise.all(resultActivities).then((results) =>
+    results.filter((act) => act !== null),
+  )
   req.body.status = StatusCodes.OK
 
   next()
