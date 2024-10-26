@@ -182,9 +182,9 @@ async function mkSuccessResponse<T>(
 ): Promise<void> {
   if (req.body.err || !req.body.result) {
     next(req.body.err)
+  } else {
+    res.status(req.body.status).json(mkSuccessJSON<T>(req.body.result))
   }
-  res.status(req.body.status).json(mkSuccessJSON<T>(req.body.result))
-  next()
 }
 
 const RequestUtils = {
