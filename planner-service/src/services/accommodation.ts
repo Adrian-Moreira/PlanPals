@@ -73,7 +73,7 @@ const createAccommodationDocument = async (
     endDate,
   })
     .then(async (accommodation) => {
-      targetDestination.accommodation.push(accommodation._id)
+      targetDestination.accommodations.push(accommodation._id)
       await targetDestination.save()
 
       return accommodation
@@ -83,7 +83,6 @@ const createAccommodationDocument = async (
         requestType: 'create',
         conflict: 'Accommodation already exists ' + JSON.stringify(err),
       })
-      console.log(req.body.err)
       next(req.body.err)
     })
 
@@ -145,7 +144,7 @@ const deleteAccommodationDocument = async (
 
   const { targetAccommodation, targetDestination } = req.body.out
 
-  targetDestination.accommodation = targetDestination.accommodation.filter(
+  targetDestination.accommodation = targetDestination.accommodations.filter(
     (aid: Types.ObjectId) => !aid.equals(targetAccommodation._id),
   )
   await targetDestination.save()
@@ -214,11 +213,13 @@ const getAccommodationDocumentsByDestinationId = async (
   const { targetDestination } = req.body.out
 
   const resultAccommodations: Accommodation[] =
-    await targetDestination.accommodation.map(async (aid: Types.ObjectId) => {
-      return await AccommodationModel.findOne({ _id: aid })
+    await targetDestination.accommodations.map(async (aid: Types.ObjectId) => {
+      return await AccommodationModel.findById(aid)
     })
 
-  req.body.result = resultAccommodations
+  req.body.result = await Promise.all(resultAccommodations).then((results) =>
+    results.filter((dest) => dest !== null),
+  )
   req.body.status = StatusCodes.OK
 
   next()
