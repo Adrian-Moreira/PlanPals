@@ -2,6 +2,7 @@ import express from 'express'
 import CommentValidator from '../controllers/comment'
 import CommentService from '../services/comment'
 import RequestUtils from '../utils/RequestUtils'
+import UserService from '../services/user'
 
 export const commentRouter = express.Router({ mergeParams: true })
 
@@ -16,6 +17,7 @@ commentRouter.get(
 commentRouter.post(
   '/',
   CommentValidator.newComment,
+  UserService.verifyUserExists,
   CommentService.findOrCreateCommentsDocument,
   CommentService.createCommentDocument,
   RequestUtils.mkSuccessResponse<Comment>,
@@ -31,6 +33,7 @@ commentRouter.get(
 commentRouter.delete(
   '/:commentId([0-9a-fA-F]{24})',
   CommentValidator.removeComment,
+  UserService.verifyUserExists,
   CommentService.findOrCreateCommentsDocument,
   CommentService.removeCommentDocument,
   RequestUtils.mkSuccessResponse<Comment>,
