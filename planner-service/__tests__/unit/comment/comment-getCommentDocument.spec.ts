@@ -14,7 +14,7 @@ import { CommentModel, CommentsModel } from '../../../src/models/Comment'
 import { Types } from 'mongoose'
 import { RecordNotFoundException } from '../../../src/exceptions/RecordNotFoundException'
 
-describe('getCommentDocument', () => {
+describe('Comment->getCommentDocument', () => {
   let commentMock: sinon.SinonMock
   let commentsMock: sinon.SinonMock
   let req: Partial<Request>

@@ -12,7 +12,7 @@ import { StatusCodes } from 'http-status-codes'
 import VoteService from '../../../src/services/vote'
 import { VoteModel } from '../../../src/models/Vote'
 
-describe('DownVote', () => {
+describe('Vote->DownVote', () => {
   let voteMock: sinon.SinonMock
   let req: Partial<Request>
   let res: Partial<Response>

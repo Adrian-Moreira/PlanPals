@@ -12,7 +12,7 @@ import { StatusCodes } from 'http-status-codes'
 import CommentService from '../../../src/services/comment'
 import { CommentModel, CommentsModel } from '../../../src/models/Comment'
 
-describe('createComment', () => {
+describe('Comment->createComment', () => {
   let commentMock: sinon.SinonMock
   let commentsMock: sinon.SinonMock
   let req: Partial<Request>

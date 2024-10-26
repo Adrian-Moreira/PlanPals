@@ -13,7 +13,7 @@ import CommentService from '../../../src/services/comment'
 import { CommentModel, CommentsModel } from '../../../src/models/Comment'
 import { Types } from 'mongoose'
 
-describe('getCommentDocuments', () => {
+describe('Comment->getCommentDocuments', () => {
   let commentMock: sinon.SinonMock
   let commentsMock: sinon.SinonMock
   let req: Partial<Request>
