@@ -12,4 +12,13 @@ router.use('/planner', plannerRouter)
 router.use('/vote', voteRouter)
 router.use('/comment', commentRouter)
 
+router.use('*', (req: express.Request, res: express.Response) => {
+  if (!req.body.err) {
+    res.status(404).json({
+      success: false,
+      data: 'Route not found',
+    })
+  }
+})
+
 export default router
