@@ -37,7 +37,7 @@ const upVote = async (
   }
   if (existingVotes.downVotes.includes(targetUser._id)) {
     existingVotes.downVotes = existingVotes.downVotes.filter(
-      (id) => id != targetUser._id,
+      (id) => id != targetUser._id.toString(),
     )
   }
   existingVotes = await VoteModel.findOneAndUpdate(
@@ -85,7 +85,7 @@ const downVote = async (
   }
   if (existingVotes.upVotes.includes(targetUser._id)) {
     existingVotes.upVotes = existingVotes.upVotes.filter(
-      (id) => id != targetUser._id,
+      (id) => id != targetUser._id.toString(),
     )
   }
   existingVotes = await VoteModel.findOneAndUpdate(
@@ -93,6 +93,7 @@ const downVote = async (
     existingVotes,
     { new: true },
   )
+
   req.body.result = existingVotes
   req.body.status = StatusCodes.OK
   next()
