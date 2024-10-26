@@ -215,19 +215,15 @@ const getDestinationDocumentsByPlannerId = async (
 
   const { targetPlanner } = req.body.out
 
-  const resultDestinations: Destination[] =
-    await targetPlanner.destinations.map(async (did: Types.ObjectId) => {
+  const resultDestinations = targetPlanner.destinations.map(
+    async (did: Types.ObjectId) => {
       return await DestinationModel.findById(did)
-    })
+    },
+  )
 
-  if (resultDestinations.length === 0) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'destination',
-      recordId: targetPlanner._id,
-    })
-    next(req.body.err)
-  }
-  req.body.result = resultDestinations
+  req.body.result = await Promise.all(resultDestinations).then((results) =>
+    results.filter((dest) => dest !== null),
+  )
   req.body.status = StatusCodes.OK
   next()
 }
