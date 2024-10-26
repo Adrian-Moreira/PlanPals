@@ -8,25 +8,25 @@ import { StatusCodes } from 'http-status-codes'
 import router from './routes/routers'
 import cors from 'cors'
 
-const errorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  let statusCode = err.status || StatusCodes.INTERNAL_SERVER_ERROR
-  if (err.name === 'BSONError') {
-    statusCode = StatusCodes.BAD_REQUEST
-  }
+// const errorHandler = (
+//   err: any,
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ) => {
+//   let statusCode = err.status || StatusCodes.INTERNAL_SERVER_ERROR
+//   if (err.name === 'BSONError') {
+//     statusCode = StatusCodes.BAD_REQUEST
+//   }
 
-  if (statusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
-    console.error(err.message)
-  }
-  res.status(statusCode).json({
-    success: false,
-    message: err.message || 'Internal Server Error',
-  })
-}
+//   if (statusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
+//     console.error(err.message)
+//   }
+//   res.status(statusCode).json({
+//     success: false,
+//     message: err.message || 'Internal Server Error',
+//   })
+// }
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 // const app: Express = express()
@@ -70,7 +70,7 @@ class PlanPals {
     this.app.use(cors())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(router)
-    this.app.use(errorHandler)
+    // this.app.use(errorHandler)
   }
 
   public async startServer(overridePort: number | null): Promise<void> {
