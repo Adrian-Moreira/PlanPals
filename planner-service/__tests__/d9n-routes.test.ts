@@ -20,7 +20,7 @@ let testDestination1: any
 let testDestination2: any
 let testDestination3: any
 
-describe.skip('D9n API', () => {
+describe('D9n API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })

@@ -12,7 +12,7 @@ let testPlanner: any
 
 let userToBeInvited: any
 
-describe.skip('Planner API', () => {
+describe('Planner API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
