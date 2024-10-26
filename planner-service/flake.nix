@@ -21,7 +21,7 @@
           typescript
         ];
         npmBuildScript = "build";
-        npmDepsHash = "sha256-0vIY1Oh2TWuuzvHre1nRttWxNfuKU/xjZyNMa9Av7fk=";
+        npmDepsHash = "sha256-xHK6yVxT0+YbNHn3VwFegbahlIvYxHjBT71jlE8ESZI=";
         nodejs = pkgs.nodejs_20;
       };
     in
