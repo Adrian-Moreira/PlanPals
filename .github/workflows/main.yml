@@ -15,7 +15,6 @@ jobs:
         run: |
           pushd planner-service
           npm install
-          npm run build
           npm run test -- --maxWorkers=1 --ci --reporters=jest-junit
           popd
       - uses: actions/upload-artifact@v4
