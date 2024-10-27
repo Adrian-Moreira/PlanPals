@@ -9,7 +9,6 @@ import 'package:planpals/features/travel_planner/views/components/Forms/create/c
 import 'package:planpals/features/travel_planner/views/components/Forms/create/create_activity_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/accommodation_card.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/activity_card.dart';
-import 'package:planpals/mockdb.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:provider/provider.dart';
@@ -28,15 +27,21 @@ class DestinationCard extends StatefulWidget {
 class _DestinationCardState extends State<DestinationCard> {
   User? user;
 
-  @override
-  void initState( ) {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  bool _hasFetchedData = false;
+
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    Destination destination = widget.destination;
+    if (!_hasFetchedData) {
       user = Provider.of<UserViewModel>(context, listen: false).currentUser;
-      Provider.of<PlannerViewModel>(context, listen: false).fetchAccommodationsByDestinationId(widget.destination.plannerId, widget.destination.destinationId, user!.id);
-      Provider.of<PlannerViewModel>(context, listen: false).fetchActivitiesByDestinationId(widget.destination.plannerId, widget.destination.destinationId, user!.id);
-    });
-  }
+      destination.accommodationList = await Provider.of<PlannerViewModel>(context, listen: false).fetchAccommodationsByDestinationId(destination.plannerId, destination.destinationId, user!.id);
+      destination.activityList = await Provider.of<PlannerViewModel>(context, listen: false).fetchActivitiesByDestinationId(destination.plannerId, destination.destinationId, user!.id);
+      _hasFetchedData = true; // Set the flag to true after fetching
+    }
+  });
+}
 
 
   @override
@@ -44,29 +49,30 @@ class _DestinationCardState extends State<DestinationCard> {
     PlannerViewModel plannerViewModel =
         Provider.of<PlannerViewModel>(context, listen: false);
 
-    List<Accommodation> accommodations = MockDatabase.getAccommodations();
-    List<Activity> activities = MockDatabase.getActivities();
+    Destination destination = widget.destination;
 
     return Card(
       child: ExpansionTile(
-        title: Text(widget.destination.name,
+        title: Text(destination.name,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-                'Departure: ${DateTimeFormat.formatDateTime(widget.destination.startDate)}'),
+                'Departure: ${DateTimeFormat.formatDateTime(destination.startDate)}'),
             Text(
-                'Arrival: ${DateTimeFormat.formatDateTime(widget.destination.endDate)}'),
-            Text('${widget.destination.accommodations.length} accommodations'),
-            Text('${widget.destination.activities.length} activities'),
+                'Arrival: ${DateTimeFormat.formatDateTime(destination.endDate)}'),
+            Text('${destination.accommodations.length} accommodations'),
+            Text('${destination.activities.length} activities'),
           ],
         ),
         
         children: [
+          // Display Accommodations
           GenericListView(
-            itemList: plannerViewModel.accommodations,
+            itemList: destination.accommodationList,
             itemBuilder: (accommodation) => AccommodationCard(
+              destination: destination,
               accommodation: accommodation,
               onEdit: () {},
               onDelete: () {},
@@ -81,16 +87,19 @@ class _DestinationCardState extends State<DestinationCard> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => CreateAccommodationForm(
-                          destination: widget.destination,)),
+                          destination: destination,)),
               );
             },
             headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             headerIconSize: 25,
           ),
 
+
+          // Display Activities
           GenericListView(
-            itemList: plannerViewModel.activities,
+            itemList: destination.activityList,
             itemBuilder: (activity) => ActivityCard(
+              destination: destination,
               activity: activity,
               onEdit: () {},
               onDelete: () {},
@@ -105,12 +114,14 @@ class _DestinationCardState extends State<DestinationCard> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => CreateActivityForm(
-                          destination: widget.destination,)),
+                          destination: destination,)),
               );
             },
             headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             headerIconSize: 25,
           ),
+
+          SizedBox(height: 20),
         ],
       ),
     );

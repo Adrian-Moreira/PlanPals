@@ -93,18 +93,35 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
                     // Validate custom date logic (if needed)
                     // Note: You might want to add validation for the time format as well
 
-                    // Create an Activity object
-                    Activity newActivity = Activity(
-                      name: _activityNameController.text,
-                      date: _selectedDate!,
-                      duration: double.parse(_selectedDuration!),
-                      destinationId: destination.destinationId);
-                   
+                    Activity? newActivity;
+
                     newActivity = await plannerViewModel.addActivity(
-                        newActivity, destination.plannerId, user!.id
+                      Activity(
+                        name: _activityNameController.text,
+                        startDate: _selectedDate!,
+                        duration: double.parse(_selectedDuration!),
+                        destinationId: destination.destinationId,
+                        createdBy: user!.id, 
+                        location: '',
+                      ),
+                      destination.plannerId,
+                      user.id,
                     );
-                    
-                    destination.activities.add(newActivity.activityId!);
+
+                    if (newActivity != null) {
+                      // Activity added successfully, do something with the newActivity object
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Activity added successfully!')),
+                      );
+                      
+                      destination.activityList.add(newActivity);  // Add the new activity to the destination
+
+                    } else {
+                      // Failed to add activity
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to add activity!')),
+                      );
+                    }
 
                     // Close the form screen
                     Navigator.pop(context);

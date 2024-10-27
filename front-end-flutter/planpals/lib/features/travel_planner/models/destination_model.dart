@@ -1,3 +1,5 @@
+import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
+import 'package:planpals/features/travel_planner/models/activity_model.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class Destination {
@@ -9,6 +11,8 @@ class Destination {
   DateTime endDate; // End date of the destination
   final List<String> activities; // List of associated activity IDs
   final List<String> accommodations; // List of associated accommodation IDs
+  List<Activity> activityList = [];
+  List<Accommodation> accommodationList = [];
 
   // Constructor
   Destination({
@@ -67,5 +71,12 @@ class Destination {
     name = updatedDestination.name;
     startDate = updatedDestination.startDate;
     endDate = updatedDestination.endDate;
+  }
+
+  void updateAnAccommodation(Accommodation updatedAccommodation) {
+    accommodationList
+        .firstWhere((accommodation) =>
+            accommodation.accommodationId == updatedAccommodation.accommodationId)
+        .update(updatedAccommodation);
   }
 }

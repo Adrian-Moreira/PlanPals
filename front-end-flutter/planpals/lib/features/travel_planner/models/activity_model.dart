@@ -1,20 +1,24 @@
+import 'package:planpals/shared/utils/date_utils.dart';
+
 class Activity {
   final String? activityId;
   final String destinationId;
+  final String createdBy;
   String name;
-  DateTime date; // Date as String
+  String location;
+  DateTime startDate; // startDate as String
   double duration; // Duration of the activity in minutes
-  List<String>? locations;
   List<String>? votes;
   List<String>? comments;
 
   Activity({
     this.activityId,
+    required this.createdBy,
     required this.destinationId,
     required this.name,
-    required this.date,
+    required this.startDate,
     required this.duration,
-    this.locations,
+    required this.location,
     this.votes,
     this.comments,
   });
@@ -22,14 +26,13 @@ class Activity {
   // Factory method to create Activity from JSON
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
+      createdBy: json['createdBy'],
       activityId: json['activityId'],
       destinationId: json['destinationId'],
       name: json['name'],
-      date: DateTime.parse(json['date']),
+      startDate: DateTime.parse(json['startDate']),
       duration: json['duration'].toDouble(),
-      locations: json['locations'] != null
-          ? List<String>.from(json['locations'])
-          : null,
+      location: json['location'],
       votes: json['votes'] != null ? List<String>.from(json['votes']) : null,
       comments:
           json['comments'] != null ? List<String>.from(json['comments']) : null,
@@ -39,12 +42,13 @@ class Activity {
   // Method to convert Activity to JSON
   Map<String, dynamic> toJson() {
     return {
+      'createdBy': createdBy,
       'activityId': activityId,
       'destinationId': destinationId,
       'name': name,
-      'date': date.toIso8601String(),
+      'startDate': DateTimeToIso.formatToUtcIso(startDate),
       'duration': duration,
-      'locations': locations,
+      'location': location,
       'votes': votes,
       'comments': comments,
     };
@@ -54,11 +58,12 @@ class Activity {
   String toString() {
     return 'Activity {\n'
         '  activityId: $activityId,\n'
+        '  createdById: $createdBy,\n'
         '  destinationId: $destinationId,\n'
         '  name: $name,\n'
-        '  date: $date,\n'
+        '  startDate: $startDate,\n'
         '  duration: $duration,\n'
-        '  locations: $locations,\n'
+        '  location: $location,\n'
         '  votes: $votes,\n'
         '  comments: $comments\n'
         '}';
@@ -66,9 +71,9 @@ class Activity {
 
   void update(Activity updatedActivity) {
     name = updatedActivity.name;
-    date = updatedActivity.date;
+    startDate = updatedActivity.startDate;
     duration = updatedActivity.duration;
-    locations = updatedActivity.locations;
+    location = updatedActivity.location;
     votes = updatedActivity.votes;
     comments = updatedActivity.comments;
   }

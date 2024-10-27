@@ -127,18 +127,47 @@ class _UpdateAccommodationFormState extends State<UpdateAccommodationForm> {
                       return;
                     }
 
-                    // Create Updated Accommodoation
-                    final Accommodation updatedAccommodation = Accommodation(
-                      accommodationId: accommodation.accommodationId,
-                      destinationId: destination.destinationId,
-                      name: _nameController.text,
-                      address: _addressController.text,
-                      checkInDate: _checkIn!,
-                      checkOutDate: _checkOut!,
+
+                    // // Create Updated Accommodoation
+                    // final Accommodation updatedAccommodation = 
+                    // Accommodation(
+                    //   accommodationId: accommodation.accommodationId,
+                    //   destinationId: destination.destinationId,
+                    //   name: _nameController.text,
+                    //   address: _addressController.text,
+                    //   checkInDate: _checkIn!,
+                    //   checkOutDate: _checkOut!,
+                    // );
+
+                    // // Update Accommodation
+                    // await plannerViewModel.updateAccommodation(updatedAccommodation, destination.plannerId, user.id);
+
+                    Accommodation? updatedAccommodation = await plannerViewModel.updateAccommodation(
+                      Accommodation(
+                        accommodationId: accommodation.accommodationId,
+                        destinationId: destination.destinationId,
+                        name: _nameController.text,
+                        address: _addressController.text,
+                        checkInDate: _checkIn!,
+                        checkOutDate: _checkOut!,
+                        location: accommodation.location,
+                        createdBy: accommodation.createdBy,
+                      ),
+                      destination.plannerId,
+                      user.id
                     );
 
-                    // Update Accommodation
-                    await plannerViewModel.updateAccommodation(updatedAccommodation, destination.plannerId, user.id);
+                    if (updatedAccommodation != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Accommodation Updated')),
+                      );
+                      
+                      destination.updateAnAccommodation(updatedAccommodation);  // Update the Accommodation in the Destination
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to update accommodation')),
+                      );
+                    }
 
 
                     // Close the form screen

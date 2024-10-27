@@ -115,24 +115,37 @@ class _CreateAccommodationFormState extends State<CreateAccommodationForm> {
                       return;
                     }
 
-                    // Create an Accommodation object
-                    Accommodation newAccommodation = Accommodation(
-                      name: _nameController.text,
-                      address: _addressController.text,
-                      checkInDate: _checkIn!,
-                      checkOutDate: _checkOut!,
-                      destinationId: destination.destinationId, 
-                      accommodationId: '',
+                    Accommodation? newAccommodation;
+
+                    newAccommodation = await plannerViewModel.addAccommodation(
+                      Accommodation(
+                        name: _nameController.text,
+                        address: _addressController.text,
+                        checkInDate: _checkIn!,
+                        checkOutDate: _checkOut!,
+                        destinationId: destination.destinationId, 
+                        accommodationId: '',
+                        location: '',
+                        createdBy: user!.id
+                      ),
+                      destination.plannerId,
+                      user.id
                     );
 
-                    // Add the Accommodation to the destination
-                    newAccommodation = await plannerViewModel.addAccommodation(
-                      newAccommodation,
-                      destination.destinationId,
-                      user!.id
-                    );
                     
-                    destination.accommodations.add(newAccommodation.accommodationId); // Add the new Accommodation ID to the destination
+                    if (newAccommodation == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to add Accommodation')),
+                      );
+                    }
+                    else {
+                      // Add the new Accommodation ID to the destination
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Accommodation added successfully!')),
+                      );
+                      destination.accommodations.add(newAccommodation.accommodationId); // Add the new Accommodation ID to the destination
+                    }
+
 
                     // Close the form screen
                     Navigator.pop(context);

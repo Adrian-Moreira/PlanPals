@@ -7,17 +7,17 @@ import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.da
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
-class CreateActivityForm extends StatefulWidget {
+class UpdateActivityForm extends StatefulWidget {
   final Destination destination;
   final Activity activity;
 
-  const CreateActivityForm({super.key, required this.destination, required this.activity,});
+  const UpdateActivityForm({super.key, required this.destination, required this.activity,});
 
   @override
-  _CreateActivityFormState createState() => _CreateActivityFormState();
+  _UpdateActivityFormState createState() => _UpdateActivityFormState();
 }
 
-class _CreateActivityFormState extends State<CreateActivityForm> {
+class _UpdateActivityFormState extends State<UpdateActivityForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _activityNameController;
   DateTime? _selectedDate;
@@ -30,7 +30,7 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
     final Activity activity = widget.activity;
 
     _activityNameController.text = activity.name;
-    _selectedDate = activity.date;
+    _selectedDate = activity.startDate;
     _selectedDuration = activity.duration.toString();
   }
 
@@ -106,12 +106,13 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
                     Activity updatedActivity = Activity(
                       activityId: activity.activityId,
                       name: _activityNameController.text,
-                      date: _selectedDate!,
+                      startDate: _selectedDate!,
                       duration: double.parse(_selectedDuration!),
                       destinationId: activity.destinationId,
-                      locations: activity.locations,
+                      location: activity.location,
                       votes: activity.votes,
-                      comments: activity.comments,
+                      comments: activity.comments, 
+                      createdBy: user.id,
                     );
 
                     // Update the Activity

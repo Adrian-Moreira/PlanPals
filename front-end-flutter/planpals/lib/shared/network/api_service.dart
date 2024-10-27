@@ -22,6 +22,7 @@ class ApiService {
             'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (error) {
+      print(error);
       throw Exception('Failed to load data: $error');
     }
   }
@@ -46,6 +47,7 @@ class ApiService {
 
       return response;
     } catch (error) {
+      print(error);
       throw Exception('Failed to post data: $error');
     }
   }
@@ -62,6 +64,11 @@ class ApiService {
           'Content-Type': 'application/json',
         },
       );
+
+      print('updated data: $data');
+      print('response request: ${response.request}');
+      print('response body: ${response.body}');
+      print('statuc code: ${response.statusCode}');
 
       // Check for successful response
       _handleResponse(response);
