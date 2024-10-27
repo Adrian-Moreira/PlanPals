@@ -6,6 +6,7 @@ services:
       - 8080:8080
       - 9229:9229
     environment:
+      - LOG_LEVEL=0
       - SERVER_PORT=8080
       - DATABASE_CONNECTIONSTRING=mongodb://mongo:27017/planner
       - RABBITMQ_CONNECTIONSTRING=amqp://user:password@rabbitmq:5672
@@ -20,7 +21,7 @@ services:
     volumes:
       - mongodb:/data/db
       - mongodb_config:/data/configdb
-      
+
   rabbitmq:
     image: rabbitmq:management
     ports:

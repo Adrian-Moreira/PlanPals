@@ -10,22 +10,20 @@ const verifyUserExists = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  let {
-    userId,
-    createdBy,
-  }: { userId: Types.ObjectId; createdBy: Types.ObjectId } = req.body.out
+  let { userId, createdBy }: { userId: any; createdBy: any } = req.body.out
   userId ||= createdBy // Assuming either userId or createdBy is provided
+
   const user = await UserModel.findOne({ _id: userId })
+
   if (!user) {
     req.body.err = new RecordNotFoundException({
       recordType: 'User',
       recordId: userId.toString(),
     })
     next(req.body.err)
+  } else {
+    req.body.out = { ...req.body.out, targetUser: user }
   }
-
-  req.body.out = { ...req.body.out, targetUser: user }
-
   next()
 }
 

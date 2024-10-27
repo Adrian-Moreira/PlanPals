@@ -59,7 +59,7 @@ function mkRequestParser<T>(
             .concat(` Body: ${req.body}`)
             .concat(` Params: ${req.params}`)
             .concat(` Query: ${req.query}`)
-            .concat(' Error: ' + error.toString()),
+            .concat(' Error: ' + error),
           requestType: 'parseRequest',
         })
         next(req.body.err)

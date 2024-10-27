@@ -1,7 +1,6 @@
 import { PlannerModel } from '../models/Planner'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { NextFunction, Request, Response } from 'express'
-import assert from 'assert'
 import { StatusCodes } from 'http-status-codes'
 
 /**
@@ -30,6 +29,7 @@ export const createPlannerDocument = async (
     transportations,
     invites,
   } = req.body.out
+
   const planner = await PlannerModel.create({
     createdBy: targetUser._id,
     name,
@@ -141,6 +141,7 @@ export const getPlannerDocumentsByUserId = async (
     })
     next(req.body.err)
   }
+
   req.body.result = resultPlanners
   req.body.status = StatusCodes.OK
   next()
@@ -180,6 +181,7 @@ async function verifyPlannerExists(
   next: NextFunction,
 ) {
   const { plannerId } = req.body.out
+
   const targetPlanner = await PlannerModel.findOne({ _id: plannerId })
   if (!targetPlanner) {
     req.body.err = new RecordNotFoundException({
@@ -202,7 +204,7 @@ async function verifyPlannerExists(
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-function verifyUserCanEditPlanner(
+async function verifyUserCanEditPlanner(
   req: Request,
   res: Response,
   next: NextFunction,
@@ -233,12 +235,13 @@ function verifyUserCanEditPlanner(
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-function verifyUserCanViewPlanner(
+async function verifyUserCanViewPlanner(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
-  let { targetUser, targetPlanner } = req.body.out
+  const { targetUser, targetPlanner } = req.body.out
+
   if (
     !targetPlanner.roUsers.includes(targetUser._id) &&
     !targetPlanner.rwUsers.includes(targetUser._id) &&

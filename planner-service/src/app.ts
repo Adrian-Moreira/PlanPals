@@ -4,34 +4,11 @@ import express, { Express, NextFunction, Request, Response } from 'express'
 import { createServer, Server } from 'node:http'
 import config from './config'
 import { closeMongoConnection, connectToMongoDB } from './config/db'
-import { StatusCodes } from 'http-status-codes'
 import router from './routes/routers'
 import cors from 'cors'
 import RequestUtils from './utils/RequestUtils'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
-// const app: Express = express()
-// const server: Server = createServer(app)
-// let db
-
-// const initRoutes = (): void => {
-//   app.use(cors())
-//   app.use(express.urlencoded({ extended: false }))
-//   app.use(router)
-//   app.use(errorHandler)
-// }
-
-// const startPP = async (): Promise<void> => {
-//   db =await connectToMongoDB(config.database.connectionString)
-//   server.listen(port, () => {
-//     console.log(`PP erected on port ${port}`)
-//   })
-// }
-
-// const stopPP = async (): Promise<void> => {
-//   await closeMongoConnection()
-//   server.close()
-// }
 
 class PlanPals {
   public app: Express
