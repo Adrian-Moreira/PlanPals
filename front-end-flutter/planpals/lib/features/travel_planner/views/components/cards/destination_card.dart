@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
@@ -90,6 +91,27 @@ class _DestinationCardState extends State<DestinationCard> {
             headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             headerIconSize: 25,
 =======
+=======
+import 'package:planpals/features/travel_planner/models/destination_model.dart';
+import 'package:planpals/shared/utils/date_utils.dart';
+
+class DestinationCard extends StatelessWidget {
+  final Destination destination;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final bool functional;
+
+  const DestinationCard(
+      {super.key,
+      required this.destination,
+      required this.onEdit,
+      required this.onDelete,
+      required this.functional});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
       child: ListTile(
           title: Text(destination.name, style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Column(
@@ -100,6 +122,7 @@ class _DestinationCardState extends State<DestinationCard> {
               Text(
                   'Arrival: ${DateTimeFormat.formatDateTime(destination.endDate)}'),
             ],
+<<<<<<< HEAD
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/cards/destination_card.dart
           ),
 
@@ -128,6 +151,24 @@ class _DestinationCardState extends State<DestinationCard> {
           ),
         ],
       ),
+=======
+          ),
+          trailing: functional
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: onEdit, // Handle the edit logic
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: onDelete, // Handle the delete logic
+                    ),
+                  ],
+                )
+              : null),
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
     );
   }
 }

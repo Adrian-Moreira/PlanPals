@@ -78,20 +78,27 @@ class LoginPage extends StatelessWidget {
                     if (_formKey.currentState?.validate() == true) {
                       // Fetch the user by username and wait for the result
                       await userViewModel
+<<<<<<< HEAD
 <<<<<<< HEAD:front-end-android/planpals/lib/features/profile/views/login_page.dart
                           .login(_usernameController.text);
 =======
                           .fetchUserByUserName(_usernameController.text);
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/profile/views/login_page.dart
+=======
+                          .fetchUserByUserName(_usernameController.text);
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
 
                       // Check if the user has been fetched successfully
                       if (userViewModel.currentUser != null) {
                         // NAVIGATE TO THE HOME PAGE
                         Navigator.pushReplacementNamed(context, '/home');
+<<<<<<< HEAD
 <<<<<<< HEAD:front-end-android/planpals/lib/features/profile/views/login_page.dart
                         // Navigator.pushReplacementNamed(context, '/test');
 =======
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/profile/views/login_page.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
                       } else {
                         // Handle the case where the user was not found or there was an error
                         ScaffoldMessenger.of(context).showSnackBar(

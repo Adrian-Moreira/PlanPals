@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
+import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/validators/planner_validator.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<<< HEAD:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/update/update_destination_form.dart
 class UpdateDestinationForm extends StatefulWidget {
   final Destination destination;
 
@@ -17,6 +19,18 @@ class UpdateDestinationForm extends StatefulWidget {
 }
 
 class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
+========
+class DestinationForm extends StatefulWidget {
+  final Planner planner;
+
+  const DestinationForm({super.key, required this.planner});
+
+  @override
+  DestinationFormState createState() => DestinationFormState();
+}
+
+class DestinationFormState extends State<DestinationForm> {
+>>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/destination_form.dart
   final _formKey = GlobalKey<FormState>();
 
   late final TextEditingController _nameController;
@@ -24,6 +38,7 @@ class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
   DateTime? _endDate;
 
   @override
+<<<<<<<< HEAD:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/update/update_destination_form.dart
   void initState() {
     super.initState();
 
@@ -42,6 +57,15 @@ class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
     final PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context, listen: false);
     final User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
     final Destination destination = widget.destination;
+========
+  Widget build(BuildContext context) {
+    final PlannerViewModel plannerViewModel =
+        Provider.of<PlannerViewModel>(context, listen: false);
+    final User? user = Provider.of<UserViewModel>(context).currentUser;
+
+    final Planner planner = widget.planner;
+    final String plannerId = planner.plannerId;
+>>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/destination_form.dart
 
     return Scaffold(
       appBar: AppBar(
@@ -111,6 +135,7 @@ class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
                       return;
                     }
 
+<<<<<<<< HEAD:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/update/update_destination_form.dart
                     // Create an updated destination
                     Destination updatedDestination = Destination(
                       createdBy: destination.createdBy, 
@@ -124,6 +149,21 @@ class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
 
                     // Update the destination
                     await plannerViewModel.updateDestination(updatedDestination, user.id);
+========
+                    Destination newDestination = Destination(
+                        createdBy: user!.id,
+                        destinationId: '',
+                        plannerId: plannerId,
+                        name: _nameController.text,
+                        startDate: _startDate!,
+                        endDate: _endDate!,
+                        activities: [],
+                        accommodations: []);
+
+                    newDestination = await plannerViewModel.addDestination(plannerId, newDestination);
+                    
+                    planner.destinations.add(newDestination.destinationId); // Add destination ID to planner
+>>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/destination_form.dart
 
                     // Close the form screen
                     Navigator.pop(context);

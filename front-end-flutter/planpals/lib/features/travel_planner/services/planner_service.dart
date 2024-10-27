@@ -8,6 +8,7 @@ import '../models/planner_model.dart';
 
 class PlannerService {
   final ApiService _apiService = ApiService();
+<<<<<<< HEAD
 <<<<<<< HEAD:front-end-android/planpals/lib/features/travel_planner/services/planner_service.dart
 
   // ------------------------------------------
@@ -15,6 +16,8 @@ class PlannerService {
   // ------------------------------------------
 =======
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/services/planner_service.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
 
   // Fetch the entire travel planner (flights, accommodations, activities)
   Future<List<Planner>> fetchAllPlanners() async {
@@ -59,10 +62,13 @@ class PlannerService {
   // Fetch all destinations by planner ID
   Future<List<Destination>> fetchAllDestinationsByUserId(String plannerId, String userId) async {
     try {
+<<<<<<< HEAD
 <<<<<<< HEAD:front-end-android/planpals/lib/features/travel_planner/services/planner_service.dart
       print('Fetching all destinations for planner ID=$plannerId');
 =======
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/services/planner_service.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
       final response = await _apiService.get('/planner/$plannerId/destination?userId=$userId');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => Destination.fromJson(json)).toList();
@@ -73,6 +79,7 @@ class PlannerService {
   }
 
   // Fetch all destinations by planner ID and destination ID
+<<<<<<< HEAD
   Future<List<Activity>> fetchActivitiesByDestinationId(
       String plannerId, String destinationId, String userId) async {
     try {
@@ -82,6 +89,13 @@ class PlannerService {
 =======
           .get('/planner/$plannerId/destination/$destinationId/activity');
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/services/planner_service.dart
+=======
+  Future<List<Activity>> fetchAllActivities(
+      String plannerId, String destinationId) async {
+    try {
+      final response = await _apiService
+          .get('/planner/$plannerId/destination/$destinationId/activity');
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => Activity.fromJson(json)).toList();
     } catch (e) {
@@ -90,6 +104,7 @@ class PlannerService {
     }
   }
 
+<<<<<<< HEAD
   // Fetch all accommodations by planner ID and destination ID
   Future<List<Accommodation>> fetchAccommodationsByDestinationId(
       String plannerId, String destinationId, String userId) async {
@@ -104,6 +119,8 @@ class PlannerService {
     }
   }
 
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
   // Fetch all destinations by planner ID and destination ID and activity ID
   Future<List<Location>> fetchAllLocations(
       String plannerId, String destinationId, String activityId) async {
@@ -118,6 +135,7 @@ class PlannerService {
     }
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:front-end-android/planpals/lib/features/travel_planner/services/planner_service.dart
   // ------------------------------------------
   // ADDERS
@@ -125,6 +143,8 @@ class PlannerService {
 
 =======
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/services/planner_service.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
   // Add a new planner
   Future<Planner> addPlanner(Planner planner) async {
     try {
@@ -142,18 +162,24 @@ class PlannerService {
     }
   }
   // Add a new destination to a specific planner
+<<<<<<< HEAD
 <<<<<<< HEAD:front-end-android/planpals/lib/features/travel_planner/services/planner_service.dart
   Future<Destination> addDestination(Destination destination) async {
     try {
       final response = await _apiService.post(
         '/planner/${destination.plannerId}/destination',
 =======
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
   Future<Destination> addDestination(
       String plannerId, Destination destination) async {
     try {
       final response = await _apiService.post(
         '/planner/$plannerId/destination',
+<<<<<<< HEAD
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/services/planner_service.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
         destination.toJson(),
       );
 
@@ -166,17 +192,23 @@ class PlannerService {
   }
 
   // Add a new transportation to a specific planner
+<<<<<<< HEAD
 <<<<<<< HEAD:front-end-android/planpals/lib/features/travel_planner/services/planner_service.dart
   Future<Transport> addTransport(Transport transport) async {
     try {
       final response = await _apiService.post(
         '/planner/${transport.plannerId}/transportation',
 =======
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
   Future<Transport> addTransport(String plannerId, Transport transport) async {
     try {
       final response = await _apiService.post(
         '/planner/$plannerId/transportation',
+<<<<<<< HEAD
 >>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/services/planner_service.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
         transport.toJson(),
       );
 
@@ -186,6 +218,7 @@ class PlannerService {
       throw Exception('Failed to add transportation: $e');
     }
   }
+<<<<<<< HEAD
 
   // Add a new activity to a specific destination
   Future<Activity> addActivity(Activity activity, String plannerId, String userId) async {
@@ -337,4 +370,6 @@ class PlannerService {
     }
   }
 
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
 }

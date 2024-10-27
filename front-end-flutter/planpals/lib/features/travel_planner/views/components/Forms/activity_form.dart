@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
+<<<<<<< HEAD
 <<<<<<<< HEAD:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/create/create_activity_form.dart
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 ========
 >>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/activity_form.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
@@ -103,7 +106,10 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
                     final activity = Activity(
                       activityId:
                           '123', // Placeholder ID, you may want to generate or fetch this
+<<<<<<< HEAD
 >>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/activity_form.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
                       name: _activityNameController.text,
                       date: _selectedDate!,
                       duration: double.parse(_selectedDuration!),

@@ -120,11 +120,14 @@ class _CreateAccommodationFormState extends State<CreateAccommodationForm> {
                       name: _nameController.text,
                       address: _addressController.text,
                       checkInDate: _checkIn!,
+<<<<<<< HEAD
 <<<<<<<< HEAD:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/create/create_accommodation_form.dart
                       checkOutDate: _checkOut!,
                       destinationId: destination.destinationId, 
                       accommodationId: '',
 ========
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
                       checkOutDate: _checkOut!, 
                       destinationId: '',
 >>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/Forms/accommodation_form.dart
