@@ -56,9 +56,9 @@ function mkRequestParser<T>(
       .catch((error: any) => {
         req.body.err = new MalformedRequestException({
           requestBody: ''
-            .concat(` Body: ${JSON.stringify(req.body)}`)
-            .concat(` Params: ${JSON.stringify(req.params)}`)
-            .concat(` Query: ${JSON.stringify(req.query)}`)
+            .concat(` Body: ${req.body}`)
+            .concat(` Params: ${req.params}`)
+            .concat(` Query: ${req.query}`)
             .concat(' Error: ' + error.toString()),
           requestType: 'parseRequest',
         })

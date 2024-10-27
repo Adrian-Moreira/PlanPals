@@ -9,11 +9,11 @@ import {
 } from '@jest/globals'
 import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { ActivityModel } from '../../../src/models/Activity'
-import ActivityService from '../../../src/services/activity'
+import { PlannerModel } from '../../../src/models/Planner'
+import PlannerService from '../../../src/services/planner'
 
-describe('Activity->getActivityById', () => {
-  let activityMock: sinon.SinonMock
+describe('Planner->getPlannerById', () => {
+  let plannerMock: sinon.SinonMock
   let req: Partial<Request>
   let res: Partial<Response>
   let next: Partial<NextFunction> = jest.fn()
@@ -22,24 +22,25 @@ describe('Activity->getActivityById', () => {
     _id: '671d24c18132583fe9fb978f',
   }
 
-  const existingActivity = {
+  const existingPlanner = {
     _id: '671d24c18132583fe9fb123f',
     createdBy: targetUser._id,
     startDate: new Date(),
     endDate: new Date(),
     name: 'test',
-    location: 'test',
-    destinationId: '671ceaae117001732cd0fc83',
+    description: 'test',
+    destinations: [],
+    transportations: [],
+    roUsers: [],
+    rwUsers: [targetUser._id],
   }
 
   beforeEach(() => {
-    activityMock = sinon.mock(ActivityModel)
+    plannerMock = sinon.mock(PlannerModel)
     req = {
       body: {
         out: {
-          targetActivity: existingActivity,
-          name: 'test1',
-          location: 'test1',
+          targetPlanner: existingPlanner,
         },
       },
     }
@@ -48,8 +49,8 @@ describe('Activity->getActivityById', () => {
 
   afterEach(() => {})
 
-  it('should get existing activity by id', async () => {
-    await ActivityService.getActivityDocumentById(
+  it('should get existing planner by id', async () => {
+    await PlannerService.getPlannerDocumentByPlannerId(
       req as Request,
       res as Response,
       next as NextFunction,
@@ -58,8 +59,8 @@ describe('Activity->getActivityById', () => {
     expect(req.body.status).toEqual(StatusCodes.OK)
     expect(req.body.result).toBeDefined()
     expect(req.body.result.name).toEqual('test')
-    expect(req.body.result.location).toEqual('test')
-    expect(req.body.result.startDate).toEqual(existingActivity.startDate)
-    expect(req.body.result.endDate).toEqual(existingActivity.endDate)
+    expect(req.body.result.description).toEqual('test')
+    expect(req.body.result.startDate).toEqual(existingPlanner.startDate)
+    expect(req.body.result.endDate).toEqual(existingPlanner.endDate)
   })
 })

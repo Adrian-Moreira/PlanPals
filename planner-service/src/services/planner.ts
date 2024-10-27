@@ -19,7 +19,7 @@ export const createPlannerDocument = async (
   next: NextFunction,
 ): Promise<void> => {
   const {
-    createdBy,
+    targetUser,
     name,
     description,
     startDate,
@@ -30,8 +30,8 @@ export const createPlannerDocument = async (
     transportations,
     invites,
   } = req.body.out
-  const planner = new PlannerModel({
-    createdBy,
+  const planner = await PlannerModel.create({
+    createdBy: targetUser._id,
     name,
     description,
     startDate,
@@ -42,7 +42,6 @@ export const createPlannerDocument = async (
     transportations,
     invites,
   })
-  await planner.save()
 
   req.body.result = planner
   req.body.status = StatusCodes.CREATED
@@ -76,13 +75,6 @@ export const updatePlannerDocument = async (
     { new: true },
   )
 
-  if (!savedPlanner) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'Planner',
-      recordId: targetPlanner._id.toString(),
-    })
-    next(req.body.err)
-  }
   req.body.result = savedPlanner
   req.body.status = StatusCodes.OK
   next()
@@ -137,12 +129,6 @@ export const getPlannerDocumentsByUserId = async (
       case 'ro':
         resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })
         break
-      default:
-        req.body.err = new RecordNotFoundException({
-          recordType: 'planner',
-          recordId: targetUser._id,
-        })
-        next(req.body.err)
     }
   } else {
     resultPlanners = await PlannerModel.find({ createdBy: targetUser._id })
@@ -174,9 +160,6 @@ export const getPlannerDocumentByPlannerId = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetPlanner } = req.body.out
   req.body.result = targetPlanner
   req.body.status = StatusCodes.OK
@@ -196,9 +179,6 @@ async function verifyPlannerExists(
   res: Response,
   next: NextFunction,
 ) {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { plannerId } = req.body.out
   const targetPlanner = await PlannerModel.findOne({ _id: plannerId })
   if (!targetPlanner) {
@@ -227,16 +207,11 @@ function verifyUserCanEditPlanner(
   res: Response,
   next: NextFunction,
 ) {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-  let { plannerId, createdBy, userId, targetPlanner } = req.body.out
-  userId ||= createdBy // Assuming either userId or createdBy is provided
-  assert(userId || createdBy, 'User ID is required')
-  assert(targetPlanner, 'Planner is required')
+  let { plannerId, targetUser, targetPlanner } = req.body.out
+
   if (
-    !targetPlanner.rwUsers.includes(userId) &&
-    !targetPlanner.createdBy?.equals(userId)
+    !targetPlanner.rwUsers.includes(targetUser._id) &&
+    targetPlanner.createdBy?.toString() !== targetUser._id.toString()
   ) {
     req.body.err = new RecordNotFoundException({
       recordType: 'planner',
@@ -263,20 +238,15 @@ function verifyUserCanViewPlanner(
   res: Response,
   next: NextFunction,
 ) {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-  let { plannerId, createdBy, userId, targetPlanner } = req.body.out
-  userId ||= createdBy // Assuming either userId or createdBy is provided
-  assert(userId || createdBy, 'User ID is required')
+  let { targetUser, targetPlanner } = req.body.out
   if (
-    !targetPlanner.roUsers.includes(userId) &&
-    !targetPlanner.rwUsers.includes(userId) &&
-    !targetPlanner.createdBy?.equals(userId)
+    !targetPlanner.roUsers.includes(targetUser._id) &&
+    !targetPlanner.rwUsers.includes(targetUser._id) &&
+    targetPlanner.createdBy?.toString() !== targetUser._id.toString()
   ) {
     req.body.err = new RecordNotFoundException({
       recordType: 'planner',
-      recordId: plannerId,
+      recordId: targetPlanner._id,
     })
     next(req.body.err)
   } else {

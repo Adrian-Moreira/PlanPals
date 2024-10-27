@@ -15,7 +15,7 @@ import ActivityService from '../../../src/services/activity'
 
 describe('Activity->createActivity', () => {
   let activityMock: sinon.SinonMock
-  let d9bMock: sinon.SinonMock
+  let d9nMock: sinon.SinonMock
   let req: Partial<Request>
   let res: Partial<Response>
   let next: Partial<NextFunction> = jest.fn()
@@ -44,7 +44,7 @@ describe('Activity->createActivity', () => {
 
   beforeEach(() => {
     activityMock = sinon.mock(ActivityModel)
-    d9bMock = sinon.mock(DestinationModel)
+    d9nMock = sinon.mock(DestinationModel)
     req = {
       body: {
         out: {
@@ -59,7 +59,7 @@ describe('Activity->createActivity', () => {
 
   afterEach(() => {
     activityMock.restore()
-    d9bMock.restore()
+    d9nMock.restore()
   })
 
   it('should create new comment under destination', async () => {
@@ -72,7 +72,7 @@ describe('Activity->createActivity', () => {
       endDate: newActivity.endDate,
     })
 
-    d9bMock.expects('findOneAndUpdate').resolves(existingD9n)
+    d9nMock.expects('findOneAndUpdate').resolves(existingD9n)
 
     await ActivityService.createActivityDocument(
       req as Request,
@@ -85,7 +85,7 @@ describe('Activity->createActivity', () => {
     expect(req.body.result).toBeDefined()
     expect(req.body.result.name).toEqual('test')
     expect(req.body.result.location).toEqual('test')
-    expect(req.body.result.startDate).toEqual(existingD9n.startDate)
-    expect(req.body.result.endDate).toEqual(existingD9n.endDate)
+    expect(req.body.result.startDate).toEqual(newActivity.startDate)
+    expect(req.body.result.endDate).toEqual(newActivity.endDate)
   })
 })

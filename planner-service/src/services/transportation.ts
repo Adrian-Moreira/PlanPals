@@ -2,8 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { Transport, TransportModel } from '../models/Transport'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { RecordConflictException } from '../exceptions/RecordConflictException'
-import { Types } from 'mongoose'
+import { PlannerModel } from '../models/Planner'
 
 /**
  * Verify that a transportation with the given ID exists in the database and belongs to the given planner.
@@ -18,9 +17,6 @@ async function verifyTransportationExists(
   res: Response,
   next: NextFunction,
 ) {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetPlanner, transportationId } = req.body.out
   const targetTransportation = await TransportModel.findOne({
     _id: transportationId,
@@ -53,13 +49,9 @@ const createTransportationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const {
     plannerId,
-    createdBy,
+    targetUser,
     type,
     details,
     departureTime,
@@ -70,25 +62,21 @@ const createTransportationDocument = async (
 
   const createdTransportation = await TransportModel.create({
     plannerId,
-    createdBy,
+    createdBy: targetUser._id,
     type,
     details,
     departureTime,
     arrivalTime,
     vehicleId,
   })
-    .then(async (transportation) => {
-      targetPlanner.transportations.push(transportation._id)
-      await targetPlanner.save()
+  targetPlanner.transportations.push(createdTransportation._id)
 
-      return transportation
-    })
-    .catch((err) => {
-      req.body.err = new RecordConflictException({
-        requestType: 'createTransportation',
-        conflict: 'Transportation already exists ' + JSON.stringify(err),
-      })
-    })
+  await PlannerModel.findOneAndUpdate(
+    { _id: targetPlanner._id },
+    { transportations: targetPlanner.transportations },
+    { new: true },
+  )
+
   req.body.result = createdTransportation
   req.body.status = StatusCodes.CREATED
   next()
@@ -108,10 +96,6 @@ const updateTransportationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   let {
     type,
     details,
@@ -126,7 +110,12 @@ const updateTransportationDocument = async (
   targetTransportation.departureTime ||= departureTime
   targetTransportation.arrivalTime ||= arrivalTime
   targetTransportation.vehicleId ||= vehicleId
-  const updatedTransportation = await targetTransportation.save()
+
+  const updatedTransportation = await TransportModel.findOneAndUpdate(
+    { _id: targetTransportation._id },
+    targetTransportation,
+    { new: true },
+  )
 
   req.body.result = updatedTransportation
   req.body.status = StatusCodes.OK
@@ -148,28 +137,21 @@ const deleteTransportationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetPlanner, targetTransportation } = req.body.out
 
   targetPlanner.transportations = targetPlanner.transportations.filter(
-    (tid: Types.ObjectId) => tid.equals(targetTransportation._id),
+    (tid: any) => tid.toString() != targetTransportation._id.toString(),
   )
-  await targetPlanner.save()
+
+  await PlannerModel.findOneAndUpdate(
+    { _id: targetPlanner._id },
+    { transportations: targetPlanner.transportations },
+    { new: true },
+  )
 
   const deletedTransportation = await TransportModel.findOneAndDelete({
     _id: targetTransportation._id,
   })
-
-  if (!deletedTransportation) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'transportation',
-      recordId: targetTransportation._id,
-    })
-    next(req.body.err)
-  }
 
   req.body.result = deletedTransportation
   req.body.status = StatusCodes.OK
@@ -192,10 +174,6 @@ const getTransportationDocumentById = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetTransportation } = req.body.out
 
   req.body.result = targetTransportation
@@ -218,12 +196,9 @@ const getTransportationDocumentsByPlannerId = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetPlanner } = req.body.out
   const resultTransportations: Transport[] =
-    await targetPlanner.transportations.map((tid: Types.ObjectId) =>
+    await targetPlanner.transportations.map((tid: any) =>
       TransportModel.findById(tid),
     )
 

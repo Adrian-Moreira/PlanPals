@@ -4,8 +4,6 @@ import { accommodationRouter } from './accommodation'
 import DestinationValidator from '../../../controllers/destination'
 import PlannerService from '../../../services/planner'
 import DestinationService from '../../../services/destination'
-import RequestUtils from '../../../utils/RequestUtils'
-import { Destination } from '../../../models/Destination'
 import UserService from '../../../services/user'
 
 export const destinationRouter = express.Router({ mergeParams: true })
@@ -17,8 +15,6 @@ destinationRouter.get(
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.getDestinationDocumentsByPlannerId,
-  RequestUtils.mkSuccessResponse<Destination[]>,
-  RequestUtils.mkErrorResponse,
 )
 destinationRouter.post(
   '/',
@@ -27,8 +23,6 @@ destinationRouter.post(
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.createDestinationDocument,
-  RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse,
 )
 
 destinationRouter.get(
@@ -39,8 +33,6 @@ destinationRouter.get(
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
   DestinationService.getDestinationDocumentById,
-  RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse,
 )
 destinationRouter.patch(
   '/:destinationId([0-9a-fA-F]{24})',
@@ -50,8 +42,6 @@ destinationRouter.patch(
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
   DestinationService.updateDestinationDocument,
-  RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse,
 )
 destinationRouter.delete(
   '/:destinationId([0-9a-fA-F]{24})',
@@ -61,8 +51,6 @@ destinationRouter.delete(
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
   DestinationService.deleteDestinationDocument,
-  RequestUtils.mkSuccessResponse<Destination>,
-  RequestUtils.mkErrorResponse,
 )
 
 destinationRouter.use(

@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../src/app'
+import PlanPals from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
-import { UserModel, UserSchema } from '../src/models/User'
-import { PlannerModel, PlannerSchema } from '../src/models/Planner'
+import { UserModel, UserSchema } from '../../src/models/User'
+import { PlannerModel, PlannerSchema } from '../../src/models/Planner'
 
 let app: PlanPals
 let testUser: any
@@ -12,7 +12,7 @@ let testPlanner: any
 
 let userToBeInvited: any
 
-describe('Planner API', () => {
+describe('Integration Test: Planner API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
