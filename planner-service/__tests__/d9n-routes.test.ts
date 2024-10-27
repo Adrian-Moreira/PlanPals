@@ -372,7 +372,6 @@ describe('D9n API', () => {
 
     it('should return OK and delete destination', async () => {
       const reqStr = `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`
-      console.log(reqStr)
       const response = await request(app.app)
         .delete(reqStr)
         .expect('Content-Type', /json/)

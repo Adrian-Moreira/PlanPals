@@ -6,12 +6,14 @@ import PlannerService from '../../../services/planner'
 import DestinationService from '../../../services/destination'
 import RequestUtils from '../../../utils/RequestUtils'
 import { Destination } from '../../../models/Destination'
+import UserService from '../../../services/user'
 
 export const destinationRouter = express.Router({ mergeParams: true })
 
 destinationRouter.get(
   '/',
   DestinationValidator.getDestinationsByPlannerId,
+  UserService.verifyUserExists,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.getDestinationDocumentsByPlannerId,
@@ -21,6 +23,7 @@ destinationRouter.get(
 destinationRouter.post(
   '/',
   DestinationValidator.createDestination,
+  UserService.verifyUserExists,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.createDestinationDocument,
@@ -31,6 +34,7 @@ destinationRouter.post(
 destinationRouter.get(
   '/:destinationId([0-9a-fA-F]{24})',
   DestinationValidator.getDestinationById,
+  UserService.verifyUserExists,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
@@ -41,6 +45,7 @@ destinationRouter.get(
 destinationRouter.patch(
   '/:destinationId([0-9a-fA-F]{24})',
   DestinationValidator.updateDestination,
+  UserService.verifyUserExists,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
@@ -51,6 +56,7 @@ destinationRouter.patch(
 destinationRouter.delete(
   '/:destinationId([0-9a-fA-F]{24})',
   DestinationValidator.deleteDestination,
+  UserService.verifyUserExists,
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
