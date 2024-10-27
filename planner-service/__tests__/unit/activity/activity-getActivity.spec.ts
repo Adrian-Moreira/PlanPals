@@ -10,8 +10,11 @@ import {
 import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import AccommodationService from '../../../src/services/accommodation'
+import { ActivityModel } from '../../../src/models/Activity'
+import ActivityService from '../../../src/services/activity'
 
-describe('A11N->getA11NById', () => {
+describe('Activity->getActivityById', () => {
+  let activityMock: sinon.SinonMock
   let req: Partial<Request>
   let res: Partial<Response>
   let next: Partial<NextFunction> = jest.fn()
@@ -20,7 +23,7 @@ describe('A11N->getA11NById', () => {
     _id: '671d24c18132583fe9fb978f',
   }
 
-  const existingA11n = {
+  const existingActivity = {
     _id: '671d24c18132583fe9fb123f',
     createdBy: targetUser._id,
     startDate: new Date(),
@@ -31,10 +34,13 @@ describe('A11N->getA11NById', () => {
   }
 
   beforeEach(() => {
+    activityMock = sinon.mock(ActivityModel)
     req = {
       body: {
         out: {
-          targetAccommodation: existingA11n,
+          targetActivity: existingActivity,
+          name: 'test1',
+          location: 'test1',
         },
       },
     }
@@ -43,8 +49,8 @@ describe('A11N->getA11NById', () => {
 
   afterEach(() => {})
 
-  it('should get existing a11n by id', async () => {
-    await AccommodationService.getAccommodationDocumentById(
+  it('should get existing activity by id', async () => {
+    await ActivityService.getActivityDocumentById(
       req as Request,
       res as Response,
       next as NextFunction,
@@ -54,7 +60,7 @@ describe('A11N->getA11NById', () => {
     expect(req.body.result).toBeDefined()
     expect(req.body.result.name).toEqual('test')
     expect(req.body.result.location).toEqual('test')
-    expect(req.body.result.startDate).toEqual(existingA11n.startDate)
-    expect(req.body.result.endDate).toEqual(existingA11n.endDate)
+    expect(req.body.result.startDate).toEqual(existingActivity.startDate)
+    expect(req.body.result.endDate).toEqual(existingActivity.endDate)
   })
 })
