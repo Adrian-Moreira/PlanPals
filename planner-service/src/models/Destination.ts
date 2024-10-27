@@ -1,8 +1,6 @@
 import { z } from 'zod'
-import { ObjectIdSchema, PlannerModel } from './Planner'
+import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
-import { ActivityModel } from './Activity'
-import { AccommodationModel } from './Accommodation'
 
 const DestinationMongoSchema = new Schema<Destination>(
   {

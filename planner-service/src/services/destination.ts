@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
-import { Destination, DestinationModel } from '../models/Destination'
+import { DestinationModel } from '../models/Destination'
 import { Types } from 'mongoose'
+import { PlannerModel } from '../models/Planner'
 
 /**
  * Verify that a destination with the given ID exists in the database. If not, throw
@@ -18,9 +19,6 @@ async function verifyDestinationExists(
   res: Response,
   next: NextFunction,
 ) {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { destinationId, targetPlanner } = req.body.out
   const targetDestination = await DestinationModel.findOne({
     _id: destinationId,
@@ -54,35 +52,28 @@ const createDestinationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
+  const { targetUser, startDate, endDate, name, targetPlanner } = req.body.out
 
-  const { createdBy, startDate, endDate, name, targetPlanner } = req.body.out
-
-  await DestinationModel.create({
+  const newDestination = await DestinationModel.create({
     name,
     startDate,
     endDate,
-    createdBy,
+    createdBy: targetUser._id,
     plannerId: targetPlanner._id,
     accommodation: [],
     activities: [],
   })
-    .then(async (destination) => {
-      targetPlanner.destinations.push(destination._id)
-      await targetPlanner.save()
 
-      req.body.result = destination
-      req.body.status = StatusCodes.CREATED
-    })
-    .catch(() => {
-      req.body.err = new RecordConflictException({
-        requestType: 'createDestination',
-        conflict: 'Destination already exists',
-      })
-      next(req.body.err)
-    })
+  targetPlanner.destinations.push(newDestination._id)
+
+  await PlannerModel.findOneAndUpdate(
+    { _id: targetPlanner._id },
+    { destinations: targetPlanner.destinations },
+    { new: true },
+  )
+
+  req.body.result = newDestination
+  req.body.status = StatusCodes.CREATED
 
   next()
 }
@@ -101,10 +92,6 @@ const updateDestinationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetDestination, name, startDate, endDate } = req.body.out
 
   const savedDestination = await DestinationModel.findOneAndUpdate(
@@ -116,14 +103,6 @@ const updateDestinationDocument = async (
     },
     { new: true },
   )
-
-  if (!savedDestination) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'destination',
-      recordId: targetDestination._id,
-    })
-    next(req.body.err)
-  }
 
   req.body.result = savedDestination
   req.body.status = StatusCodes.OK
@@ -145,29 +124,24 @@ const deleteDestinationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetDestination, targetPlanner } = req.body.out
 
   targetPlanner.destinations = targetPlanner.destinations.filter(
-    (did: Types.ObjectId) => did.equals(targetDestination._id),
+    (did: any) => did.toString() != targetDestination._id.toString(),
   )
-  await targetPlanner.save()
 
-  await DestinationModel.findOneAndDelete({ _id: targetDestination._id })
-    .then(() => {
-      req.body.result = targetDestination
-      req.body.status = StatusCodes.OK
-    })
-    .catch(() => {
-      req.body.err = new RecordNotFoundException({
-        recordType: 'destination',
-        recordId: targetDestination._id,
-      })
-      next(req.body.err)
-    })
+  await PlannerModel.findOneAndUpdate(
+    { _id: targetPlanner._id },
+    { destinations: targetPlanner.destinations },
+    { new: true },
+  )
+
+  const deletedDestination = await DestinationModel.findOneAndDelete({
+    _id: targetDestination._id,
+  })
+
+  req.body.result = deletedDestination
+  req.body.status = StatusCodes.OK
 
   next()
 }
@@ -186,9 +160,6 @@ const getDestinationDocumentById = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetDestination } = req.body.out
   req.body.result = targetDestination
   req.body.status = StatusCodes.OK
@@ -209,25 +180,15 @@ const getDestinationDocumentsByPlannerId = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetPlanner } = req.body.out
 
-  const resultDestinations: Destination[] =
-    await targetPlanner.destinations.map(async (did: Types.ObjectId) => {
-      return await DestinationModel.findById(did)
-    })
+  const resultDestinations = targetPlanner.destinations.map((did: any) => {
+    return DestinationModel.findById(did)
+  })
 
-  if (resultDestinations.length === 0) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'destination',
-      recordId: targetPlanner._id,
-    })
-    next(req.body.err)
-  }
-  req.body.result = resultDestinations
+  req.body.result = await Promise.all(resultDestinations).then((results) =>
+    results.filter((dest) => dest !== null),
+  )
   req.body.status = StatusCodes.OK
   next()
 }

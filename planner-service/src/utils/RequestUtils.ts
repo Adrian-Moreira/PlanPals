@@ -55,11 +55,11 @@ function mkRequestParser<T>(
       })
       .catch((error: any) => {
         req.body.err = new MalformedRequestException({
-          requestBody: `
-          Body: ${JSON.stringify(req.body, null, 2)}
-          Params: ${JSON.stringify(req.params, null, 2)}
-          Query: ${JSON.stringify(req.query, null, 2)}
-          Error: ${error.toString()}`,
+          requestBody: ''
+            .concat(` Body: ${req.body}`)
+            .concat(` Params: ${req.params}`)
+            .concat(` Query: ${req.query}`)
+            .concat(' Error: ' + error.toString()),
           requestType: 'parseRequest',
         })
         next(req.body.err)
@@ -182,9 +182,9 @@ async function mkSuccessResponse<T>(
 ): Promise<void> {
   if (req.body.err || !req.body.result) {
     next(req.body.err)
+  } else {
+    res.status(req.body.status).json(mkSuccessJSON<T>(req.body.result))
   }
-  res.status(req.body.status).json(mkSuccessJSON<T>(req.body.result))
-  next()
 }
 
 const RequestUtils = {

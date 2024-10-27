@@ -19,10 +19,7 @@ export async function findOrCreateCommentsDocument(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
-  if (req.body.err) {
-    next(req.body.err)
-  }
+): Promise<void> {
   const { type, objectId } = req.body.out
   let commentsDocument = await CommentsModel.findOne({
     objectId: { id: objectId, collection: type },
@@ -34,6 +31,7 @@ export async function findOrCreateCommentsDocument(
     })
   }
   req.body.out = { ...req.body.out, commentsDocument }
+  req.body.status = StatusCodes.OK
   next()
 }
 
@@ -50,13 +48,10 @@ const createCommentDocument = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-  const { createdBy, title, content, commentsDocument } = req.body.out
+): Promise<void> => {
+  const { targetUser, title, content, commentsDocument } = req.body.out
   const commentDocument = await CommentModel.create({
-    createdBy,
+    createdBy: targetUser._id,
     title,
     content,
   })
@@ -64,7 +59,11 @@ const createCommentDocument = async (
   if (!commentsDocument.comments.includes(commentDocument._id)) {
     commentsDocument.comments.push(commentDocument._id)
   }
-  await commentsDocument.save()
+  await CommentsModel.findOneAndUpdate(
+    { _id: commentsDocument._id },
+    commentsDocument,
+    { new: true },
+  )
 
   req.body.result = commentDocument
   req.body.status = StatusCodes.CREATED
@@ -86,11 +85,8 @@ const removeCommentDocument = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-  const { commentId, userId, commentsDocument } = req.body.out
+): Promise<void> => {
+  const { commentId, targetUser, commentsDocument } = req.body.out
 
   if (!commentsDocument.comments.includes(commentId)) {
     req.body.err = new RecordNotFoundException({
@@ -109,7 +105,7 @@ const removeCommentDocument = async (
     })
     next(req.body.err)
   }
-  if (!targetComment?.createdBy.equals(userId)) {
+  if (targetComment?.createdBy.toString() != targetUser._id.toString()) {
     req.body.err = new RecordNotFoundException({
       recordType: 'comment',
       recordId: commentId,
@@ -118,9 +114,14 @@ const removeCommentDocument = async (
   }
 
   commentsDocument.comments = commentsDocument.comments.filter(
-    (comment: Types.ObjectId) => !comment.equals(commentId),
+    (cid: any) => cid.toString() != commentId.toString(),
   )
-  await commentsDocument.save()
+
+  await CommentsModel.findOneAndUpdate(
+    { _id: commentsDocument._id },
+    commentsDocument,
+    { new: true },
+  )
 
   req.body.result = await CommentModel.findOneAndDelete({ _id: commentId })
   req.body.status = StatusCodes.OK
@@ -144,24 +145,14 @@ const getCommentsByObjectId = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
+): Promise<void> => {
   const { commentsDocument } = req.body.out
-  const comments = commentsDocument.comments.map(
-    async (comment: Types.ObjectId) => {
-      return await CommentModel.findById(comment)
-    },
+  const comments = commentsDocument.comments.map((cid: any) =>
+    CommentModel.findById(cid),
   )
-  if (!comments || comments.length === 0) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'comments',
-      recordId: commentsDocument._id,
-    })
-    next(req.body.err)
-  }
-  req.body.result = comments
+  req.body.result = await Promise.all(comments).then((results) =>
+    results.filter((comment) => comment !== null),
+  )
   req.body.status = StatusCodes.OK
   next()
 }
@@ -179,10 +170,7 @@ const getCommentById = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
+): Promise<void> => {
   const { commentId } = req.body.out
   const comment = await CommentModel.findById(commentId)
   if (!comment) {

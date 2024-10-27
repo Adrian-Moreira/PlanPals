@@ -37,7 +37,7 @@ const CommentsMongoSchema = new Schema<Comments>(
     },
   },
   {
-    _id: false,
+    _id: true,
     timestamps: false,
   },
 )

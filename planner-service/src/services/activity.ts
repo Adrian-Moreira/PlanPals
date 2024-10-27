@@ -4,6 +4,7 @@ import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { Activity, ActivityModel } from '../models/Activity'
 import { Types } from 'mongoose'
+import { DestinationModel } from '../models/Destination'
 
 /**
  * Verifies that an activity with the given ID exists in the database. If not,
@@ -21,10 +22,6 @@ async function verifyActivityExists(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { activityId } = req.body.out
   const activity = await ActivityModel.findOne({ _id: activityId })
   if (!activity) {
@@ -53,33 +50,26 @@ const createActivityDocument = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
-  const { targetDestination, name, startDate, duration, location, createdBy } =
+  const { targetDestination, name, startDate, duration, location, targetUser } =
     req.body.out
 
   const createdActivity = await ActivityModel.create({
-    createdBy,
+    createdBy: targetUser._id,
     destinationId: targetDestination._id,
     name,
     startDate,
     duration,
     location,
+  }).then(async (activity) => {
+    await DestinationModel.findOneAndUpdate(
+      { _id: targetDestination._id },
+      {
+        $push: { activities: activity._id },
+      },
+      { new: true },
+    )
+    return activity
   })
-    .then(async (activity) => {
-      targetDestination.activities.push(activity._id)
-      await targetDestination.save()
-      return activity
-    })
-    .catch(() => {
-      req.body.err = new RecordConflictException({
-        requestType: 'createActivity',
-        conflict: 'activity',
-      })
-      next(req.body.err)
-    })
 
   req.body.result = createdActivity
   req.body.status = StatusCodes.CREATED
@@ -102,17 +92,18 @@ const updateActivityDocument = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetActivity, name, startDate, duration, location } = req.body.out
 
   targetActivity.name ||= name
   targetActivity.startDate ||= startDate
   targetActivity.duration ||= duration
   targetActivity.location ||= location
-  const updatedActivity = await targetActivity.save()
+
+  const updatedActivity = await ActivityModel.findOneAndUpdate(
+    { _id: targetActivity._id },
+    targetActivity,
+    { new: true },
+  )
 
   req.body.result = updatedActivity
   req.body.status = StatusCodes.OK
@@ -134,28 +125,23 @@ const deleteActivityDocument = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (req.body.err) {
+  const { targetActivity } = req.body.out
+
+  const deletedActivity = await ActivityModel.findByIdAndDelete({
+    _id: targetActivity._id,
+  })
+
+  if (!deletedActivity) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'activity',
+      recordId: targetActivity._id,
+    })
     next(req.body.err)
   }
 
-  const { targetActivity, targetDestination } = req.body.out
-  await ActivityModel.findByIdAndDelete({ _id: targetActivity._id })
-    .then(async (a) => {
-      targetDestination.activities = targetDestination.activities.filter(
-        (aid: Types.ObjectId) => aid.equals(targetActivity._id),
-      )
-      await targetDestination.save()
+  req.body.result = deletedActivity
+  req.body.status = StatusCodes.OK
 
-      req.body.result = a
-      req.body.status = StatusCodes.OK
-    })
-    .catch(() => {
-      req.body.err = new RecordNotFoundException({
-        recordType: 'activity',
-        recordId: targetActivity._id,
-      })
-      next(req.body.err)
-    })
   next()
 }
 
@@ -173,10 +159,6 @@ const getActivityDocumentById = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetActivity } = req.body.out
 
   req.body.result = targetActivity
@@ -198,28 +180,16 @@ const getActivitiyDocumentsByDestinationId = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
+): Promise<void> => {
   const { targetDestination } = req.body.out
 
-  const resultActivities: Activity[] = await targetDestination.activities.map(
-    async (aid: Types.ObjectId) => {
-      return await ActivityModel.findOne({ _id: aid })
-    },
+  const resultActivities: Activity[] = targetDestination.activities.map(
+    (aid: any) => ActivityModel.findById(aid),
   )
 
-  if (resultActivities.length === 0) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'activity',
-      recordId: targetDestination._id,
-    })
-    next(req.body.err)
-  }
-
-  req.body.result = resultActivities
+  req.body.result = await Promise.all(resultActivities).then((results) =>
+    results.filter((act) => act !== null),
+  )
   req.body.status = StatusCodes.OK
 
   next()
