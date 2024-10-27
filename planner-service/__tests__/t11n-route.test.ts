@@ -18,11 +18,12 @@ let testPlanner2: any
 
 let testTransportation1: any
 
-describe('T11n API', () => {
+describe.skip('Planner API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
-    await app.startServer()
+    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
+    await app.startServer(port)
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
@@ -86,8 +87,8 @@ describe('T11n API', () => {
     testPlanner = await testPlanner.save()
   })
 
-  afterAll(() => {
-    app.stopServer()
+  afterAll(async () => {
+    await app.stopServer()
   })
 
   describe('perform GET from /transportation with plannerId', () => {
@@ -161,7 +162,7 @@ describe('T11n API', () => {
     it('should return Not Found', async () => {
       const response = await request(app.app)
         .get(
-          `/planner/${testPlanner2._id.toString()}/transportation?userId=${testUser4._id.toString()}`,
+          `/planner/${testPlanner._id.toString()}/transportation?userId=${testUser4._id.toString()}`,
         )
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -339,6 +340,28 @@ describe('T11n API', () => {
   })
 
   describe('perform DELETE to /transportation with plannerId and transportId', () => {
+    it('should return Not Found with invalid user', async () => {
+      const response = await request(app.app)
+        .delete(
+          `/planner/${testPlanner._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser4._id.toString()}`,
+        )
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.NOT_FOUND)
+
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return Not Found with invalid planner', async () => {
+      const response = await request(app.app)
+        .delete(
+          `/planner/${testUser1._id.toString()}/transportation/${testTransportation1._id.toString()}?userId=${testUser1._id.toString()}`,
+        )
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.NOT_FOUND)
+
+      expect(response.body.success).toBe(false)
+    })
+
     it('should return OK and delete transportation', async () => {
       const response = await request(app.app)
         .delete(

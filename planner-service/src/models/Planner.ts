@@ -1,11 +1,19 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { z } from 'zod'
+import { DestinationModel } from './Destination'
 
 export const ObjectIdSchema = z
   .instanceof(Types.ObjectId)
   .refine((val) => Types.ObjectId.isValid(val), {
     message: 'Invalid ObjectId',
   })
+
+export const ObjectIdStringSchema = z
+  .string()
+  .refine((val) => Types.ObjectId.isValid(val), {
+    message: 'Invalid ObjectId',
+  })
+  .transform((val) => new Types.ObjectId(val))
 
 const PlannerMongoSchema = new Schema<Planner>(
   {

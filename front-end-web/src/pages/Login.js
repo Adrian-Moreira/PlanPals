@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext"; // Import the Auth context
@@ -13,59 +12,59 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-  //   // Simulate checking for an existing username
-  //   const existingUsernames = ["user1", "user2", "admin"]; // Predefined usernames for testing
-
-  //   if (existingUsernames.includes(username)) {
-  //     // Simulate a successful login
-  //   login(username); // Call the login function
-  //     navigate("/home"); // Redirect to Home after login
-
-  //   } else {
-  //     // Simulate an error for invalid username
-  //     setError("User not found. Please check your username.");
-  //   }
-  // };
-try {
-    // Make a request to your backend to check if the user exists
-    const response = await axios.get(`http://localhost:8080/user/search`, {
-      params: { userName: username }  // Pass username in the request body
+    try {
+      // Make a request to your backend to check if the user exists
+      const response = await axios.get(`http://localhost:8080/user/search`, {
+        params: { userName: username }  // Pass username in the request
       });
-    console.log(response.data);
-    if (response.data.success && response.data.data.length > 0) {
-      const user = response.data.data[0]; // Assuming the first result is the user
-      login(user.userName); // Call the login function with the username
-      navigate("/home"); // Redirect to Home after login
-    } else {
-      // User does not exist, prompt to create one
-      const createUser = window.confirm(`User "${username}" does not exist. Would you like to create a new account?`);
-      if (createUser) {
-        const createResponse = await axios.post(`http://localhost:8080/user`, {
-          userName: username,
-          preferredName: username, // Use username as preferred name for simplicity
-       
-       } ,{
-        headers: {
-          'Content-Type': 'application/json', // Explicitly set the content type
-        }
-      });
-        
-        if (createResponse.data.success) {
-          // If user creation is successful, log them in
-          login(username); 
-          navigate("/home"); // Redirect to Home after login
+   
+      // If the user exists, log them in
+      if (response.data.success && response.data.data) {
+        const user = response.data.data; // Get the user object
+        login(user.userName ,user._id); // Call the login function with the username
+        console.log(user._id)
+        navigate("/home"); // Redirect to Home after login
+      }
+    } catch (err) {
+      // Handle errors based on their status
+      if (err.response) {
+        if (err.response.status === 404) {
+          // User does not exist, prompt to create a new one
+          const createUser = window.confirm(`User "${username}" does not exist. Would you like to create a new account?`);
+          
+          if (createUser) {
+            // Create a new user
+            try {
+              const createResponse = await axios.post(`http://localhost:8080/user`, {
+                userName: username,
+                preferredName: username // Use username as preferred name for simplicity
+              });
+
+              // Check if user creation was successful
+              if (createResponse.data.success) {
+                // If user creation is successful, log them in
+                login(createResponse.data.data.userName, createResponse.data.data._id); // Log in with the created user
+                navigate("/home"); // Redirect to Home after login
+              } else {
+                // Handle user creation error
+                setError(createResponse.data.message || "Error creating user. Please try again.");
+              }
+            } catch (createErr) {
+              // Handle potential error during user creation
+              setError("Error while creating user. Please try again.");
+            }
+          }
+        } else if (err.response.status === 409) {
+          setError("A user with that username already exists. Please try logging in.");
         } else {
-          setError("Error creating user. Please try again.");
+          setError("Error while trying to log in. Please try again later.");
         }
       } else {
-        setError("User not found. Please enter a valid username.");
+        setError("Error connecting to the server. Please check your network.");
       }
     }
-  } catch (err) {
-    console.error(err);
-    setError("Error while trying to log in. Please try again later.");
-  }
-};
+  };
+
   return (
     <div className="login-container">
       <h1>Login</h1>

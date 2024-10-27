@@ -31,3 +31,4 @@ export const BasicUserSchema = UserSchema.pick({
 })
 export const UserModel = mongoose.model<User>('User', UserMongoSchema)
 export type User = z.infer<typeof UserSchema>
+export type BasicUser = z.infer<typeof BasicUserSchema>

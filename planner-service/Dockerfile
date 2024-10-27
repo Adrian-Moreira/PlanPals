@@ -7,6 +7,12 @@ COPY package-lock.json package-lock.json
 
 RUN npm install
 
+RUN npm install -g nodemon
+
+RUN npm install -g typescript
+
+RUN npm install -g ts-node
+
 COPY . .
 
-CMD [ "node", "out/app.js" ]
+CMD [ "ts-node", "src/app.ts" ]

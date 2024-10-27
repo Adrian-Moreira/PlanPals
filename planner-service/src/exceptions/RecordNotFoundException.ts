@@ -1,5 +1,5 @@
-import { StatusCodes } from 'http-status-codes';
-import { BaseException } from './BaseException';
+import { StatusCodes } from 'http-status-codes'
+import { BaseException } from './BaseException'
 
 export class RecordNotFoundException extends BaseException {
   constructor({
@@ -7,14 +7,14 @@ export class RecordNotFoundException extends BaseException {
     recordId,
     message = `The requested record couldn't be found. Record Type: ${recordType}; Record ID: ${recordId}`,
   }: {
-    recordType: string;
-    recordId?: string;
-    message?: string;
+    recordType: string
+    recordId?: string
+    message?: string
   }) {
     super({
       name: 'RecordNotFoundException',
       message,
       status: StatusCodes.NOT_FOUND,
-    });
+    })
   }
 }

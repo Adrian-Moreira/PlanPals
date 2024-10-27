@@ -1,14 +1,10 @@
 import { z } from 'zod'
 import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
+import { DestinationModel } from './Destination'
 
 const ActivityMongoSchema = new Schema<Activity>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      auto: true,
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -19,20 +15,13 @@ const ActivityMongoSchema = new Schema<Activity>(
       required: true,
     },
 
-    comments: {
-      type: [Schema.Types.ObjectId],
-      required: true,
-      ref: 'Comment',
-    },
-
     name: {
       type: String,
       required: true,
     },
 
     location: {
-      type: Schema.Types.ObjectId,
-      ref: 'Location',
+      type: String,
     },
 
     duration: {
@@ -44,8 +33,14 @@ const ActivityMongoSchema = new Schema<Activity>(
       type: Boolean,
       required: true,
     },
+
+    destinationId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Destination',
+      required: true,
+    },
   },
-  { timestamps: true }
+  { _id: true, timestamps: true },
 )
 
 export const ActivitySchema = z.object({
@@ -57,13 +52,16 @@ export const ActivitySchema = z.object({
 
   startDate: z.string().datetime(),
 
-  comments: z.array(ObjectIdSchema),
-
   name: z.string(),
-  location: ObjectIdSchema.optional(),
+  location: z.string().optional(),
   duration: z.number().optional(),
   done: z.boolean(),
+
+  destinationId: ObjectIdSchema,
 })
 
-export const ActivityModel = mongoose.model<Activity>('Activity', ActivityMongoSchema)
+export const ActivityModel = mongoose.model<Activity>(
+  'Activity',
+  ActivityMongoSchema,
+)
 export type Activity = z.infer<typeof ActivitySchema>

@@ -1,1027 +1,945 @@
 # PPAPI
 
-This document outlines the API endpoints for the PPAPI (Planner API), detailing the available requests, required parameters, and expected responses. The API is structured to manage planners, destinations, accommodations, activities, and associated entities like transportation, votes, comments, and locations.
-
----
+Introduction: to be generated
 
 ## Table of Contents
 
-- [PPAPI](#ppapi)
-  - [Table of Contents](#table-of-contents)
-  - [Planner](#planner)
-    - [`GET /planner`](#get-planner)
-      - [Query Parameters:](#query-parameters)
-      - [Example Request:](#example-request)
-      - [Response:](#response)
-    - [`POST /planner`](#post-planner)
-      - [Request Body:](#request-body)
-      - [Response:](#response-1)
-  - [Transportation](#transportation)
-    - [`GET /planner/:plannerId/transportation`](#get-plannerplanneridtransportation)
-      - [Parameters:](#parameters)
-      - [Example Request:](#example-request-1)
-      - [Response:](#response-2)
-    - [`POST /planner/:plannerId/transportation`](#post-plannerplanneridtransportation)
-      - [Parameters:](#parameters-1)
-      - [Request Body:](#request-body-1)
-      - [Response:](#response-3)
-    - [`GET/PUT/DELETE /planner/:plannerId/transportation/:transportationId`](#getputdelete-plannerplanneridtransportationtransportationid)
-      - [Parameters:](#parameters-2)
-      - [GET Example Request:](#get-example-request)
-      - [GET Response:](#get-response)
-      - [PUT Request Body:](#put-request-body)
-      - [PUT Response:](#put-response)
-      - [DELETE Response:](#delete-response)
-  - [Destination](#destination)
-    - [`GET/POST /planner/:plannerId/destination`](#getpost-plannerplanneriddestination)
-      - [Parameters:](#parameters-3)
-      - [GET Example Request:](#get-example-request-1)
-      - [GET Response:](#get-response-1)
-      - [POST Request Body:](#post-request-body)
-      - [POST Response:](#post-response)
-    - [`GET/PUT/DELETE /planner/:plannerId/destination/:destinationId`](#getputdelete-plannerplanneriddestinationdestinationid)
-      - [Parameters:](#parameters-4)
-      - [GET Example Request:](#get-example-request-2)
-      - [GET Response:](#get-response-2)
-      - [PUT Request Body:](#put-request-body-1)
-      - [PUT Response:](#put-response-1)
-      - [DELETE Response:](#delete-response-1)
-  - [Accommodation](#accommodation)
-    - [`GET/POST /planner/:plannerId/destination/:destinationId/accommodation`](#getpost-plannerplanneriddestinationdestinationidaccommodation)
-      - [Parameters:](#parameters-5)
-      - [GET Example Request:](#get-example-request-3)
-      - [GET Response:](#get-response-3)
-      - [POST Request Body:](#post-request-body-1)
-      - [POST Response:](#post-response-1)
-    - [`GET/PUT/DELETE /planner/:plannerId/destination/:destinationId/accommodation/:accommodationId`](#getputdelete-plannerplanneriddestinationdestinationidaccommodationaccommodationid)
-      - [Parameters:](#parameters-6)
-      - [GET Example Request:](#get-example-request-4)
-      - [GET Response:](#get-response-4)
-      - [PUT Request Body:](#put-request-body-2)
-      - [PUT Response:](#put-response-2)
-      - [DELETE Response:](#delete-response-2)
-  - [Activity](#activity)
-    - [`GET/POST /planner/:plannerId/destination/:destinationId/activity`](#getpost-plannerplanneriddestinationdestinationidactivity)
-      - [Parameters:](#parameters-7)
-      - [GET Example Request:](#get-example-request-5)
-      - [GET Response:](#get-response-5)
-      - [POST Request Body:](#post-request-body-2)
-      - [POST Response:](#post-response-2)
-    - [`GET/PUT/DELETE /planner/:plannerId/destination/:destinationId/activity/:activityId`](#getputdelete-plannerplanneriddestinationdestinationidactivityactivityid)
-      - [Parameters:](#parameters-8)
-      - [GET Example Request:](#get-example-request-6)
-      - [GET Response:](#get-response-6)
-      - [PUT Request Body:](#put-request-body-3)
-      - [PUT Response:](#put-response-3)
-      - [DELETE Response:](#delete-response-3)
-  - [Location](#location)
-    - [`GET/POST /planner/:plannerId/destination/:destinationId/activity/:activityId/location`](#getpost-plannerplanneriddestinationdestinationidactivityactivityidlocation)
-      - [Parameters:](#parameters-9)
-      - [GET Example Request:](#get-example-request-7)
-      - [GET Response:](#get-response-7)
-      - [POST Request Body:](#post-request-body-3)
-      - [POST Response:](#post-response-3)
-    - [`GET/PUT/DELETE /planner/:plannerId/destination/:destinationId/activity/:activityId/location/:locationId`](#getputdelete-plannerplanneriddestinationdestinationidactivityactivityidlocationlocationid)
-      - [Parameters:](#parameters-10)
-      - [GET Example Request:](#get-example-request-8)
-      - [GET Response:](#get-response-8)
-      - [PUT Request Body:](#put-request-body-4)
-      - [PUT Response:](#put-response-4)
-      - [DELETE Response:](#delete-response-4)
-  - [Vote](#vote)
-    - [`GET /planner/:plannerId/destination/:destinationId/activity/:activityId/vote`](#get-plannerplanneriddestinationdestinationidactivityactivityidvote)
-      - [Parameters:](#parameters-11)
-      - [Example Request:](#example-request-2)
-      - [Response:](#response-4)
-    - [`POST /planner/:plannerId/destination/:destinationId/activity/:activityId/vote`](#post-plannerplanneriddestinationdestinationidactivityactivityidvote)
-      - [Parameters:](#parameters-12)
-      - [Request Body:](#request-body-2)
-      - [Response:](#response-5)
-  - [Comment](#comment)
-    - [`GET/POST /planner/:plannerId/destination/:destinationId/activity/:activityId/comment`](#getpost-plannerplanneriddestinationdestinationidactivityactivityidcomment)
-      - [Parameters:](#parameters-13)
-      - [GET Example Request:](#get-example-request-9)
-      - [GET Response:](#get-response-9)
-      - [POST Request Body:](#post-request-body-4)
-      - [POST Response:](#post-response-4)
-    - [`GET/PUT /planner/:plannerId/destination/:destinationId/activity/:activityId/comment/:commentId`](#getput-plannerplanneriddestinationdestinationidactivityactivityidcommentcommentid)
-      - [Parameters:](#parameters-14)
-      - [GET Example Request:](#get-example-request-10)
-      - [GET Response:](#get-response-10)
-      - [PUT Request Body:](#put-request-body-5)
-      - [PUT Response:](#put-response-5)
+- [User Endpoints](#user-endpoints)
+- [Planner Endpoints](#planner-endpoints)
+- [Destination Endpoints](#destination-endpoints)
+- [Accommodation Endpoints](#accommodation-endpoints)
+- [Activity Endpoints](#activity-endpoints)
+- [Transportation Endpoints](#transportation-endpoints)
+- [Vote Endpoints](#vote-endpoints)
+- [Comment Endpoints](#comment-endpoints)
 
 ---
 
-## Planner
+## User Endpoints
 
-### `GET /planner`
+**Base URL:** `/user`
 
-Retrieve a list of planners created by a specific user.
+### Create a User
 
-#### Query Parameters:
+- **URL:** `/user`
+- **Method:** `POST`
+- **Description:** Creates a new user.
+- **Request Body:**
 
-- `userId` (string): **Required.** The user ID of the planner creator.
+  | Field          | Type   | Required | Description              |
+  | -------------- | ------ | -------- | ------------------------ |
+  | `userName`     | string | Yes      | The user's username.     |
+  | `preferredName`| string | Yes      | The user's preferred name.|
 
-#### Example Request:
+- **Response:**
 
-```
-GET /planner?userId=user123
-```
+  Returns the created user object.
 
-#### Response:
+### Get User by Username
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "_id": "planner001",
-      "createdBy": "user123",
-      "startDate": "2023-10-01T00:00:00Z",
-      "endDate": "2023-10-10T00:00:00Z", // ISODateString
-      "name": "Trip to Spain",
-      "description": "Exploring Barcelona and Madrid",
-      "roUsers": [{}: User],
-      "rwUsers": [{}: User],
-      "destinations": [{}: Destination],
-      "transportations": [{}: Transport],
-      "invites": [{}: User],
-    }
-    // ... more planners
-  ]
-}
-```
+- **URL:** `/user/search`
+- **Method:** `GET`
+- **Description:** Retrieves a user by their username.
+- **Query Parameters:**
 
-### `POST /planner`
+  | Parameter  | Type   | Required | Description        |
+  | ---------- | ------ | -------- | ------------------ |
+  | `userName` | string | Yes      | The user's username.|
 
-Create a new planner.
+- **Response:**
 
-#### Request Body:
+  Returns the user object matching the provided username.
 
-```json
-{
-  "createdBy": "user123",
-  "startDate": "2023-10-01T00:00:00Z",
-  "endDate": "2023-10-10T00:00:00Z",
-  "roUsers": ["user456"],        // Optional: Read-only user ids
-  "rwUsers": ["user789"],        // Optional: Read-write user ids
-  "name": "Trip to Spain",
-  "description": "Exploring Barcelona and Madrid",  // Optional
-  "destinations": ["dest001"],   // List of destination IDs
-  "transportations": ["trans001"] // List of transportation IDs
-}
-```
+### Get User by ID
 
-#### Response:
+- **URL:** `/user/:userId`
+- **Method:** `GET`
+- **Description:** Retrieves a user by their ID.
+- **Path Parameters:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "_id": "planner002",
-    "createdBy": "user123",
-    "startDate": "2023-10-01T00:00:00Z",
-    "endDate": "2023-10-10T00:00:00Z",
-    "name": "Trip to Spain",
-    "description": "Exploring Barcelona and Madrid",
-    "roUsers": [{}: User],
-    "rwUsers": [{}: User],
-    "destinations": [{}: Destination],
-    "transportations": [{}: Transport],
-    "invites": [{}: User],
-  }
-}
-```
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID (24-character hexadecimal string). |
 
----
+- **Response:**
 
-## Transportation
+  Returns the user object.
 
-### `GET /planner/:plannerId/transportation`
+### Update User
 
-Retrieve all transportation entries associated with a planner.
+- **URL:** `/user/:userId`
+- **Method:** `PATCH`
+- **Description:** Updates user information.
+- **Path Parameters:**
 
-#### Parameters:
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-- `plannerId` (string): **Required.** The ID of the planner.
+- **Request Body:**
 
-#### Example Request:
+  | Field          | Type   | Required | Description              |
+  | -------------- | ------ | -------- | ------------------------ |
+  | `userName`     | string | No       | The user's username.     |
+  | `preferredName`| string | No       | The user's preferred name.|
 
-```
-GET /planner/planner001/transportation?userId=uid001
-```
+- **Response:**
 
-#### Response:
+  Returns the updated user object.
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "_id": "trans001",
-      "plannerId": "planner001",
-      "type": "Flight",
-      "details": "Flight from NYC to Madrid with Iberia",
-      "vehicleId": "IB6252",
-      "departureTime": "2024-10-09T20:45:00-04:00",
-      "arrivalTime": "2024-10-10T09:54:00+02:00"
-    }
-    // ... more transportation entries
-  ]
-}
-```
+### Delete User
 
-### `POST /planner/:plannerId/transportation`
+- **URL:** `/user/:userId`
+- **Method:** `DELETE`
+- **Description:** Deletes a user by ID.
+- **Path Parameters:**
 
-Add a new transportation entry to a planner.
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-#### Parameters:
+- **Response:**
 
-- `plannerId` (string): **Required.** The ID of the planner.
-
-#### Request Body:
-
-```json
-{
-  "createdBy": "uid001",
-  "type": "Flight",
-  "details": "Flight from NYC to Madrid with Iberia",
-  "departureTime": "2024-10-09T20:45:00-04:00",
-  "arrivalTime": "2024-10-10T09:54:00+02:00",
-  "vehicleId": "IB6252"
-}
-```
-
-#### Response:
-
-```json
-{
-  "success": true,
-  "data": {
-    "_id": "trans002",
-    "plannerId": "planner001",
-    "type": "Train",
-    "vehicleId": "AVE #3141",
-    "details": "Train from Madrid to Barcelona",
-    "departureTime": "2024-10-11T14:30:00+02:00",
-    "arrivalTime": "2024-10-11T16:30:00+02:00"
-  }
-}
-```
-
-### `GET/PUT/DELETE /planner/:plannerId/transportation/:transportationId`
-
-#### Parameters:
-
-- `plannerId` (string): **Required.** The ID of the planner.
-- `transportationId` (string): **Required.** The ID of the transportation entry.
-
-#### GET Example Request:
-
-```
-GET /planner/planner001/transportation/trans001
-```
-
-#### GET Response:
-
-```json
-{
-  "success": true,
-  "data": {
-    "transportationId": "trans001",
-    "plannerId": "planner001",
-    "type": "Flight",
-    "details": "Flight from NYC to Madrid",
-    "departureTime": "2023-10-01T08:00:00Z",
-    "arrivalTime": "2023-10-01T20:00:00Z"
-  }
-}
-```
-
-#### PUT Request Body:
-
-```json
-{
-  "details"?: "Updated flight details",
-  "vehicleId"?: "",
-  "departureTime"?: "",
-  "arrivalTime"?: ""
-}
-```
-
-#### PUT Response:
-
-```json
-{
-  "success": true,
-  "data": {}: Transport // updated object
-}
-```
-
-#### DELETE Response:
-
-```json
-{
-  "success": true,
-  "message": "Transportation entry deleted successfully."
-}
-```
+  Returns confirmation of deletion.
 
 ---
 
-## Destination
+## Planner Endpoints
 
-### `GET/POST /planner/:plannerId/destination`
+**Base URL:** `/planner`
 
-#### Parameters:
+### Get Planners
 
-- `plannerId` (string): **Required.** The ID of the planner.
+- **URL:** `/planner`
+- **Method:** `GET`
+- **Description:** Retrieves planners associated with a user.
+- **Query Parameters:**
 
-#### GET Example Request:
+  | Parameter | Type   | Required | Description                             |
+  | --------- | ------ | -------- | --------------------------------------- |
+  | `userId`  | string | Yes      | The user's ID.                          |
+  | `access`  | string | No       | Access level (`'ro'` for read-only, `'rw'` for read-write). |
 
-```
-GET /planner/planner001/destination
-```
+- **Response:**
 
-#### GET Response:
+  Returns a list of planners.
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "destinationId": "dest001",
-      "plannerId": "planner001",
-      "name": "Madrid",
-      "startDate": "2023-10-01",
-      "endDate": "2023-10-05",
-      "activities": ["activity001"],
-      "accommodations": ["accom001"]
-    }
-    // ... more destinations
-  ]
-}
-```
+### Create Planner
 
-#### POST Request Body:
+- **URL:** `/planner`
+- **Method:** `POST`
+- **Description:** Creates a new planner.
+- **Request Body:**
 
-```json
-{
-  "name": "Barcelona",
-  "startDate": "2023-10-05",
-  "endDate": "2023-10-10"
-}
-```
+  | Field          | Type             | Required | Description                      |
+  | -------------- | ---------------- | -------- | -------------------------------- |
+  | `createdBy`    | string           | Yes      | ID of the user creating the planner. |
+  | `name`         | string           | Yes      | Name of the planner.             |
+  | `description`  | string           | No       | Description of the planner.      |
+  | `startDate`    | string or Date   | Yes      | Start date of the planner.       |
+  | `endDate`      | string or Date   | Yes      | End date of the planner.         |
+  | `roUsers`      | array of strings | No       | IDs of read-only users.          |
+  | `rwUsers`      | array of strings | No       | IDs of read-write users.         |
+  | `destinations` | array of strings | No       | List of destination IDs.         |
+  | `transportations` | array of strings | No    | List of transportation IDs.      |
 
-#### POST Response:
+- **Response:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "destinationId": "dest002",
-    "plannerId": "planner001",
-    "name": "Barcelona",
-    "startDate": "2023-10-05",
-    "endDate": "2023-10-10",
-    "activities": [],
-    "accommodations": []
-  }
-}
-```
+  Returns the created planner object.
 
-### `GET/PUT/DELETE /planner/:plannerId/destination/:destinationId`
+### Get Planner by ID
 
-#### Parameters:
+- **URL:** `/planner/:plannerId`
+- **Method:** `GET`
+- **Description:** Retrieves a planner by its ID.
+- **Path Parameters:**
 
-- `plannerId` (string): **Required.** The ID of the planner.
-- `destinationId` (string): **Required.** The ID of the destination.
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `plannerId` | string | Yes      | The planner's ID.             |
 
-#### GET Example Request:
+- **Query Parameters:**
 
-```
-GET /planner/planner001/destination/dest001
-```
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-#### GET Response:
+- **Response:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "destinationId": "dest001",
-    "plannerId": "planner001",
-    "name": "Madrid",
-    "startDate": "2023-10-01",
-    "endDate": "2023-10-05",
-    "activities": ["activity001"],
-    "accommodations": ["accom001"]
-  }
-}
-```
+  Returns the planner object.
 
-#### PUT Request Body:
+### Update Planner
 
-```json
-{
-  "name": "Madrid City",
-  "endDate": "2023-10-06" // Extended stay
-}
-```
+- **URL:** `/planner/:plannerId`
+- **Method:** `PATCH`
+- **Description:** Updates a planner.
+- **Path Parameters:**
 
-#### PUT Response:
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `plannerId` | string | Yes      | The planner's ID.             |
 
-```json
-{
-  "success": true,
-  "data": {
-    "destinationId": "dest001",
-    "plannerId": "planner001",
-    "name": "Madrid City",
-    "startDate": "2023-10-01",
-    "endDate": "2023-10-06",
-    "activities": ["activity001"],
-    "accommodations": ["accom001"]
-  }
-}
-```
+- **Query Parameters:**
 
-#### DELETE Response:
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-```json
-{
-  "success": true,
-  "message": "Destination deleted successfully."
-}
-```
+- **Request Body:**
+
+  | Field          | Type           | Required | Description                |
+  | -------------- | -------------- | -------- | -------------------------- |
+  | `name`         | string         | No       | Name of the planner.       |
+  | `description`  | string         | No       | Description of the planner.|
+  | `startDate`    | string or Date | No       | Start date of the planner. |
+  | `endDate`      | string or Date | No       | End date of the planner.   |
+
+- **Response:**
+
+  Returns the updated planner object.
+
+### Delete Planner
+
+- **URL:** `/planner/:plannerId`
+- **Method:** `DELETE`
+- **Description:** Deletes a planner.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `plannerId` | string | Yes      | The planner's ID.             |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns confirmation of deletion.
 
 ---
 
-## Accommodation
+## Destination Endpoints
 
-### `GET/POST /planner/:plannerId/destination/:destinationId/accommodation`
+**Base URL:** `/planner/:plannerId/destination`
 
-#### Parameters:
+### Get Destinations by Planner ID
 
-- `plannerId` (string): **Required.** The ID of the planner.
-- `destinationId` (string): **Required.** The ID of the destination.
+- **URL:** `/planner/:plannerId/destination`
+- **Method:** `GET`
+- **Description:** Retrieves destinations associated with a planner.
+- **Path Parameters:**
 
-#### GET Example Request:
+  | Parameter   | Type   | Required | Description         |
+  | ----------- | ------ | -------- | ------------------- |
+  | `plannerId` | string | Yes      | The planner's ID.   |
 
-```
-GET /planner/planner001/destination/dest001/accommodation
-```
+- **Query Parameters:**
 
-#### GET Response:
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "accommodationId": "accom001",
-      "destinationId": "dest001",
-      "name": "Madrid Hotel",
-      "address": "123 Main St, Madrid",
-      "checkInDate": "2023-10-01",
-      "checkOutDate": "2023-10-05"
-    }
-    // ... more accommodations
-  ]
-}
-```
+- **Response:**
 
-#### POST Request Body:
+  Returns a list of destinations.
 
-```json
-{
-  "name": "Barcelona Hostel",
-  "address": "456 Side St, Barcelona",
-  "checkInDate": "2023-10-05",
-  "checkOutDate": "2023-10-10"
-}
-```
+### Create Destination
 
-#### POST Response:
+- **URL:** `/planner/:plannerId/destination`
+- **Method:** `POST`
+- **Description:** Creates a new destination within a planner.
+- **Path Parameters:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "accommodationId": "accom002",
-    "destinationId": "dest002",
-    "name": "Barcelona Hostel",
-    "address": "456 Side St, Barcelona",
-    "checkInDate": "2023-10-05",
-    "checkOutDate": "2023-10-10"
-  }
-}
-```
+  | Parameter   | Type   | Required | Description         |
+  | ----------- | ------ | -------- | ------------------- |
+  | `plannerId` | string | Yes      | The planner's ID.   |
 
-### `GET/PUT/DELETE /planner/:plannerId/destination/:destinationId/accommodation/:accommodationId`
+- **Request Body:**
 
-#### Parameters:
+  | Field       | Type           | Required | Description                |
+  | ----------- | -------------- | -------- | -------------------------- |
+  | `createdBy` | string         | Yes      | ID of the user creating the destination. |
+  | `startDate` | string or Date | Yes      | Start date of the destination. |
+  | `endDate`   | string or Date | Yes      | End date of the destination.   |
+  | `name`      | string         | Yes      | Name of the destination.   |
 
-- `plannerId` (string): **Required.** The ID of the planner.
-- `destinationId` (string): **Required.** The ID of the destination.
-- `accommodationId` (string): **Required.** The ID of the accommodation.
+- **Response:**
 
-#### GET Example Request:
+  Returns the created destination object.
 
-```
-GET /planner/planner001/destination/dest001/accommodation/accom001
-```
+### Get Destination by ID
 
-#### GET Response:
+- **URL:** `/planner/:plannerId/destination/:destinationId`
+- **Method:** `GET`
+- **Description:** Retrieves a destination by its ID.
+- **Path Parameters:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "accommodationId": "accom001",
-    "destinationId": "dest001",
-    "name": "Madrid Hotel",
-    "address": "123 Main St, Madrid",
-    "checkInDate": "2023-10-01",
-    "checkOutDate": "2023-10-05"
-  }
-}
-```
+  | Parameter       | Type   | Required | Description                  |
+  | --------------- | ------ | -------- | ---------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.            |
+  | `destinationId` | string | Yes      | The destination's ID.        |
 
-#### PUT Request Body:
+- **Query Parameters:**
 
-```json
-{
-  "name": "Madrid Luxury Hotel",
-  "address": "Updated Address, Madrid"
-}
-```
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-#### PUT Response:
+- **Response:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "accommodationId": "accom001",
-    "destinationId": "dest001",
-    "name": "Madrid Luxury Hotel",
-    "address": "Updated Address, Madrid",
-    "checkInDate": "2023-10-01",
-    "checkOutDate": "2023-10-05"
-  }
-}
-```
+  Returns the destination object.
 
-#### DELETE Response:
+### Update Destination
 
-```json
-{
-  "success": true,
-  "message": "Accommodation deleted successfully."
-}
-```
+- **URL:** `/planner/:plannerId/destination/:destinationId`
+- **Method:** `PATCH`
+- **Description:** Updates a destination.
+- **Path Parameters:**
+
+  | Parameter       | Type   | Required | Description                  |
+  | --------------- | ------ | -------- | ---------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.            |
+  | `destinationId` | string | Yes      | The destination's ID.        |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Request Body:**
+
+  | Field       | Type           | Required | Description                |
+  | ----------- | -------------- | -------- | -------------------------- |
+  | `name`      | string         | No       | Name of the destination.   |
+  | `startDate` | string or Date | No       | Start date of the destination. |
+  | `endDate`   | string or Date | No       | End date of the destination.   |
+
+- **Response:**
+
+  Returns the updated destination object.
+
+### Delete Destination
+
+- **URL:** `/planner/:plannerId/destination/:destinationId`
+- **Method:** `DELETE`
+- **Description:** Deletes a destination.
+- **Path Parameters:**
+
+  | Parameter       | Type   | Required | Description                  |
+  | --------------- | ------ | -------- | ---------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.            |
+  | `destinationId` | string | Yes      | The destination's ID.        |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns confirmation of deletion.
 
 ---
 
-## Activity
+## Accommodation Endpoints
 
-### `GET/POST /planner/:plannerId/destination/:destinationId/activity`
+**Base URL:** `/planner/:plannerId/destination/:destinationId/accommodation`
 
-#### Parameters:
+### Get Accommodations by Destination ID
 
-- `plannerId` (string): **Required.** The ID of the planner.
-- `destinationId` (string): **Required.** The ID of the destination.
+- **URL:** `/planner/:plannerId/destination/:destinationId/accommodation`
+- **Method:** `GET`
+- **Description:** Retrieves accommodations for a destination.
+- **Path Parameters:**
 
-#### GET Example Request:
+  | Parameter       | Type   | Required | Description                |
+  | --------------- | ------ | -------- | -------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.          |
+  | `destinationId` | string | Yes      | The destination's ID.      |
 
-```
-GET /planner/planner001/destination/dest001/activity
-```
+- **Query Parameters:**
 
-#### GET Response:
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "activityId": "activity001",
-      "destinationId": "dest001",
-      "name": "Visit Prado Museum",
-      "date": "2023-10-02",
-      "time": "10:00",
-      "locations": ["loc001"],
-      "votes": ["vote001"],
-      "comments": ["comment001"]
-    }
-    // ... more activities
-  ]
-}
-```
+- **Response:**
 
-#### POST Request Body:
+  Returns a list of accommodations.
 
-```json
-{
-  "name": "Sagrada Familia Tour",
-  "date": "2023-10-06",
-  "time": "14:00"
-}
-```
+### Create Accommodation
 
-#### POST Response:
+- **URL:** `/planner/:plannerId/destination/:destinationId/accommodation`
+- **Method:** `POST`
+- **Description:** Creates a new accommodation within a destination.
+- **Path Parameters:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "activityId": "activity002",
-    "destinationId": "dest002",
-    "name": "Sagrada Familia Tour",
-    "date": "2023-10-06",
-    "time": "14:00",
-    "locations": [],
-    "votes": [],
-    "comments": []
-  }
-}
-```
+  | Parameter       | Type   | Required | Description                |
+  | --------------- | ------ | -------- | -------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.          |
+  | `destinationId` | string | Yes      | The destination's ID.      |
 
-### `GET/PUT/DELETE /planner/:plannerId/destination/:destinationId/activity/:activityId`
+- **Request Body:**
 
-#### Parameters:
+  | Field       | Type           | Required | Description                 |
+  | ----------- | -------------- | -------- | --------------------------- |
+  | `name`      | string         | Yes      | Name of the accommodation.  |
+  | `location`  | string         | No       | Location of the accommodation. |
+  | `startDate` | string or Date | Yes      | Start date of the stay.     |
+  | `endDate`   | string or Date | Yes      | End date of the stay.       |
+  | `createdBy` | string         | Yes      | ID of the user creating the accommodation. |
 
-- `plannerId` (string): **Required.** The ID of the planner.
-- `destinationId` (string): **Required.** The ID of the destination.
-- `activityId` (string): **Required.** The ID of the activity.
+- **Response:**
 
-#### GET Example Request:
+  Returns the created accommodation object.
 
-```
-GET /planner/planner001/destination/dest001/activity/activity001
-```
+### Get Accommodation by ID
 
-#### GET Response:
+- **URL:** `/planner/:plannerId/destination/:destinationId/accommodation/:accommodationId`
+- **Method:** `GET`
+- **Description:** Retrieves an accommodation by ID.
+- **Path Parameters:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "activityId": "activity001",
-    "destinationId": "dest001",
-    "name": "Visit Prado Museum",
-    "date": "2023-10-02",
-    "time": "10:00",
-    "locations": ["loc001"],
-    "votes": ["vote001"],
-    "comments": ["comment001"]
-  }
-}
-```
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `plannerId`       | string | Yes      | The planner's ID.             |
+  | `destinationId`   | string | Yes      | The destination's ID.         |
+  | `accommodationId` | string | Yes      | The accommodation's ID.       |
 
-#### PUT Request Body:
+- **Query Parameters:**
 
-```json
-{
-  "time": "11:00" // Updated time
-}
-```
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-#### PUT Response:
+- **Response:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "activityId": "activity001",
-    "destinationId": "dest001",
-    "name": "Visit Prado Museum",
-    "date": "2023-10-02",
-    "time": "11:00",
-    "locations": ["loc001"],
-    "votes": ["vote001"],
-    "comments": ["comment001"]
-  }
-}
-```
+  Returns the accommodation object.
 
-#### DELETE Response:
+### Update Accommodation
 
-```json
-{
-  "success": true,
-  "message": "Activity deleted successfully."
-}
-```
+- **URL:** `/planner/:plannerId/destination/:destinationId/accommodation/:accommodationId`
+- **Method:** `PATCH`
+- **Description:** Updates an accommodation.
+- **Path Parameters:**
 
----
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `plannerId`       | string | Yes      | The planner's ID.             |
+  | `destinationId`   | string | Yes      | The destination's ID.         |
+  | `accommodationId` | string | Yes      | The accommodation's ID.       |
 
-## Location
+- **Query Parameters:**
 
-### `GET/POST /planner/:plannerId/destination/:destinationId/activity/:activityId/location`
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-#### Parameters:
+- **Request Body:**
 
-- `plannerId` (string): **Required.** The ID of the planner.
-- `destinationId` (string): **Required.** The ID of the destination.
-- `activityId` (string): **Required.** The ID of the activity.
+  | Field       | Type           | Required | Description                 |
+  | ----------- | -------------- | -------- | --------------------------- |
+  | `name`      | string         | No       | Name of the accommodation.  |
+  | `location`  | string         | No       | Location of the accommodation. |
+  | `startDate` | string or Date | No       | Start date of the stay.     |
+  | `endDate`   | string or Date | No       | End date of the stay.       |
 
-#### GET Example Request:
+- **Response:**
 
-```
-GET /planner/planner001/destination/dest001/activity/activity001/location
-```
+  Returns the updated accommodation object.
 
-#### GET Response:
+### Delete Accommodation
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "locationId": "loc001",
-      "activityId": "activity001",
-      "createdBy": "user123",
-      "name": "Prado Museum",
-      "address": "C. de Ruiz de Alarcón, 23, 28014 Madrid"
-    }
-    // ... more locations
-  ]
-}
-```
+- **URL:** `/planner/:plannerId/destination/:destinationId/accommodation/:accommodationId`
+- **Method:** `DELETE`
+- **Description:** Deletes an accommodation.
+- **Path Parameters:**
 
-#### POST Request Body:
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `plannerId`       | string | Yes      | The planner's ID.             |
+  | `destinationId`   | string | Yes      | The destination's ID.         |
+  | `accommodationId` | string | Yes      | The accommodation's ID.       |
 
-```json
-{
-  "createdBy": "user123",
-  "name": "Retiro Park",
-  "address": "Plaza de la Independencia, 7, 28001 Madrid"
-}
-```
+- **Query Parameters:**
 
-#### POST Response:
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-```json
-{
-  "success": true,
-  "data": {
-    "locationId": "loc002",
-    "activityId": "activity001",
-    "createdBy": "user123",
-    "name": "Retiro Park",
-    "address": "Plaza de la Independencia, 7, 28001 Madrid"
-  }
-}
-```
+- **Response:**
 
-### `GET/PUT/DELETE /planner/:plannerId/destination/:destinationId/activity/:activityId/location/:locationId`
-
-#### Parameters:
-
-- `plannerId` (string): **Required.** The ID of the planner.
-- `destinationId` (string): **Required.** The ID of the destination.
-- `activityId` (string): **Required.** The ID of the activity.
-- `locationId` (string): **Required.** The ID of the location.
-
-#### GET Example Request:
-
-```
-GET /planner/planner001/destination/dest001/activity/activity001/location/loc001
-```
-
-#### GET Response:
-
-```json
-{
-  "success": true,
-  "data": {
-    "locationId": "loc001",
-    "activityId": "activity001",
-    "createdBy": "user123",
-    "name": "Prado Museum",
-    "address": "C. de Ruiz de Alarcón, 23, 28014 Madrid"
-  }
-}
-```
-
-#### PUT Request Body:
-
-```json
-{
-  "name": "The Prado National Museum"
-}
-```
-
-#### PUT Response:
-
-```json
-{
-  "success": true,
-  "data": {
-    "locationId": "loc001",
-    "activityId": "activity001",
-    "createdBy": "user123",
-    "name": "The Prado National Museum",
-    "address": "C. de Ruiz de Alarcón, 23, 28014 Madrid"
-  }
-}
-```
-
-#### DELETE Response:
-
-```json
-{
-  "success": true,
-  "message": "Location deleted successfully."
-}
-```
+  Returns confirmation of deletion.
 
 ---
 
-## Vote
+## Activity Endpoints
 
-### `GET /planner/:plannerId/destination/:destinationId/activity/:activityId/vote`
+**Base URL:** `/planner/:plannerId/destination/:destinationId/activity`
 
-Retrieve all votes for a specific activity.
+### Get Activities by Destination ID
 
-#### Parameters:
+- **URL:** `/planner/:plannerId/destination/:destinationId/activity`
+- **Method:** `GET`
+- **Description:** Retrieves activities for a destination.
+- **Path Parameters:**
 
-- `plannerId` (string): **Required.**
-- `destinationId` (string): **Required.**
-- `activityId` (string): **Required.**
+  | Parameter       | Type   | Required | Description                |
+  | --------------- | ------ | -------- | -------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.          |
+  | `destinationId` | string | Yes      | The destination's ID.      |
 
-#### Example Request:
+- **Query Parameters:**
 
-```
-GET /planner/planner001/destination/dest001/activity/activity001/vote
-```
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-#### Response:
+- **Response:**
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "voteId": "vote001",
-      "activityId": "activity001",
-      "createdBy": "user456",
-      "voteType": "upvote"
-    }
-    // ... more votes
-  ]
-}
-```
+  Returns a list of activities.
 
-### `POST /planner/:plannerId/destination/:destinationId/activity/:activityId/vote`
+### Create Activity
 
-Cast a vote on an activity.
+- **URL:** `/planner/:plannerId/destination/:destinationId/activity`
+- **Method:** `POST`
+- **Description:** Creates a new activity within a destination.
+- **Path Parameters:**
 
-#### Parameters:
+  | Parameter       | Type   | Required | Description                |
+  | --------------- | ------ | -------- | -------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.          |
+  | `destinationId` | string | Yes      | The destination's ID.      |
 
-- `plannerId` (string): **Required.**
-- `destinationId` (string): **Required.**
-- `activityId` (string): **Required.**
+- **Request Body:**
 
-#### Request Body:
+  | Field       | Type             | Required | Description                 |
+  | ----------- | ---------------- | -------- | --------------------------- |
+  | `createdBy` | string           | Yes      | ID of the user creating the activity. |
+  | `name`      | string           | Yes      | Name of the activity.       |
+  | `location`  | string           | No       | Location of the activity.   |
+  | `startDate` | string or Date   | Yes      | Start date and time of the activity. |
+  | `duration`  | number           | Yes      | Duration of the activity (in hours or minutes). |
 
-```json
-{
-  "createdBy": "user789",
-  "voteType": "downvote" // Options: "upvote", "downvote"
-}
-```
+- **Query Parameters:**
 
-#### Response:
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-```json
-{
-  "success": true,
-  "data": {
-    "voteId": "vote002",
-    "activityId": "activity001",
-    "createdBy": "user789",
-    "voteType": "downvote"
-  }
-}
-```
+- **Response:**
 
----
+  Returns the created activity object.
 
-## Comment
+### Get Activity by ID
 
-### `GET/POST /planner/:plannerId/destination/:destinationId/activity/:activityId/comment`
+- **URL:** `/planner/:plannerId/destination/:destinationId/activity/:activityId`
+- **Method:** `GET`
+- **Description:** Retrieves an activity by ID.
+- **Path Parameters:**
 
-#### Parameters:
+  | Parameter       | Type   | Required | Description                |
+  | --------------- | ------ | -------- | -------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.          |
+  | `destinationId` | string | Yes      | The destination's ID.      |
+  | `activityId`    | string | Yes      | The activity's ID.         |
 
-- `plannerId` (string): **Required.**
-- `destinationId` (string): **Required.**
-- `activityId` (string): **Required.**
+- **Query Parameters:**
 
-#### GET Example Request:
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-```
-GET /planner/planner001/destination/dest001/activity/activity001/comment
-```
+- **Response:**
 
-#### GET Response:
+  Returns the activity object.
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "commentId": "comment001",
-      "activityId": "activity001",
-      "createdBy": "user456",
-      "content": "Can't wait to visit!"
-    }
-    // ... more comments
-  ]
-}
-```
+### Update Activity
 
-#### POST Request Body:
+- **URL:** `/planner/:plannerId/destination/:destinationId/activity/:activityId`
+- **Method:** `PATCH`
+- **Description:** Updates an activity.
+- **Path Parameters:**
 
-```json
-{
-  "createdBy": "user789",
-  "content": "This place looks amazing!"
-}
-```
+  | Parameter       | Type   | Required | Description                |
+  | --------------- | ------ | -------- | -------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.          |
+  | `destinationId` | string | Yes      | The destination's ID.      |
+  | `activityId`    | string | Yes      | The activity's ID.         |
 
-#### POST Response:
+- **Query Parameters:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "commentId": "comment002",
-    "activityId": "activity001",
-    "createdBy": "user789",
-    "content": "This place looks amazing!"
-  }
-}
-```
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-### `GET/PUT /planner/:plannerId/destination/:destinationId/activity/:activityId/comment/:commentId`
+- **Request Body:**
 
-#### Parameters:
+  | Field       | Type             | Required | Description                 |
+  | ----------- | ---------------- | -------- | --------------------------- |
+  | `name`      | string           | No       | Name of the activity.       |
+  | `startDate` | string or Date   | No       | Start date and time of the activity. |
+  | `duration`  | number           | No       | Duration of the activity.   |
+  | `location`  | string           | No       | Location of the activity.   |
 
-- `plannerId` (string): **Required.**
-- `destinationId` (string): **Required.**
-- `activityId` (string): **Required.**
-- `commentId` (string): **Required.**
+- **Response:**
 
-#### GET Example Request:
+  Returns the updated activity object.
 
-```
-GET /planner/planner001/destination/dest001/activity/activity001/comment/comment001
-```
+### Delete Activity
 
-#### GET Response:
+- **URL:** `/planner/:plannerId/destination/:destinationId/activity/:activityId`
+- **Method:** `DELETE`
+- **Description:** Deletes an activity.
+- **Path Parameters:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "commentId": "comment001",
-    "activityId": "activity001",
-    "createdBy": "user456",
-    "content": "Can't wait to visit!"
-  }
-}
-```
+  | Parameter       | Type   | Required | Description                |
+  | --------------- | ------ | -------- | -------------------------- |
+  | `plannerId`     | string | Yes      | The planner's ID.          |
+  | `destinationId` | string | Yes      | The destination's ID.      |
+  | `activityId`    | string | Yes      | The activity's ID.         |
 
-#### PUT Request Body:
+- **Query Parameters:**
 
-```json
-{
-  "content": "Really excited about this visit!"
-}
-```
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
 
-#### PUT Response:
+- **Response:**
 
-```json
-{
-  "success": true,
-  "data": {
-    "commentId": "comment001",
-    "activityId": "activity001",
-    "createdBy": "user456",
-    "content": "Really excited about this visit!"
-  }
-}
-```
+  Returns confirmation of deletion.
 
 ---
 
-Please ensure that all dates are in ISO 8601 format and times are in 24-hour notation where applicable. All IDs (`plannerId`, `destinationId`, etc.) are strings uniquely identifying the respective resource.
+## Transportation Endpoints
 
-When making requests, replace placeholders like `:plannerId` with actual IDs. For example, `/planner/planner001/destination` refers to the destinations of the planner with ID `planner001`.
+**Base URL:** `/planner/:plannerId/transportation`
+
+### Get Transportations by Planner ID
+
+- **URL:** `/planner/:plannerId/transportation`
+- **Method:** `GET`
+- **Description:** Retrieves transportations associated with a planner.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description         |
+  | ----------- | ------ | -------- | ------------------- |
+  | `plannerId` | string | Yes      | The planner's ID.   |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns a list of transportation objects.
+
+### Create Transportation
+
+- **URL:** `/planner/:plannerId/transportation`
+- **Method:** `POST`
+- **Description:** Creates a new transportation within a planner.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description         |
+  | ----------- | ------ | -------- | ------------------- |
+  | `plannerId` | string | Yes      | The planner's ID.   |
+
+- **Request Body:**
+
+  | Field          | Type           | Required | Description                   |
+  | -------------- | -------------- | -------- | ----------------------------- |
+  | `createdBy`    | string         | Yes      | ID of the user creating the transportation. |
+  | `type`         | string         | Yes      | Type of transportation (e.g., flight, train). |
+  | `details`      | string         | No       | Additional details.           |
+  | `departureTime`| string or Date | Yes      | Departure time.               |
+  | `arrivalTime`  | string or Date | Yes      | Arrival time.                 |
+  | `vehicleId`    | string         | No       | ID of the vehicle used.       |
+
+- **Response:**
+
+  Returns the created transportation object.
+
+### Get Transportation by ID
+
+- **URL:** `/planner/:plannerId/transportation/:transportationId`
+- **Method:** `GET`
+- **Description:** Retrieves a transportation by ID.
+- **Path Parameters:**
+
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `plannerId`       | string | Yes      | The planner's ID.             |
+  | `transportationId`| string | Yes      | The transportation's ID.      |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns the transportation object.
+
+### Update Transportation
+
+- **URL:** `/planner/:plannerId/transportation/:transportationId`
+- **Method:** `PATCH`
+- **Description:** Updates a transportation.
+- **Path Parameters:**
+
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `plannerId`       | string | Yes      | The planner's ID.             |
+  | `transportationId`| string | Yes      | The transportation's ID.      |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Request Body:**
+
+  | Field          | Type           | Required | Description                   |
+  | -------------- | -------------- | -------- | ----------------------------- |
+  | `type`         | string         | No       | Type of transportation.       |
+  | `details`      | string         | No       | Additional details.           |
+  | `departureTime`| string or Date | No       | Departure time.               |
+  | `arrivalTime`  | string or Date | No       | Arrival time.                 |
+  | `vehicleId`    | string         | No       | ID of the vehicle used.       |
+
+- **Response:**
+
+  Returns the updated transportation object.
+
+### Delete Transportation
+
+- **URL:** `/planner/:plannerId/transportation/:transportationId`
+- **Method:** `DELETE`
+- **Description:** Deletes a transportation.
+- **Path Parameters:**
+
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `plannerId`       | string | Yes      | The planner's ID.             |
+  | `transportationId`| string | Yes      | The transportation's ID.      |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns confirmation of deletion.
 
 ---
+
+## Vote Endpoints
+
+**Base URL:** `/vote`
+
+### Get Votes by Object ID
+
+- **URL:** `/vote`
+- **Method:** `GET`
+- **Description:** Retrieves votes associated with a specific object.
+- **Query Parameters:**
+
+  | Parameter  | Type   | Required | Description                             |
+  | ---------- | ------ | -------- | --------------------------------------- |
+  | `objectId` | string | Yes      | The ID of the object being voted on.    |
+  | `type`     | string | Yes      | The type of the object (e.g., 'post').  |
+
+- **Response:**
+
+  Returns a list of votes.
+
+### Check if User Voted
+
+- **URL:** `/vote/:userId`
+- **Method:** `GET`
+- **Description:** Checks if a user has voted on a specific object.
+- **Path Parameters:**
+
+  | Parameter | Type   | Required | Description          |
+  | --------- | ------ | -------- | -------------------- |
+  | `userId`  | string | Yes      | The user's ID.       |
+
+- **Query Parameters:**
+
+  | Parameter  | Type   | Required | Description                             |
+  | ---------- | ------ | -------- | --------------------------------------- |
+  | `objectId` | string | Yes      | The ID of the object being voted on.    |
+  | `type`     | string | Yes      | The type of the object.                 |
+
+- **Response:**
+
+  Returns an object indicating if the user has upvoted or downvoted:
+
+  ```json
+  {
+    "upVoted": boolean,
+    "downVoted": boolean
+  }
+  ```
+
+### Upvote
+
+- **URL:** `/vote/up`
+- **Method:** `POST`
+- **Description:** Upvotes an object.
+- **Request Body:**
+
+  | Field       | Type   | Required | Description                     |
+  | ----------- | ------ | -------- | ------------------------------- |
+  | `type`      | string | Yes      | The type of the object.         |
+  | `objectId`  | string | Yes      | The ID of the object.           |
+  | `createdBy` | string | Yes      | ID of the user voting.          |
+
+- **Response:**
+
+  Returns the vote object.
+
+### Downvote
+
+- **URL:** `/vote/down`
+- **Method:** `POST`
+- **Description:** Downvotes an object.
+- **Request Body:**
+
+  | Field       | Type   | Required | Description                     |
+  | ----------- | ------ | -------- | ------------------------------- |
+  | `type`      | string | Yes      | The type of the object.         |
+  | `objectId`  | string | Yes      | The ID of the object.           |
+  | `createdBy` | string | Yes      | ID of the user voting.          |
+
+- **Response:**
+
+  Returns the vote object.
+
+### Remove Vote
+
+- **URL:** `/vote`
+- **Method:** `DELETE`
+- **Description:** Removes a user's vote on an object.
+- **Request Body:**
+
+  | Field      | Type   | Required | Description                     |
+  | ---------- | ------ | -------- | ------------------------------- |
+  | `objectId` | string | Yes      | The ID of the object.           |
+  | `type`     | string | Yes      | The type of the object.         |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns confirmation of vote removal.
+
+---
+
+## Comment Endpoints
+
+**Base URL:** `/comment`
+
+### Get Comments by Object ID
+
+- **URL:** `/comment`
+- **Method:** `GET`
+- **Description:** Retrieves comments associated with a specific object.
+- **Query Parameters:**
+
+  | Parameter  | Type   | Required | Description                             |
+  | ---------- | ------ | -------- | --------------------------------------- |
+  | `type`     | string | Yes      | The type of the object (e.g., 'post').  |
+  | `objectId` | string | Yes      | The ID of the object.                   |
+
+- **Response:**
+
+  Returns a list of comments.
+
+### Create Comment
+
+- **URL:** `/comment`
+- **Method:** `POST`
+- **Description:** Adds a comment to an object.
+- **Request Body:**
+
+  | Field       | Type   | Required | Description                              |
+  | ----------- | ------ | -------- | ---------------------------------------- |
+  | `type`      | string | Yes      | The type of the object.                  |
+  | `objectId`  | string | Yes      | The ID of the object.                    |
+  | `createdBy` | string | Yes      | ID of the user creating the comment.     |
+  | `title`     | string | Yes      | Title of the comment.                    |
+  | `content`   | string | Yes      | Content of the comment.                  |
+
+- **Response:**
+
+  Returns the created comment object.
+
+### Get Comment by ID
+
+- **URL:** `/comment/:commentId`
+- **Method:** `GET`
+- **Description:** Retrieves a comment by its ID.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `commentId` | string | Yes      | The comment's ID.             |
+
+- **Response:**
+
+  Returns the comment object.
+
+### Delete Comment
+
+- **URL:** `/comment/:commentId`
+- **Method:** `DELETE`
+- **Description:** Deletes a comment.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `commentId` | string | Yes      | The comment's ID.             |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Request Body:**
+
+  | Field      | Type   | Required | Description                      |
+  | ---------- | ------ | -------- | -------------------------------- |
+  | `type`     | string | Yes      | The type of the object commented on. |
+  | `objectId` | string | Yes      | The ID of the object.            |
+
+- **Response:**
+
+  Returns confirmation of deletion.
+
+---
+
+# Notes
+
+- All `userId`, `plannerId`, `destinationId`, `accommodationId`, `activityId`, `transportationId`, and `commentId` parameters are expected to be 24-character hexadecimal strings, representing MongoDB ObjectIDs.
+- Dates can be provided as ISO 8601 strings or JavaScript `Date` objects.
+- Ensure that you have the necessary permissions and that the user exists before making requests that require authentication.
+- Response formats are generally in JSON, returning the requested object or a confirmation message. You'll receive a 404 and an HTML if the route
+is not implemented.

@@ -1,13 +1,14 @@
 import { z } from 'zod'
 import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
+import { DestinationModel } from './Destination'
 
 const AccommodationMongoSchema = new Schema<Accommodation>(
   {
-    _id: {
+    destinationId: {
       type: Schema.Types.ObjectId,
       required: true,
-      auto: true,
+      ref: 'Destination',
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -18,35 +19,28 @@ const AccommodationMongoSchema = new Schema<Accommodation>(
       type: String,
       required: true,
     },
-
     endDate: {
       type: String,
       required: true,
     },
-
-    comments: {
-      type: [Schema.Types.ObjectId],
-      required: true,
-      ref: 'Comment',
-    },
-
     name: {
       type: String,
       required: true,
     },
-
     location: {
-      type: Schema.Types.ObjectId,
-      ref: 'Location',
+      type: String,
     },
   },
   {
+    _id: true,
     timestamps: true,
-  }
+  },
 )
 
 export const AccommodationSchema = z.object({
   _id: ObjectIdSchema,
+
+  destinationId: ObjectIdSchema,
 
   createdAt: z.string().datetime(),
   createdBy: ObjectIdSchema,
@@ -55,11 +49,12 @@ export const AccommodationSchema = z.object({
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
 
-  comments: z.array(ObjectIdSchema),
-
   name: z.string(),
-  location: ObjectIdSchema.optional(),
+  location: z.string().optional(),
 })
 
-export const AccommodationModel = mongoose.model<Accommodation>('Accommodation', AccommodationMongoSchema)
+export const AccommodationModel = mongoose.model<Accommodation>(
+  'Accommodation',
+  AccommodationMongoSchema,
+)
 export type Accommodation = z.infer<typeof AccommodationSchema>

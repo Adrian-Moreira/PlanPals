@@ -1,51 +1,35 @@
 import { z } from 'zod'
-import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
+import { ObjectIdSchema } from './Planner'
 
 const VoteMongoSchema = new Schema<Vote>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      auto: true,
+    objectId: {
+      id: { type: Schema.Types.ObjectId, required: true },
+      collection: { type: String, required: true },
     },
-    createdBy: {
-      type: Schema.Types.ObjectId,
+    upVotes: {
+      type: [Schema.Types.ObjectId],
       required: true,
       ref: 'User',
     },
-    startDate: {
-      type: String,
+    downVotes: {
+      type: [Schema.Types.ObjectId],
       required: true,
-    },
-    endDate: {
-      type: String,
-      required: true,
+      ref: 'User',
     },
   },
   {
-    timestamps: true,
+    _id: false,
+    timestamps: false,
   },
 )
 
 export const VoteSchema = z.object({
-  _id: ObjectIdSchema,
-
-  createdAt: z.string().datetime(),
-  createdBy: ObjectIdSchema,
-  updatedAt: z.string().datetime(),
-
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
-
-  comments: z.array(ObjectIdSchema),
-
-  name: z.string(),
-  location: ObjectIdSchema.optional(),
+  objectId: z.object({ id: ObjectIdSchema, collection: z.string() }),
+  upVotes: z.array(ObjectIdSchema),
+  downVotes: z.array(ObjectIdSchema),
 })
 
-export const VoteModel = mongoose.model<Vote>(
-  'Vote',
-  VoteMongoSchema,
-)
+export const VoteModel = mongoose.model<Vote>('Vote', VoteMongoSchema)
 export type Vote = z.infer<typeof VoteSchema>
