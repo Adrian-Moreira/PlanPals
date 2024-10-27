@@ -16,28 +16,56 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# Visual Studio Code settings (optional, uncomment if needed)
 #.vscode/
 
 # Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+.packages
+build/
+**/doc/api/
+**/ios/Flutter/.last_build_id
 
-# Symbolication related
+# Flutter specific files
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Pods/
+
+# Symbolication and Obfuscation related
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
 # Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/app/build/
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+
+# iOS-related files
+ios/Runner.xcworkspace/
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Flutter/Generated.xcconfig
+
+# Web-related files
+web/manifest.json
+
+# macOS-related files
+macos/Flutter/GeneratedPluginRegistrant.*
+macos/Pods/
+macos/Runner.xcworkspace/
+macos/.symlinks/
+
+# Linux-related files
+linux/flutter/GeneratedPluginRegistrant.*
+
+# Windows-related files
+windows/flutter/GeneratedPluginRegistrant.*
