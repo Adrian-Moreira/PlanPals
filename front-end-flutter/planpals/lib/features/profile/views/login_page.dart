@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/features/home/views/home_page.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
-import 'package:planpals/features/profile/views/signup_page.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {

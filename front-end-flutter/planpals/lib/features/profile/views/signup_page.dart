@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/features/home/views/home_page.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:provider/provider.dart';
