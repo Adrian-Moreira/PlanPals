@@ -5,4 +5,7 @@ export default {
   database: {
     connectionString: process.env.DATABASE_CONNECTIONSTRING,
   },
+  logger: {
+    level: process.env.LOG_LEVEL,
+  },
 }

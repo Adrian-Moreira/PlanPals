@@ -5,8 +5,11 @@ import userRouter from './user'
 import { voteRouter } from './vote'
 import { commentRouter } from './comment'
 import RequestUtils from '../utils/RequestUtils'
+import { initLogs } from '../utils/Logger'
 
 const router = express.Router()
+
+router.use(initLogs)
 
 router.use('/user', userRouter)
 router.use('/planner', plannerRouter)
