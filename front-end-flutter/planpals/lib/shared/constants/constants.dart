@@ -4,7 +4,7 @@ class Urls {
   // static const String baseUrl = 'http://ec2-54-224-27-60.compute-1.amazonaws.com:8080';
 
   // Localhost server
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static const String baseUrl = 'http://127.0.0.1:8080';
   
   // Travel planner URLs
   static const String travelPlanner = '$baseUrl/planner';
