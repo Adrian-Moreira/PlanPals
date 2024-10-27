@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, Travel-planner]
+    branches: [main, reshaping-pp]
 
 jobs:
   build-and-test:
@@ -15,7 +15,7 @@ jobs:
         run: |
           pushd planner-service
           npm install
-          npm run test -- --maxWorkers=1 --ci --reporters=jest-junit
+          npm run test -- --ci --reporters=jest-junit
           popd
       - uses: actions/upload-artifact@v4
         with:

@@ -2,7 +2,6 @@ import { PlannerModel } from '../models/Planner'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { concatLog, debugLogger, logWriter } from '../utils/Logger'
 
 /**
  * Creates a new planner document in the database.
@@ -18,8 +17,6 @@ export const createPlannerDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const logger = debugLogger('createPlannerDocument')
-
   const {
     targetUser,
     name,
@@ -33,8 +30,6 @@ export const createPlannerDocument = async (
     invites,
   } = req.body.out
 
-  req.body.logs = concatLog(req.body.logs, logger('Creating planner document'))
-
   const planner = await PlannerModel.create({
     createdBy: targetUser._id,
     name,
@@ -47,11 +42,6 @@ export const createPlannerDocument = async (
     transportations,
     invites,
   })
-
-  req.body.logs = concatLog(
-    req.body.logs,
-    logger('Created planner document' + planner._id),
-  )
 
   req.body.result = planner
   req.body.status = StatusCodes.CREATED
@@ -127,14 +117,7 @@ export const getPlannerDocumentsByUserId = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const logger = debugLogger('getPlannerDocumentsByUserId')
-
   const { targetUser, access } = req.body.out
-
-  req.body.logs = concatLog(
-    req.body.logs,
-    logger('Retrieving planner documents for user' + targetUser._id),
-  )
 
   let resultPlanners
 
@@ -152,22 +135,12 @@ export const getPlannerDocumentsByUserId = async (
   }
 
   if (!resultPlanners || resultPlanners.length === 0) {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger('No planner documents found for user' + targetUser._id),
-    )
-
     req.body.err = new RecordNotFoundException({
       recordType: 'planner',
       recordId: targetUser._id,
     })
     next(req.body.err)
   }
-
-  req.body.logs = concatLog(
-    req.body.logs,
-    logger('Retrieved planner documents for user' + targetUser._id),
-  )
 
   req.body.result = resultPlanners
   req.body.status = StatusCodes.OK
@@ -207,30 +180,16 @@ async function verifyPlannerExists(
   res: Response,
   next: NextFunction,
 ) {
-  const logger = debugLogger('verifyPlannerExists')
   const { plannerId } = req.body.out
-
-  req.body.logs = concatLog(
-    req.body.logs,
-    logger(`Verifying planner exists. plannerId: ${plannerId}`),
-  )
 
   const targetPlanner = await PlannerModel.findOne({ _id: plannerId })
   if (!targetPlanner) {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`Planner does not exist. plannerId: ${plannerId}`),
-    )
     req.body.err = new RecordNotFoundException({
       recordType: 'planner',
       recordId: plannerId,
     })
     next(req.body.err)
   } else {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`Planner exists. plannerId: ${plannerId}`),
-    )
     req.body.out = { ...req.body.out, targetPlanner }
   }
   next()
@@ -250,33 +209,18 @@ async function verifyUserCanEditPlanner(
   res: Response,
   next: NextFunction,
 ) {
-  const logger = debugLogger('verifyUserCanEditPlanner')
-
   let { plannerId, targetUser, targetPlanner } = req.body.out
-
-  req.body.logs = concatLog(
-    req.body.logs,
-    logger(`Verifying user can edit planner. plannerId: ${plannerId}`),
-  )
 
   if (
     !targetPlanner.rwUsers.includes(targetUser._id) &&
     targetPlanner.createdBy?.toString() !== targetUser._id.toString()
   ) {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`User cannot edit planner. plannerId: ${plannerId}`),
-    )
     req.body.err = new RecordNotFoundException({
       recordType: 'planner',
       recordId: plannerId,
     })
     next(req.body.err)
   } else {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`User can edit planner. plannerId: ${plannerId}`),
-    )
     req.body.out = { ...req.body.out, targetPlanner }
   }
   next()
@@ -296,37 +240,19 @@ async function verifyUserCanViewPlanner(
   res: Response,
   next: NextFunction,
 ) {
-  const logger = debugLogger('verifyUserCanViewPlanner')
   const { targetUser, targetPlanner } = req.body.out
-
-  if (!targetUser) {
-    logWriter(req.body.logs)
-  }
-
-  req.body.logs = concatLog(
-    req.body.logs,
-    logger(`Verifying user can view planner. plannerId: ${targetPlanner._id}`),
-  )
 
   if (
     !targetPlanner.roUsers.includes(targetUser._id) &&
     !targetPlanner.rwUsers.includes(targetUser._id) &&
     targetPlanner.createdBy?.toString() !== targetUser._id.toString()
   ) {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`User cannot view planner. plannerId: ${targetPlanner._id}`),
-    )
     req.body.err = new RecordNotFoundException({
       recordType: 'planner',
       recordId: targetPlanner._id,
     })
     next(req.body.err)
   } else {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`User can view planner. plannerId: ${targetPlanner._id}`),
-    )
     req.body.out = { ...req.body.out, targetPlanner }
   }
   next()

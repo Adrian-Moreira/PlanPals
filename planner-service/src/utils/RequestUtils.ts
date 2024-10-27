@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
 import { MalformedRequestException } from '../exceptions/MalformedRequestException'
 import { StatusCodes } from 'http-status-codes'
-import { logWriter } from './Logger'
 
 /**
  * A function that takes a list of functions and returns a new function that

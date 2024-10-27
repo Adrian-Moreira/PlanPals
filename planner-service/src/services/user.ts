@@ -4,39 +4,24 @@ import { StatusCodes } from 'http-status-codes'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { BasicUser, UserModel } from '../models/User'
-import { concatLog, debugLogger, logWriter } from '../utils/Logger'
 
 const verifyUserExists = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  const logger = debugLogger('verifyUserExists')
   let { userId, createdBy }: { userId: any; createdBy: any } = req.body.out
   userId ||= createdBy // Assuming either userId or createdBy is provided
-
-  req.body.logs = concatLog(
-    req.body.logs,
-    logger(`Verifying user exists. userId: ${userId}`),
-  )
 
   const user = await UserModel.findOne({ _id: userId })
 
   if (!user) {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`User does not exist. userId: ${userId}`),
-    )
     req.body.err = new RecordNotFoundException({
       recordType: 'User',
       recordId: userId.toString(),
     })
     next(req.body.err)
   } else {
-    req.body.logs = concatLog(
-      req.body.logs,
-      logger(`User exists. userId: ${userId}`),
-    )
     req.body.out = { ...req.body.out, targetUser: user }
   }
   next()

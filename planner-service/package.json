@@ -1,6 +1,6 @@
 {
   "name": "planner-service",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "main": "src/app.ts",
   "bin": "out/app.js",
@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "nodemon",
     "debug": "nodemon --inspect=0.0.0.0:9229",
-    "test": "jest"
+    "test": "jest --maxWorkers=1"
   },
   "dependencies": {
     "cors": "^2.8.5",
