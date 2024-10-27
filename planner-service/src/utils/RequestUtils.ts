@@ -131,8 +131,15 @@ async function mkErrorResponse(
 ): Promise<void> {
   if (err) {
     switch (err.name) {
+      case 'SyntaxError':
       case 'BSONError':
         res.status(StatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: err.message,
+        })
+        break
+      case 'AuthorizationError':
+        res.status(err.status).json({
           success: false,
           message: err.message,
         })
