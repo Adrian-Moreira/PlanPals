@@ -42,17 +42,19 @@ class _PlannersViewState extends State<PlannersView> {
 
     return Scaffold(
       appBar: const NavigatorAppBar(title: "Travel Planners"),
-      body: GenericListView(
-        itemList: plannerViewModel.planners,
-        itemBuilder: (planner) => PlannerCard(
-          travelPlanner: planner,
+      body: SingleChildScrollView(
+        child: GenericListView(
+          itemList: plannerViewModel.planners,
+          itemBuilder: (planner) => PlannerCard(
+            travelPlanner: planner,
+          ),
+          onAdd: () {},
+          headerTitle: "My Travel Planners",
+          headerIcon: Icons.airplanemode_active,
+          emptyMessage: "There are no travel planners",
+          functional: false,
+          scrollable: true,
         ),
-        onAdd: () {},
-        headerTitle: "My Travel Planners",
-        headerIcon: Icons.airplanemode_active,
-        emptyMessage: "There are no travel planners",
-        functional: false,
-        scrollable: true,
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 30.0, right: 20.0),

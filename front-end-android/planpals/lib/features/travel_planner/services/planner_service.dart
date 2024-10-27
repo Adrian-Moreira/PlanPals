@@ -1,4 +1,5 @@
 import 'dart:convert'; // Import for JSON encoding/decoding
+import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/location_model.dart';
@@ -56,6 +57,7 @@ class PlannerService {
   // Fetch all destinations by planner ID
   Future<List<Destination>> fetchAllDestinationsByUserId(String plannerId, String userId) async {
     try {
+      print('Fetching all destinations for planner ID=$plannerId');
       final response = await _apiService.get('/planner/$plannerId/destination?userId=$userId');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => Destination.fromJson(json)).toList();
@@ -66,16 +68,30 @@ class PlannerService {
   }
 
   // Fetch all destinations by planner ID and destination ID
-  Future<List<Activity>> fetchAllActivities(
-      String plannerId, String destinationId) async {
+  Future<List<Activity>> fetchActivitiesByDestinationId(
+      String plannerId, String destinationId, String userId) async {
     try {
       final response = await _apiService
-          .get('/planner/$plannerId/destination/$destinationId/activity');
+          .get('/planner/$plannerId/destination/$destinationId/activity?userId=$userId');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => Activity.fromJson(json)).toList();
     } catch (e) {
       throw Exception(
           'Failed to fetch activities for planner ID=$plannerId and destinatoin ID=$destinationId: $e');
+    }
+  }
+
+  // Fetch all accommodations by planner ID and destination ID
+  Future<List<Accommodation>> fetchAccommodationsByDestinationId(
+      String plannerId, String destinationId, String userId) async {
+    try {
+      final response = await _apiService
+          .get('/planner/$plannerId/destination/$destinationId/accommodation?userId=$userId');
+      final List<dynamic> jsonList = jsonDecode(response.body)['data'];
+      return jsonList.map((json) => Accommodation.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception(
+          'Failed to fetch accommodations for planner ID=$plannerId and destination ID=$destinationId: $e');
     }
   }
 
@@ -144,6 +160,36 @@ class PlannerService {
     }
   }
 
+  // Add a new activity to a specific destination
+  Future<Activity> addActivity(Activity activity, String plannerId, String userId) async {
+    try {
+      final response = await _apiService.post(
+        '/planner/$plannerId/destination/${activity.destinationId}/activity?userId=$userId',
+        activity.toJson(),
+      );
+
+      final responseBody = jsonDecode(response.body);
+      return Activity.fromJson(responseBody['data']);
+    } catch (e) {
+      throw Exception('Failed to add activity: $e');
+    }
+  }
+
+  // Add a new accommodation to a specific destination
+  Future<Accommodation> addAccommodation(Accommodation accommodation, String plannerId, String userId) async {
+    try {
+      final response = await _apiService.post(
+        '/planner/$plannerId/destination/${accommodation.destinationId}/accommodation?userId=$userId',
+        accommodation.toJson(),
+      );
+
+      final responseBody = jsonDecode(response.body);
+      return Accommodation.fromJson(responseBody['data']);
+    } catch (e) {
+      throw Exception('Failed to add accommodation: $e');
+    }
+  }
+
 
   // ------------------------------------------
   // UPDATERS
@@ -192,6 +238,34 @@ class PlannerService {
     }
   }
 
+  Future<Accommodation> updateAccommodation(Accommodation accommodation, String plannerId,String userId) async {
+    try {
+      final response = await _apiService.patch(
+        '/planner/$plannerId/destination/${accommodation.destinationId}/accommodation/${accommodation.accommodationId}?userId=$userId',
+        accommodation.toJson(),
+      );
+
+      final responseBody = jsonDecode(response.body);
+      return Accommodation.fromJson(responseBody['data']);
+    } catch (e) {
+      throw Exception('Failed to update the accommodation: $e');
+    }
+  }
+
+  Future<Activity> updateActivity(Activity activity, String plannerId, String userId) async {
+    try {
+      final response = await _apiService.patch(
+        '/planner/$plannerId/destination/${activity.destinationId}/activity/${activity.activityId}?userId=$userId',
+        activity.toJson(),
+      );
+
+      final responseBody = jsonDecode(response.body);
+      return Activity.fromJson(responseBody['data']);
+    } catch (e) {
+      throw Exception('Failed to update the activity: $e');
+    }
+  }
+
   // ------------------------------------------
   // DELETERS
   // ------------------------------------------
@@ -217,6 +291,22 @@ class PlannerService {
       await _apiService.delete('/planner/${transport.plannerId}/transportation/${transport.id}?userId=$userId');
     } catch (e) {
       throw Exception('Failed to delete the transportation: $e');
+    }
+  }
+
+  Future<void> deleteAccommodation(Accommodation accommodation, String plannerId, String userId) async {
+    try {
+      await _apiService.delete('/planner/$plannerId/destination/${accommodation.destinationId}/accommodation/${accommodation.accommodationId}?userId=$userId');
+    } catch (e) {
+      throw Exception('Failed to delete the accommodation: $e');
+    }
+  }
+
+  Future<void> deleteActivity(Activity activity, String plannerId, String userId) async {
+    try {
+      await _apiService.delete('/planner/$plannerId/destination/${activity.destinationId}/activity/${activity.activityId}?userId=$userId');
+    } catch (e) {
+      throw Exception('Failed to delete the activity: $e');
     }
   }
 

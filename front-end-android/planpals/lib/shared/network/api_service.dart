@@ -17,6 +17,7 @@ class ApiService {
         return response;
       } else {
         print(response.body);
+        print('STATUS CODE: ${response.statusCode}');
         throw Exception(
             'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
@@ -41,7 +42,7 @@ class ApiService {
 
       _handleResponse(response);
 
-      print("POSTING: Status Code: ${response.statusCode}");
+      print("SUCCESS: Status Code: ${response.statusCode}");
 
       return response;
     } catch (error) {

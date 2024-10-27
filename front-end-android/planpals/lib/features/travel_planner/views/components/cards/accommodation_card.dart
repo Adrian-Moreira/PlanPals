@@ -26,7 +26,7 @@ class AccommodationCard extends StatelessWidget {
             children: [
               Text('Addy: ${accommodation.address}'),
               Text(
-                  '${accommodation.checkInDate} - ${accommodation.checkOutDate}'),
+                  '${DateTimeFormat.formatDateTime(accommodation.checkInDate)} - ${DateTimeFormat.formatDateTime(accommodation.checkOutDate)}'),
             ],
           ),
           trailing: functional

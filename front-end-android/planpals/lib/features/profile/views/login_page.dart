@@ -81,6 +81,7 @@ class LoginPage extends StatelessWidget {
                       if (userViewModel.currentUser != null) {
                         // NAVIGATE TO THE HOME PAGE
                         Navigator.pushReplacementNamed(context, '/home');
+                        // Navigator.pushReplacementNamed(context, '/test');
                       } else {
                         // Handle the case where the user was not found or there was an error
                         ScaffoldMessenger.of(context).showSnackBar(

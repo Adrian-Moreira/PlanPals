@@ -8,12 +8,15 @@ class UserService {
   // Fetch user details by userName
   /// Fetches a user by their username.
   Future<User> fetchUserByUserName(String userName) async {
+    print('USERSERVICE: FETCHING USER: $userName');
     final response = await _apiService.get('/user/search?userName=$userName');
 
     if (response.statusCode == 200) {
+      print(response.body);
       final userJson = json.decode(response.body);
       return User.fromJson(userJson['data']);
     } else {
+      print(response.body);
       throw Exception('Failed to load user: ${response.statusCode}');
     }
   }

@@ -32,25 +32,21 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
   void initState() {
     super.initState();
     Planner travelPlanner = widget.travelPlanner; // get planner from widget
-    user = Provider.of<UserViewModel>(context, listen: false).currentUser;  // get user from provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
+    user = Provider.of<UserViewModel>(context, listen: false).currentUser;  // get user from provider
       // fetch destinations and transports for planner
       Provider.of<PlannerViewModel>(context, listen: false)
-          .fetchAllDestinationsByUserId(travelPlanner.plannerId, user!.id);
+          .fetchDestinationsByPlannerId(travelPlanner.plannerId, user!.id);
       Provider.of<PlannerViewModel>(context, listen: false)
-          .fetchAllTransportsByUserId(travelPlanner.plannerId, user!.id);
-    });
+          .fetchTransportsByPlannerId(travelPlanner.plannerId, user!.id);
 
-    _initializeUserAndFunctional();
-  }
-
-  void _initializeUserAndFunctional() {
-
-    // Check if the user is a Read-Write-User
-    if (user != null) {
+      if (user != null) {
       functional = widget.travelPlanner.rwUsers.contains(user!.id);
     }
-  } 
+    });
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
