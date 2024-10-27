@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../src/app'
+import PlanPals from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
-import { UserModel } from '../src/models/User'
-import { PlannerModel } from '../src/models/Planner'
-import { TransportModel } from '../src/models/Transport'
+import { UserModel } from '../../src/models/User'
+import { PlannerModel } from '../../src/models/Planner'
+import { TransportModel } from '../../src/models/Transport'
 
 let app: PlanPals
 
@@ -18,7 +18,7 @@ let testPlanner2: any
 
 let testTransportation1: any
 
-describe.skip('Planner API', () => {
+describe('Integration Test: Transport API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })

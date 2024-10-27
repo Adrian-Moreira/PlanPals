@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../src/app'
+import PlanPals from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
-import { User, UserModel } from '../src/models/User'
-import { PlannerModel } from '../src/models/Planner'
+import { User, UserModel } from '../../src/models/User'
+import { PlannerModel } from '../../src/models/Planner'
 
 describe.skip('Comment API', () => {
   let app: PlanPals

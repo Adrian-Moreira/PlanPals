@@ -20,7 +20,7 @@ const VoteMongoSchema = new Schema<Vote>(
     },
   },
   {
-    _id: false,
+    _id: true,
     timestamps: false,
   },
 )

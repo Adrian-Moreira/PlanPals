@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../src/app'
+import PlanPals from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
-import { UserModel, UserSchema } from '../src/models/User'
+import { BasicUserSchema, UserModel, UserSchema } from '../../src/models/User'
 
 let app: PlanPals
 let testUser: any = {
@@ -15,15 +15,16 @@ let postUser: any = {
   preferredName: 'Foo Bar',
 }
 
-describe.skip('User API', () => {
+describe('Integration Test: User API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
     const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
     await app.startServer(port)
     await UserModel.deleteMany({})
+
     testUser = await UserModel.create(testUser)
-    testUser = await UserSchema.parseAsync(testUser.toObject())
+    testUser = await UserSchema.parseAsync(testUser)
   })
 
   afterAll(async () => {
@@ -73,7 +74,10 @@ describe.skip('User API', () => {
     it('should return OK and create user', async () => {
       const response = await request(app.app)
         .post('/user')
-        .send(postUser)
+        .send({
+          userName: postUser.userName,
+          preferredName: postUser.preferredName,
+        })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.CREATED)
 
@@ -87,7 +91,10 @@ describe.skip('User API', () => {
     it('should return Conflict', async () => {
       const response = await request(app.app)
         .post('/user')
-        .send(postUser)
+        .send({
+          userName: postUser.userName,
+          preferredName: postUser.preferredName,
+        })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.CONFLICT)
 

@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { Types } from 'mongoose'
-import { Accommodation, AccommodationModel } from '../models/Accommodation'
+import { AccommodationModel } from '../models/Accommodation'
+import { DestinationModel } from '../models/Destination'
 
 /**
  * Verifies that an accommodation with the given ID exists in the database. If not,
@@ -21,10 +21,6 @@ async function verifyAccommodationExists(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { accommodationId } = req.body.out
   const targetAccommodation = await AccommodationModel.findOne({
     _id: accommodationId,
@@ -57,35 +53,26 @@ const createAccommodationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
-  const { targetDestination, createdBy, name, location, startDate, endDate } =
+  const { targetDestination, targetUser, name, location, startDate, endDate } =
     req.body.out
 
   const createdAccommodation = await AccommodationModel.create({
-    createdBy,
+    createdBy: targetUser._id,
     destinationId: targetDestination._id,
     name,
     location,
     startDate,
     endDate,
+  }).then(async (acc) => {
+    await DestinationModel.findOneAndUpdate(
+      { _id: targetDestination._id },
+      {
+        $push: { accommodations: acc._id },
+      },
+      { new: true },
+    )
+    return acc
   })
-    .then(async (accommodation) => {
-      targetDestination.accommodation.push(accommodation._id)
-      await targetDestination.save()
-
-      return accommodation
-    })
-    .catch((err) => {
-      req.body.err = new RecordConflictException({
-        requestType: 'create',
-        conflict: 'Accommodation already exists ' + JSON.stringify(err),
-      })
-      console.log(req.body.err)
-      next(req.body.err)
-    })
 
   req.body.result = createdAccommodation
   req.body.status = StatusCodes.CREATED
@@ -107,9 +94,6 @@ const updateAccommodationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetAccommodation, name, location, startDate, endDate } =
     req.body.out
 
@@ -117,7 +101,12 @@ const updateAccommodationDocument = async (
   targetAccommodation.location ||= location
   targetAccommodation.startDate ||= startDate
   targetAccommodation.endDate ||= endDate
-  const updatedAccommodation = await targetAccommodation.save()
+
+  const updatedAccommodation = await AccommodationModel.findOneAndUpdate(
+    { _id: targetAccommodation._id },
+    targetAccommodation,
+    { new: true },
+  )
 
   req.body.result = updatedAccommodation
   req.body.status = StatusCodes.OK
@@ -139,16 +128,17 @@ const deleteAccommodationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetAccommodation, targetDestination } = req.body.out
 
-  targetDestination.accommodation = targetDestination.accommodation.filter(
-    (aid: Types.ObjectId) => !aid.equals(targetAccommodation._id),
+  targetDestination.accommodation = targetDestination.accommodations.filter(
+    (aid: any) => aid.toString() != targetAccommodation._id.toString(),
   )
-  await targetDestination.save()
+
+  await DestinationModel.findOneAndUpdate(
+    { _id: targetDestination._id },
+    { accommodations: targetDestination.accommodation },
+    { new: true },
+  )
 
   const deletedAccommodation = await AccommodationModel.findOneAndDelete({
     _id: targetAccommodation._id,
@@ -182,10 +172,6 @@ const getAccommodationDocumentById = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetAccommodation } = req.body.out
   req.body.result = targetAccommodation
   req.body.status = StatusCodes.OK
@@ -207,18 +193,17 @@ const getAccommodationDocumentsByDestinationId = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
-
   const { targetDestination } = req.body.out
 
-  const resultAccommodations: Accommodation[] =
-    await targetDestination.accommodation.map(async (aid: Types.ObjectId) => {
-      return await AccommodationModel.findOne({ _id: aid })
-    })
+  const resultAccommodations = targetDestination.accommodations.map(
+    (aid: any) => {
+      return AccommodationModel.findById(aid)
+    },
+  )
 
-  req.body.result = resultAccommodations
+  req.body.result = await Promise.all(resultAccommodations).then((results) =>
+    results.filter((acc) => acc !== null),
+  )
   req.body.status = StatusCodes.OK
 
   next()

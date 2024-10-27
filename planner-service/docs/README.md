@@ -941,5 +941,4 @@ Introduction: to be generated
 - All `userId`, `plannerId`, `destinationId`, `accommodationId`, `activityId`, `transportationId`, and `commentId` parameters are expected to be 24-character hexadecimal strings, representing MongoDB ObjectIDs.
 - Dates can be provided as ISO 8601 strings or JavaScript `Date` objects.
 - Ensure that you have the necessary permissions and that the user exists before making requests that require authentication.
-- Response formats are generally in JSON, returning the requested object or a confirmation message. You'll receive a 404 and an HTML if the route
-is not implemented.
+- Response formats are generally in JSON, returning a `success` boolean, and the requested object as `data` or a confirmation message.

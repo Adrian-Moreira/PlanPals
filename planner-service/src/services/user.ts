@@ -10,9 +10,6 @@ const verifyUserExists = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   let {
     userId,
     createdBy,
@@ -46,9 +43,6 @@ const createUserDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const newUser: BasicUser = req.body.out as BasicUser
   const userCreated = await UserModel.create(newUser).catch(() => {
     req.body.err = new RecordConflictException({
@@ -76,9 +70,6 @@ const updateUserDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetUser, userName, preferredName } = req.body.out
 
   const userUpdated = await UserModel.findOneAndUpdate(
@@ -126,18 +117,8 @@ const deleteUserDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetUser } = req.body.out
   const userDeleted = await UserModel.findOneAndDelete({ _id: targetUser._id })
-  if (!userDeleted) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'User',
-      recordId: targetUser._id.toString(),
-    })
-    next(req.body.err)
-  }
 
   req.body.result = userDeleted
   req.body.status = StatusCodes.OK
@@ -159,9 +140,6 @@ const getUserDocumentById = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { targetUser } = req.body.out
   req.body.result = targetUser
   req.body.status = StatusCodes.OK
@@ -182,9 +160,6 @@ const getUserDocumentByName = async (
   res: Response,
   next: NextFunction,
 ): Promise<any> => {
-  if (req.body.err) {
-    next(req.body.err)
-  }
   const { userName }: { userName: string } = req.body.out
   const user = await UserModel.findOne({ userName })
   if (!user) {
