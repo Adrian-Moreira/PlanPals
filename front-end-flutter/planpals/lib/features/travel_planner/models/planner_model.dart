@@ -3,10 +3,17 @@ import 'package:planpals/shared/utils/date_utils.dart';
 class Planner {
   final String plannerId;
   final String createdBy;
+<<<<<<< HEAD
+  DateTime startDate;
+  DateTime endDate;
+  String name;
+  String description;
+=======
   final DateTime startDate;
   final DateTime endDate;
   final String name;
   final String description;
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
   final List<String> roUsers;
   final List<String> rwUsers;
   final List<String> destinations;
@@ -71,4 +78,17 @@ class Planner {
         'transportations: $transportations '
         '}';
   }
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/travel_planner/models/planner_model.dart
+
+  void update(Planner updatedPlanner) {
+    startDate = updatedPlanner.startDate;
+    endDate = updatedPlanner.endDate;
+    name = updatedPlanner.name;
+    description = updatedPlanner.description;
+  }
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/models/planner_model.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
 }

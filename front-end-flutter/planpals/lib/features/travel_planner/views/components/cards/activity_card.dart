@@ -19,7 +19,22 @@ class ActivityCard extends StatelessWidget {
     return Card(
       child: ListTile(
           title: Text(activity.name),
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/travel_planner/views/components/cards/activity_card.dart
+          subtitle: 
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Date: ${DateTimeFormat.formatDateTime(activity.date)}',),
+              Text('Duration: ${activity.duration} minutes',),
+            ]
+          ),
+=======
           subtitle: Text('${activity.date}, ${activity.time}'),
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/travel_planner/views/components/cards/activity_card.dart
+=======
+          subtitle: Text('${activity.date}, ${activity.time}'),
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
           trailing: functional
               ? Row(
                   mainAxisSize: MainAxisSize.min,

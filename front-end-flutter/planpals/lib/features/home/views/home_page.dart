@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/home/views/home_page.dart
+=======
+<<<<<<< HEAD
 import 'package:planpals/features/travel_planner/views/planners_view.dart';
 =======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/home/views/home_page.dart
+=======
+<<<<<<< HEAD
+import 'package:planpals/features/travel_planner/views/planners_view.dart';
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
@@ -12,7 +21,14 @@ import 'package:planpals/features/travel_planner/views/components/cards/transpor
 import 'package:planpals/features/travel_planner/views/planners_view.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/navigator_bar.dart';
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/home/views/home_page.dart
+=======
 >>>>>>> f61c82b6c329af1b7e97ff6c6c046514dee96035
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/home/views/home_page.dart
+=======
+>>>>>>> f61c82b6c329af1b7e97ff6c6c046514dee96035
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -45,6 +61,12 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
 <<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/home/views/home_page.dart
+                Navigator.pushNamed(context, '/planners');
+=======
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
+<<<<<<< HEAD
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -54,6 +76,10 @@ class HomePage extends StatelessWidget {
 =======
                 Navigator.pushNamed(context, '/planners');
 >>>>>>> f61c82b6c329af1b7e97ff6c6c046514dee96035
+<<<<<<< HEAD
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/home/views/home_page.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
               },
               child: const Text('Go to Travel Planner'),
             ),

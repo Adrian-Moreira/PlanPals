@@ -17,6 +17,13 @@ class ApiService {
         return response;
       } else {
         print(response.body);
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/shared/network/api_service.dart
+        print('STATUS CODE: ${response.statusCode}');
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/shared/network/api_service.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
         throw Exception(
             'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
@@ -41,6 +48,14 @@ class ApiService {
 
       _handleResponse(response);
 
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/shared/network/api_service.dart
+      print("SUCCESS: Status Code: ${response.statusCode}");
+
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/shared/network/api_service.dart
+=======
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
       return response;
     } catch (error) {
       throw Exception('Failed to post data: $error');
@@ -48,10 +63,11 @@ class ApiService {
   }
 
   // PUT request
-  Future<http.Response> put(String endpoint, Map<String, dynamic> data) async {
+
+  Future<http.Response> patch(String endpoint, Map<String, dynamic> data) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      final response = await http.put(
+      final response = await http.patch(
         url,
         body: json.encode(data),
         headers: {

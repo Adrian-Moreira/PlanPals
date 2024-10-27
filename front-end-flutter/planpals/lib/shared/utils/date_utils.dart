@@ -3,7 +3,15 @@ import 'package:intl/intl.dart';
 
 class DateTimeFormat {
   static String formatDateTime(DateTime dateTime) {
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/shared/utils/date_utils.dart
+    DateFormat formatter = DateFormat('MMM d, h:mm a');
+=======
     DateFormat formatter = DateFormat('MMMM d, h:mm a');
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/shared/utils/date_utils.dart
+=======
+    DateFormat formatter = DateFormat('MMMM d, h:mm a');
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
     String formatted = formatter.format(dateTime);
     return formatted.trim();
   }

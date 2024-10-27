@@ -92,12 +92,28 @@ class SignUpPage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState?.validate() == true) {
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/profile/views/signup_page.dart
+                      User? fetchedUser = await userViewModel
+=======
                       await userViewModel
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/profile/views/signup_page.dart
+=======
+                      await userViewModel
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
                           .fetchUserByUserName(_usernameController.text);
         
                       print('SIGN UP: ${userViewModel.currentUser}');
 
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/profile/views/signup_page.dart
+                      if (fetchedUser != null) {
+=======
                       if (userViewModel.currentUser != null) {
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/profile/views/signup_page.dart
+=======
+                      if (userViewModel.currentUser != null) {
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
                         // User already exists
                         print('User already exists');
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -105,7 +121,14 @@ class SignUpPage extends StatelessWidget {
                             content: Text('Username already exists'),
                           ),
                         );
+<<<<<<< HEAD
+<<<<<<< HEAD:front-end-android/planpals/lib/features/profile/views/signup_page.dart
+=======
                         userViewModel.logout();   // set current user to null
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb:front-end-flutter/planpals/lib/features/profile/views/signup_page.dart
+=======
+                        userViewModel.logout();   // set current user to null
+>>>>>>> 9d450e7847ca1857e5a54067c7c6c85fdc311ccb
                         return;
                       } 
                         // Add user
