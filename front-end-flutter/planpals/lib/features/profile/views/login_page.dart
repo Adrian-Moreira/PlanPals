@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:planpals/features/home/views/home_page.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
@@ -9,8 +8,6 @@ class LoginPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -78,12 +75,13 @@ class LoginPage extends StatelessWidget {
                     if (_formKey.currentState?.validate() == true) {
                       // Fetch the user by username and wait for the result
                       await userViewModel
-                          .fetchUserByUserName(_usernameController.text);
+                          .login(_usernameController.text);
 
                       // Check if the user has been fetched successfully
                       if (userViewModel.currentUser != null) {
                         // NAVIGATE TO THE HOME PAGE
                         Navigator.pushReplacementNamed(context, '/home');
+                        // Navigator.pushReplacementNamed(context, '/test');
                       } else {
                         // Handle the case where the user was not found or there was an error
                         ScaffoldMessenger.of(context).showSnackBar(

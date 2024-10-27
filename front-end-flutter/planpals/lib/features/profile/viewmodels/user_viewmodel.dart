@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/shared/constants/constants.dart';
-import 'package:pp_service_kit/pp_service_kit.dart';
+import 'package:planpals/features/profile/services/user_service.dart';
+import '../models/user_model.dart'; // Import your user model
 
 class UserViewModel extends ChangeNotifier {
-  final UserService _userService =
-      UserService(ApiClient(baseUrl: Urls.baseUrl));
+  final UserService _userService = UserService();
 
   User? _user; // Cached user data
   bool _isLoading = false; // Loading state
@@ -14,24 +13,34 @@ class UserViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading; // Get loading state
   String? get errorMessage => _errorMessage; // Get error message
 
-  // Fetch user details by userName
-  /// Fetches a user by their username.
-  Future<void> fetchUserByUserName(String userName) async {
+  //-------------------------------------------
+  // FETCH USER
+  //-------------------------------------------
+
+  Future<User?> fetchUserByUserName(String userName) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
+    User? fetchedUser;
+
     try {
       print("USERVIEWMODEL: FETCHING USER: $userName");
-      _user = await _userService.fetchUserByUserName(userName);
+      fetchedUser= await _userService.fetchUserByUserName(userName);
       print('USERVIEWMODEL: FETCHED USER: $_user');
-    } on Exception catch (error) {
+    } catch (error) {
       _errorMessage = error.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+
+    return fetchedUser;
   }
+
+  // -------------------------------------------
+  // ADD USER
+  //-------------------------------------------
 
   // Add a new destination to the planner
   Future<void> addUser(User user) async {
@@ -47,6 +56,16 @@ class UserViewModel extends ChangeNotifier {
       // Handle the exception and throw an error with a meaningful message
       throw Exception('Failed to add destination: $e');
     }
+  }
+
+  //-------------------------------------------
+  // LOGIN LOGOUT
+  //-------------------------------------------
+
+  Future<void> login(String userName) async {
+    User? fetched = await fetchUserByUserName(userName);
+    _user = fetched;
+    notifyListeners();
   }
 
   void logout() {

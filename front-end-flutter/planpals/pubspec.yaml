@@ -31,8 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  pp_service_kit:
-    path: ../pp_service_kit
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

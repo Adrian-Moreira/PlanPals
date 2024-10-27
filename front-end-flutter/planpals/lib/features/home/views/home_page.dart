@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'package:planpals/features/travel_planner/views/planners_view.dart';
-=======
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
@@ -12,10 +9,9 @@ import 'package:planpals/features/travel_planner/views/components/cards/transpor
 import 'package:planpals/features/travel_planner/views/planners_view.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/navigator_bar.dart';
->>>>>>> f61c82b6c329af1b7e97ff6c6c046514dee96035
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +40,7 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-<<<<<<< HEAD
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const PlannersView()), // navigate to travel planners
-                );
-=======
                 Navigator.pushNamed(context, '/planners');
->>>>>>> f61c82b6c329af1b7e97ff6c6c046514dee96035
               },
               child: const Text('Go to Travel Planner'),
             ),

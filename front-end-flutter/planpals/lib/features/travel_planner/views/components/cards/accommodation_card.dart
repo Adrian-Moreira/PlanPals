@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
 
 class AccommodationCard extends StatelessWidget {
@@ -25,7 +26,7 @@ class AccommodationCard extends StatelessWidget {
             children: [
               Text('Addy: ${accommodation.address}'),
               Text(
-                  '${accommodation.checkInDate} - ${accommodation.checkOutDate}'),
+                  '${DateTimeFormat.formatDateTime(accommodation.checkInDate)} - ${DateTimeFormat.formatDateTime(accommodation.checkOutDate)}'),
             ],
           ),
           trailing: functional

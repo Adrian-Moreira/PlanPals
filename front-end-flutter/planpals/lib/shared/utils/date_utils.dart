@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 class DateTimeFormat {
   static String formatDateTime(DateTime dateTime) {
-    DateFormat formatter = DateFormat('MMMM d, h:mm a');
+    DateFormat formatter = DateFormat('MMM d, h:mm a');
     String formatted = formatter.format(dateTime);
     return formatted.trim();
   }

@@ -14,7 +14,7 @@ class Urls {
 
   // Shopping list URLs
   static const String shoppingList = '$baseUrl/shoppinglist';
-
+  
   // To-do list URLs
   static const String todoList = '$baseUrl/todolist';
 
@@ -22,7 +22,9 @@ class Urls {
   static const String users = '$baseUrl/user';
 }
 
+
 class ErrorMessage {
+
   // Travel planner Error Messages
   static const String nullTravelPlanner = "No Travel Planner Available.";
 

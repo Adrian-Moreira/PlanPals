@@ -7,14 +7,14 @@ import 'package:planpals/features/travel_planner/models/planner_model.dart';
 import 'package:planpals/features/travel_planner/views/planner_details_view.dart';
 import 'package:provider/provider.dart';
 
-class PlannerForm extends StatefulWidget {
-  const PlannerForm({super.key});
+class CreatePlannerForm extends StatefulWidget {
+  const CreatePlannerForm({super.key});
 
   @override
-  _PlannerFormState createState() => _PlannerFormState();
+  _CreatePlannerFormState createState() => _CreatePlannerFormState();
 }
 
-class _PlannerFormState extends State<PlannerForm> {
+class _CreatePlannerFormState extends State<CreatePlannerForm> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for the form fields
