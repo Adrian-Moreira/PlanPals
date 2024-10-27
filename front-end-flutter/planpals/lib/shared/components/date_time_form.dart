@@ -31,6 +31,7 @@ class DateTimeForm extends StatelessWidget {
                 DateTimeSelector.combineDateTime(pickedDate, pickedTime);
             dateTimeSelected(selectedDateTime);
           }
+          ;
         }
       },
       child: InputDecorator(

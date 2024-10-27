@@ -17,6 +17,7 @@ class ApiService {
         return response;
       } else {
         print(response.body);
+        print('STATUS CODE: ${response.statusCode}');
         throw Exception(
             'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
@@ -41,6 +42,8 @@ class ApiService {
 
       _handleResponse(response);
 
+      print("SUCCESS: Status Code: ${response.statusCode}");
+
       return response;
     } catch (error) {
       throw Exception('Failed to post data: $error');
@@ -48,10 +51,11 @@ class ApiService {
   }
 
   // PUT request
-  Future<http.Response> put(String endpoint, Map<String, dynamic> data) async {
+
+  Future<http.Response> patch(String endpoint, Map<String, dynamic> data) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      final response = await http.put(
+      final response = await http.patch(
         url,
         body: json.encode(data),
         headers: {

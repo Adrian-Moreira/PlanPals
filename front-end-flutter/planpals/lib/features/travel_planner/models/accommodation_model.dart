@@ -1,10 +1,10 @@
 class Accommodation {
   final String accommodationId;
   final String destinationId;
-  final String name;
-  final String address;
-  final DateTime checkInDate; // Date as a string
-  final DateTime checkOutDate; // Date as a string
+  String name;
+  String address;
+  DateTime checkInDate; // Date as a string
+  DateTime checkOutDate; // Date as a string
 
   Accommodation({
     required this.accommodationId,
@@ -37,5 +37,24 @@ class Accommodation {
       'checkInDate': checkInDate.toIso8601String(),
       'checkOutDate': checkOutDate.toIso8601String(),
     };
+  }
+
+  @override
+  String toString() {
+    return 'Accommodation {\n'
+        '  accommodationId: $accommodationId,\n'
+        '  destinationId: $destinationId,\n'
+        '  name: $name,\n'
+        '  address: $address,\n'
+        '  checkInDate: $checkInDate,\n'
+        '  checkOutDate: $checkOutDate\n'
+        '}';
+  }
+
+  void update(Accommodation updatedAccommodation) {
+    name = updatedAccommodation.name;
+    address = updatedAccommodation.address;
+    checkInDate = updatedAccommodation.checkInDate;
+    checkOutDate = updatedAccommodation.checkOutDate;
   }
 }
