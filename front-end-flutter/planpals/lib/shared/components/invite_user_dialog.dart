@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 class InviteUserDialog extends StatefulWidget {
-  const InviteUserDialog({super.key});
-
   @override
   _InviteUserDialogState createState() => _InviteUserDialogState();
 }
@@ -14,7 +12,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Invite User'),
+      title: Text('Invite User'),
       content: Form(
         key: _formKey,
         child: Column(
@@ -22,7 +20,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
           children: [
             TextFormField(
               controller: _usernameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Enter username to invite',
               ),
               validator: (value) {
@@ -52,13 +50,13 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: const Text('Invite'),
+          child: Text('Invite'),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Cancel'),
+          child: Text('Cancel'),
         ),
       ],
     );
@@ -74,7 +72,6 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
   // Simple username validation method
   bool isValidUsername(String username) {
     // Use a regex or a more sophisticated validation if needed
-    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-        .hasMatch(username);
+    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(username);
   }
 }

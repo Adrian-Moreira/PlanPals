@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/create/create_destination_form.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/create/create_transport_form.dart';
 import 'package:provider/provider.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/models/transport_model.dart';
-import 'package:planpals/features/travel_planner/views/components/Forms/destination_form.dart';
-import 'package:planpals/features/travel_planner/views/components/Forms/transport_form.dart';
+import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/destination_card.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/transport_card.dart';
 import 'package:planpals/features/travel_planner/models/planner_model.dart';
@@ -31,25 +32,21 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
   void initState() {
     super.initState();
     Planner travelPlanner = widget.travelPlanner; // get planner from widget
-    user = Provider.of<UserViewModel>(context, listen: false).currentUser;  // get user from provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
+    user = Provider.of<UserViewModel>(context, listen: false).currentUser;  // get user from provider
       // fetch destinations and transports for planner
       Provider.of<PlannerViewModel>(context, listen: false)
-          .fetchAllDestinationsByUserId(travelPlanner.plannerId, user!.id);
+          .fetchDestinationsByPlannerId(travelPlanner.plannerId, user!.id);
       Provider.of<PlannerViewModel>(context, listen: false)
-          .fetchAllTransportsByUserId(travelPlanner.plannerId, user!.id);
-    });
+          .fetchTransportsByPlannerId(travelPlanner.plannerId, user!.id);
 
-    _initializeUserAndFunctional();
-  }
-
-  void _initializeUserAndFunctional() {
-
-    // Check if the user is a Read-Write-User
-    if (user != null) {
+      if (user != null) {
       functional = widget.travelPlanner.rwUsers.contains(user!.id);
     }
-  } 
+    });
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,11 +92,11 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                       style: const TextStyle(fontSize: 18)),
                   trailing: IconButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                InviteUserDialog()), // navigate to travel planners
+                      showDialog(
+                        context: context,
+                        builder: (context) => InviteUserDialog(
+                          // TODO: Add invite functionality
+                        )
                       );
                     },
                     icon: const Icon(
@@ -148,8 +145,8 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${widget.travelPlanner.destinations.length} Destinations'),
-                          Text('${widget.travelPlanner.transportations.length} Transportations'), 
+                          Text('${destinations.length} Destinations'),
+                          Text('${transportations.length} Transportations'), 
                         ]),
                 ),
                 ListTile(
@@ -182,8 +179,6 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                   itemList: destinations,
                   itemBuilder: (destination) => DestinationCard(
                     destination: destination,
-                    onEdit: () {},
-                    onDelete: () {},
                     functional: functional,
                   ),
                   onAdd: () {
@@ -191,7 +186,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                DestinationForm(planner: planner)));
+                                CreateDestinationForm(planner: planner)));
                   },
                   headerTitle: "Destinations",
                   headerIcon: Icons.landscape,
@@ -209,15 +204,13 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                   itemList: transportations,
                   itemBuilder: (transport) => TransportCard(
                     transport: transport,
-                    onEdit: () {},
-                    onDelete: () {},
                     functional: functional,
                   ),
                   onAdd: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => TransportForm(
+                            builder: (context) => CreateTransportForm(
                                   planner: planner,
                                 )));
                   },

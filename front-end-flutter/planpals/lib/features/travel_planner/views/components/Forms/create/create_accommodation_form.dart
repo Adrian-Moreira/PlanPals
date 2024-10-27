@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
+import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/validators/accommodation_validator.dart';
+import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/shared/components/date_time_form.dart';
+import 'package:provider/provider.dart';
 
-class AccommodationForm extends StatefulWidget {
-  final Function(Accommodation) onAccommodationAdd;
+class CreateAccommodationForm extends StatefulWidget {
+  final Destination destination;
 
-  const AccommodationForm({super.key, required this.onAccommodationAdd});
+  const CreateAccommodationForm({super.key, required this.destination});
 
   @override
-  _AccommodationFormState createState() => _AccommodationFormState();
+  _CreateAccommodationFormState createState() => _CreateAccommodationFormState();
 }
 
-class _AccommodationFormState extends State<AccommodationForm> {
+class _CreateAccommodationFormState extends State<CreateAccommodationForm> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = TextEditingController();
@@ -22,6 +27,13 @@ class _AccommodationFormState extends State<AccommodationForm> {
 
   @override
   Widget build(BuildContext context) {
+    final PlannerViewModel plannerViewModel =
+        Provider.of<PlannerViewModel>(context, listen: false);
+    final User? user = Provider.of<UserViewModel>(context).currentUser;
+
+    final Destination destination = widget.destination;
+
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Accommodation Form'),
@@ -91,7 +103,7 @@ class _AccommodationFormState extends State<AccommodationForm> {
 
               // Submit Button
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState?.validate() == true) {
                     // Validate custom date logic
                     final dateError = AccommodationValidator.validateDates(
@@ -104,17 +116,23 @@ class _AccommodationFormState extends State<AccommodationForm> {
                     }
 
                     // Create an Accommodation object
-                    final accommodation = Accommodation(
-                      accommodationId: '',
+                    Accommodation newAccommodation = Accommodation(
                       name: _nameController.text,
                       address: _addressController.text,
                       checkInDate: _checkIn!,
-                      checkOutDate: _checkOut!, 
-                      destinationId: '',
+                      checkOutDate: _checkOut!,
+                      destinationId: destination.destinationId, 
+                      accommodationId: '',
                     );
 
-                    // Call the callback with the new Accommodation
-                    widget.onAccommodationAdd(accommodation);
+                    // Add the Accommodation to the destination
+                    newAccommodation = await plannerViewModel.addAccommodation(
+                      newAccommodation,
+                      destination.destinationId,
+                      user!.id
+                    );
+                    
+                    destination.accommodations.add(newAccommodation.accommodationId); // Add the new Accommodation ID to the destination
 
                     // Close the form screen
                     Navigator.pop(context);

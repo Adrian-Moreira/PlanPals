@@ -3,10 +3,10 @@ import 'package:planpals/shared/utils/date_utils.dart';
 class Planner {
   final String plannerId;
   final String createdBy;
-  final DateTime startDate;
-  final DateTime endDate;
-  final String name;
-  final String description;
+  DateTime startDate;
+  DateTime endDate;
+  String name;
+  String description;
   final List<String> roUsers;
   final List<String> rwUsers;
   final List<String> destinations;
@@ -70,5 +70,12 @@ class Planner {
         'destinations: $destinations, '
         'transportations: $transportations '
         '}';
+  }
+
+  void update(Planner updatedPlanner) {
+    startDate = updatedPlanner.startDate;
+    endDate = updatedPlanner.endDate;
+    name = updatedPlanner.name;
+    description = updatedPlanner.description;
   }
 }

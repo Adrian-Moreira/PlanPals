@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
-import 'package:planpals/features/travel_planner/views/components/Forms/planner_form.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/create/create_planner_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/planner_card.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/navigator_bar.dart';
@@ -42,17 +42,19 @@ class _PlannersViewState extends State<PlannersView> {
 
     return Scaffold(
       appBar: const NavigatorAppBar(title: "Travel Planners"),
-      body: GenericListView(
-        itemList: plannerViewModel.planners,
-        itemBuilder: (planner) => PlannerCard(
-          travelPlanner: planner,
+      body: SingleChildScrollView(
+        child: GenericListView(
+          itemList: plannerViewModel.planners,
+          itemBuilder: (planner) => PlannerCard(
+            travelPlanner: planner,
+          ),
+          onAdd: () {},
+          headerTitle: "My Travel Planners",
+          headerIcon: Icons.airplanemode_active,
+          emptyMessage: "There are no travel planners",
+          functional: false,
+          scrollable: true,
         ),
-        onAdd: () {},
-        headerTitle: "My Travel Planners",
-        headerIcon: Icons.airplanemode_active,
-        emptyMessage: "There are no travel planners",
-        functional: false,
-        scrollable: true,
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 30.0, right: 20.0),
@@ -63,7 +65,7 @@ class _PlannersViewState extends State<PlannersView> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PlannerForm()),
+                MaterialPageRoute(builder: (context) => const CreatePlannerForm()),
               );
             },
             tooltip: 'Add Travel Planner',

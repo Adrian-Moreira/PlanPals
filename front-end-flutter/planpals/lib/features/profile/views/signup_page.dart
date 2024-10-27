@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/features/home/views/home_page.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -92,12 +91,12 @@ class SignUpPage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState?.validate() == true) {
-                      await userViewModel
+                      User? fetchedUser = await userViewModel
                           .fetchUserByUserName(_usernameController.text);
         
                       print('SIGN UP: ${userViewModel.currentUser}');
 
-                      if (userViewModel.currentUser != null) {
+                      if (fetchedUser != null) {
                         // User already exists
                         print('User already exists');
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -105,7 +104,6 @@ class SignUpPage extends StatelessWidget {
                             content: Text('Username already exists'),
                           ),
                         );
-                        userViewModel.logout();   // set current user to null
                         return;
                       } 
                         // Add user

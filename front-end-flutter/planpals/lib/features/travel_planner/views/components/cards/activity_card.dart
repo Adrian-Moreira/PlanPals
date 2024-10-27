@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
 
 class ActivityCard extends StatelessWidget {
@@ -19,7 +20,14 @@ class ActivityCard extends StatelessWidget {
     return Card(
       child: ListTile(
           title: Text(activity.name),
-          subtitle: Text('${activity.date}, ${activity.time}'),
+          subtitle: 
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Date: ${DateTimeFormat.formatDateTime(activity.date)}',),
+              Text('Duration: ${activity.duration} minutes',),
+            ]
+          ),
           trailing: functional
               ? Row(
                   mainAxisSize: MainAxisSize.min,
