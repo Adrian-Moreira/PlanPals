@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/comment_page.dart';
 import 'package:planpals/features/home/views/home_page.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/profile/views/login_page.dart';
@@ -36,11 +37,13 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.blue,
             ),
             initialRoute: '/login', // Set the initial route to login
+            // initialRoute: '/comment',
             routes: {
               '/home': (context) => HomePage(),
               '/login': (context) => LoginPage(),
               '/signup': (context) => SignUpPage(),
               '/planners': (context) => const PlannersView(),
+              '/comment': (context) => CommentPage(),
             },
           ),
         ),
