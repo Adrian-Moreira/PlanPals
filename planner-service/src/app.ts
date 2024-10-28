@@ -7,6 +7,7 @@ import { closeMongoConnection, connectToMongoDB } from './config/db'
 import router from './routes/routers'
 import cors from 'cors'
 import RequestUtils from './utils/RequestUtils'
+import path from 'node:path'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 
@@ -14,12 +15,14 @@ class PlanPals {
   public app: Express
   server: Server
   dbURI: string
+  testing: boolean
 
-  constructor({ dbURI }: any) {
+  constructor({ dbURI, testing }: any) {
     this.app = express()
     this.server = createServer(this.app)
     this.dbURI =
       dbURI || config.database.connectionString || 'mongodb://localhost:27017'
+    this.testing = testing || false
     this.initRoutes()
   }
 
@@ -27,6 +30,10 @@ class PlanPals {
     this.app.use(express.json())
     this.app.use(cors())
     this.app.use(express.urlencoded({ extended: false }))
+    this.app.use(express.static('public'))
+    this.app.get('/', (req, res) => {
+      res.sendFile(path.join(__dirname, 'public', 'index.html'))
+    })
     this.app.use(router)
     this.app.use(RequestUtils.mkErrorResponse)
   }

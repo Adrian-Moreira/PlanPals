@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Performance Analysis Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .chart-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        canvas {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <div class="chart-title">POST /comment (10 Concurrent Users)</div>
+        <div class="chart-subtitle">Content-Type: application/json | Total Requests: 250 | Payload: post_data.json</div>
+        <canvas id="c10-throughput"></canvas>
+        <canvas id="c10-latency"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">POST /comment (20 Concurrent Users)</div>
+        <div class="chart-subtitle">Content-Type: application/json | Total Requests: 250 | Payload: post_data.json</div>
+        <canvas id="c20-throughput"></canvas>
+        <canvas id="c20-latency"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-title">POST /comment (50 Concurrent Users)</div>
+        <div class="chart-subtitle">Content-Type: application/json | Total Requests: 250 | Payload: post_data.json</div>
+        <canvas id="c50-throughput"></canvas>
+        <canvas id="c50-latency"></canvas>
+    </div>
+
+    <script>
+        const createThroughputChart = (elementId, data, title) => {
+            const ctx = document.getElementById(elementId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.name),
+                    datasets: [
+                        {
+                            label: 'Requests per Second',
+                            data: data.map(d => d.rps),
+                            backgroundColor: '#82ca9d',
+                        },
+                        {
+                            label: 'Failed Requests',
+                            data: data.map(d => d.failures),
+                            backgroundColor: '#ff8042',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Throughput and Failures'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        };
+
+        const createLatencyChart = (elementId, data, title) => {
+            const ctx = document.getElementById(elementId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.name),
+                    datasets: [
+                        {
+                            label: '50th Percentile (ms)',
+                            data: data.map(d => d.p50),
+                            backgroundColor: '#8884d8',
+                        },
+                        {
+                            label: '90th Percentile (ms)',
+                            data: data.map(d => d.p90),
+                            backgroundColor: '#82ca9d',
+                        },
+                        {
+                            label: '99th Percentile (ms)',
+                            data: data.map(d => d.p99),
+                            backgroundColor: '#ffc658',
+                        },
+                        {
+                            label: 'Max Response Time (ms)',
+                            data: data.map(d => d.max),
+                            backgroundColor: '#ff8042',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Response Time Distribution'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        };
+
+        // Data for concurrency level 10
+        const c10Data = [
+            {
+                name: "Local (10.0.0.8)",
+                rps: 89.65,
+                p50: 96,
+                p90: 156,
+                p99: 242,
+                max: 275,
+                failures: 0
+            },
+            {
+                name: "Remote (10.0.0.225)",
+                rps: 3.42,
+                p50: 2706,
+                p90: 4764,
+                p99: 7787,
+                max: 10170,
+                failures: 0
+            }
+        ];
+
+        // Data for concurrency level 20
+        const c20Data = [
+            {
+                name: "Local (10.0.0.8)",
+                rps: 96.54,
+                p50: 194,
+                p90: 243,
+                p99: 282,
+                max: 304,
+                failures: 0
+            },
+            {
+                name: "Remote (10.0.0.225)",
+                rps: 2.18,
+                p50: 7953,
+                p90: 14553,
+                p99: 22898,
+                max: 26486,
+                failures: 3
+            }
+        ];
+
+        // Data for concurrency level 50
+        const c50Data = [
+            {
+                name: "Local (10.0.0.8)",
+                rps: 98.29,
+                p50: 470,
+                p90: 546,
+                p99: 715,
+                max: 780,
+                failures: 0
+            },
+            {
+                name: "Remote (10.0.0.225)",
+                rps: 1.93,
+                p50: 21208,
+                p90: 41566,
+                p99: 75183,
+                max: 77780,
+                failures: 15
+            }
+        ];
+
+        // Create all charts
+        createThroughputChart('c10-throughput', c10Data);
+        createLatencyChart('c10-latency', c10Data);
+        createThroughputChart('c20-throughput', c20Data);
+        createLatencyChart('c20-latency', c20Data);
+        createThroughputChart('c50-throughput', c50Data);
+        createLatencyChart('c50-latency', c50Data);
+    </script>
+</body>
+</html>
