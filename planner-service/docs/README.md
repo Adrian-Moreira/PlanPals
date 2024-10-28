@@ -759,7 +759,7 @@ Introduction: to be generated
   | Parameter  | Type   | Required | Description                             |
   | ---------- | ------ | -------- | --------------------------------------- |
   | `objectId` | string | Yes      | The ID of the object being voted on.    |
-  | `type`     | string | Yes      | The type of the object (e.g., 'post').  |
+  | `type`     | string | Yes      | The type of the object (e.g., 'Planner', 'Destination', 'Transport', 'Activity').  |
 
 - **Response:**
 
