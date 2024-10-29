@@ -6,8 +6,8 @@
   "bin": "out/app.js",
   "scripts": {
     "build": "tsc",
-    "start": "nodemon",
     "debug": "nodemon --inspect=0.0.0.0:9229",
+    "start": "nodemon",
     "test": "jest --maxWorkers=1"
   },
   "dependencies": {
@@ -17,13 +17,14 @@
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.0",
     "planner-service": "file:",
+    "sst": "3.2.67",
     "ts-node": "^10.9.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@shelf/jest-mongodb": "^4.3.2",
-    "@types/aws-lambda": "^8.10.145",
+    "@types/aws-lambda": "8.10.145",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/mongoose": "^5.11.96",
