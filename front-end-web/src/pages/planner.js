@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom'; // Import useParams to get plannerId from URL
 import { useAuth } from '../AuthContext'; // Import Auth context to get userId
-import { BiSolidPlane } from "react-icons/bi"; // Icon for destinations
+import { BiSolidPlane } from "react-icons/bi"; // Icon for transport
 import { BiSolidBed } from "react-icons/bi"; // Icon for accommodations
 import { BiCalendarEvent } from "react-icons/bi"; // Icon for activities
+import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill, BsFillPinMapFill } from "react-icons/bs";
 import axios from "axios"; // Import axios for API calls
 
 const Planner = () => {
     // Retrieve plannerId and userId from URL and context
-    const { plannerId } = useParams(); 
+    const { plannerId, access } = useParams();
+    const isReadOnly = access === "ro"; //set planner to read only if user has ro access 
     const { userId } = useAuth(); 
     
     // State variables for planner and destinations
@@ -188,6 +190,7 @@ const Planner = () => {
         setDestinationStartDate("");
         setDestinationEndDate("");
         setError(""); // Clear any error messages
+        setShowDestinationForm(false);
     };
 
     // Handle adding an accommodation
@@ -292,40 +295,18 @@ const Planner = () => {
     }
 
     return (
-        <div>
+        <div className="Page-color">
+            <div className="List">
+                <p/>
+                <h1>
+                    {planner.name}
+                </h1>
+                <div className="List-subheader">
+                    {planner.description}
+                    <p/>
+                    {`${new Date(planner.startDate).toLocaleDateString()} To ${new Date(planner.endDate).toLocaleDateString()}`}
+                </div>
             <header className="Page-header">
-                <h1>{planner.name}</h1>
-                <p>{planner.description}</p>
-                <p>{`From: ${new Date(planner.startDate).toLocaleDateString()} To: ${new Date(planner.endDate).toLocaleDateString()}`}</p>
-
-                {/* Add Destination Form */}
-                <button onClick={() => setShowDestinationForm(!showDestinationForm)}>
-                    {showDestinationForm ? "❌ Cancel" : "➕ Add Destination"}
-                </button>
-                {showDestinationForm && (
-                    <form onSubmit={editingDestinationId ? handleEditDestination : handleAddDestination}>
-                        <input
-                            type="text"
-                            value={destinationName}
-                            onChange={(e) => setDestinationName(e.target.value)}
-                            placeholder="Destination Name"
-                            required
-                        />
-                        <input
-                            type="date"
-                            value={destinationStartDate}
-                            onChange={(e) => setDestinationStartDate(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="date"
-                            value={destinationEndDate}
-                            onChange={(e) => setDestinationEndDate(e.target.value)}
-                            required
-                        />
-                        <button type="submit">{editingDestinationId ? "Update Destination" : "Add Destination"}</button>
-                    </form>
-                )}
 
                 {/* Add Accommodation Form */}
                 <button onClick={() => setShowAccommodationForm(!showAccommodationForm)}>
@@ -417,28 +398,85 @@ const Planner = () => {
                 <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
             </header>
 
-            <div className="List">
+                <p/>
                 <div className="List-header">
-                    <BiSolidPlane /> Destinations
+                    <BsFillMapFill /> Destinations
                 </div>
                 {destinations.length > 0 ? (
                     destinations.map(dest => (
                         <div className="List-item" key={dest._id}>
                             <div>
-                                {dest.name} 
-                                <button onClick={() => {
-                                    setEditingDestinationId(dest._id);
-                                    setDestinationName(dest.name);
-                                    setDestinationStartDate(dest.startDate.split("T")[0]); // Format date for input
-                                    setDestinationEndDate(dest.endDate.split("T")[0]); // Format date for input
-                                    setShowDestinationForm(true); // Show form for editing
-                                }}>✏️ Edit</button>
-                                <button onClick={() => handleDeleteDestination(dest._id)}>🗑️ Delete</button>
+                                <h3>
+                                    {dest.name} 
+                                </h3>
+                                <h4>
+                                    {`${new Date(dest.startDate).toLocaleDateString()} To ${new Date(dest.endDate).toLocaleDateString()}`}
+                                </h4>
+                                
+                                {!isReadOnly &&(
+                                    <div>
+                                        <button className="Icon-button" onClick={() => {
+                                            setEditingDestinationId(dest._id);
+                                            setDestinationName(dest.name);
+                                            setDestinationStartDate(dest.startDate.split("T")[0]); // Format date for input
+                                            setDestinationEndDate(dest.endDate.split("T")[0]); // Format date for input
+                                            setShowDestinationForm(true); // Show form for editing
+                                        }}><BsPencilFill /></button>
+                                        <button className="Icon-button" onClick={() => handleDeleteDestination(dest._id)}><BsTrashFill /></button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))
                 ) : (
                     <p>No destinations available.</p> // Display message if no destinations
+                )}
+
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button" onClick={() => {
+                            setShowDestinationForm(true)
+                        }}><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
+                
+                
+                {showDestinationForm && (
+                    //create/edit destination modal
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
+                            <form onSubmit={editingDestinationId ? handleEditDestination : handleAddDestination} onReset={resetDestinationForm}>
+                                Destination Name:
+                                <input
+                                    type="text"
+                                    value={destinationName}
+                                    onChange={(e) => setDestinationName(e.target.value)}
+                                    placeholder="Destination Name"
+                                    required
+                                />
+                                <p/>
+                                Start Date:
+                                <input
+                                    type="date"
+                                    value={destinationStartDate}
+                                    onChange={(e) => setDestinationStartDate(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                End Date:
+                                <input
+                                    type="date"
+                                    value={destinationEndDate}
+                                    onChange={(e) => setDestinationEndDate(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                <button type="reset">Cancel</button>
+                                <button type="submit">{editingDestinationId ? "Update Destination" : "Add Destination"}</button>
+                            </form>
+                        </div>
+                    </div>
                 )}
                 <p />
 
