@@ -1,18 +1,18 @@
 import RequestUtils, { ReqAttrSchema } from '../utils/RequestUtils'
-import { ObjectIdStringSchema } from '../models/Planner'
+import { ObjectIdStringSchema, ValidCollectionSchema } from '../models/Planner'
 import z from 'zod'
 
 const VoteRouteSchema = {
   upVote: ReqAttrSchema.extend({
     body: z.object({
-      type: z.string(),
+      type: ValidCollectionSchema,
       objectId: ObjectIdStringSchema,
       createdBy: ObjectIdStringSchema,
     }),
   }),
   downVote: ReqAttrSchema.extend({
     body: z.object({
-      type: z.string(),
+      type: ValidCollectionSchema,
       objectId: ObjectIdStringSchema,
       createdBy: ObjectIdStringSchema,
     }),
@@ -20,7 +20,7 @@ const VoteRouteSchema = {
   removeVote: ReqAttrSchema.extend({
     body: z.object({
       objectId: ObjectIdStringSchema,
-      type: z.string(),
+      type: ValidCollectionSchema,
     }),
     query: z.object({
       userId: ObjectIdStringSchema,
@@ -29,13 +29,13 @@ const VoteRouteSchema = {
   getVotesByObjectId: ReqAttrSchema.extend({
     query: z.object({
       objectId: ObjectIdStringSchema,
-      type: z.string(),
+      type: ValidCollectionSchema,
     }),
   }),
   isUserVoted: ReqAttrSchema.extend({
     query: z.object({
       objectId: ObjectIdStringSchema,
-      type: z.string(),
+      type: ValidCollectionSchema,
     }),
     params: z.object({
       userId: ObjectIdStringSchema,

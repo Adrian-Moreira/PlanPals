@@ -1,6 +1,20 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { z } from 'zod'
-import { DestinationModel } from './Destination'
+export const ValidCollections = [
+  'Activity',
+  'Planner',
+  'User',
+  'Vote',
+  'Comment',
+  'Destination',
+  'Transport',
+  'Accommodation',
+]
+
+export const ValidCollectionSchema = z
+  .string()
+  .refine((val) => ValidCollections.includes(val))
+// .transform((val: string) => mongoose.models[val!])
 
 export const ObjectIdSchema = z
   .instanceof(Types.ObjectId)

@@ -2,31 +2,33 @@ import { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
 import { MalformedRequestException } from '../exceptions/MalformedRequestException'
 import { StatusCodes } from 'http-status-codes'
+import mongoose from 'mongoose'
+import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 
 /**
- * A function that takes a list of functions and returns a new function that
- * pipes the output of each function to the next one. The input to the first
- * function is the input to the returned function, and the output of the last
- * function is the output of the returned function.
+ * Verifies that an object with the given objectId exists in the given collection.
  *
- * @example
- * const double = (num: number) => num * 2
- * const addOne = (num: number) => num + 1
- * const doubleAndAddOne = pipe(double, addOne)
- * doubleAndAddOne(4) // resolves to 9
+ * @param {Request} req - The incoming request from the client.
+ * @param {Response} res - The response to the client.
+ * @param {NextFunction} next - The next function in the middleware chain.
  *
- * @param funcs - An array of functions to pipe together.
- * @return A function that takes the input to the first function and returns a
- *         Promise that resolves to the output of the last function.
+ * @throws {RecordNotFoundException} If the object does not exist.
  */
-export function pipe<T, R>(
-  ...funcs: Array<(arg: any) => any | Promise<any>>
-): (input: T) => Promise<R> {
-  return (input: T): Promise<R> =>
-    funcs.reduce(
-      async (prevPromise, nextFunc) => nextFunc(await prevPromise),
-      Promise.resolve(input),
-    ) as Promise<R>
+export async function verifyObjectExistInCollection(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  const { objectId, type } = req.body.out
+  const object = await mongoose.models[type].findById(objectId)
+  if (!object) {
+    req.body.err = new RecordNotFoundException({
+      recordType: type,
+      recordId: objectId,
+    })
+    next(req.body.err)
+  }
+  next()
 }
 
 /**
@@ -199,6 +201,7 @@ const RequestUtils = {
   mkParsers: mkRequestParsers,
   mkErrorResponse: mkErrorResponse,
   mkSuccessResponse: mkSuccessResponse,
+  verifyObjectExistInCollection: verifyObjectExistInCollection,
 }
 
 export default RequestUtils
