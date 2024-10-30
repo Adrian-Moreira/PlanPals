@@ -15,9 +15,6 @@ const ActivityRouteSchema = {
       startDate: z.string().datetime().or(z.date()),
       duration: z.number(),
     }),
-    query: z.object({
-      userId: ObjectIdStringSchema,
-    }),
   }),
   getActivityById: ReqAttrSchema.extend({
     params: z.object({
