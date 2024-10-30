@@ -25,7 +25,6 @@ describe('Comment->findOrCreateComments', () => {
 
   const existingComment = {
     createdBy: targetUser._id,
-    title: 'test',
     content: 'test',
     _id: '671d119e14be184dbc5c0d90',
   }

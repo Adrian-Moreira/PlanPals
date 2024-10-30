@@ -97,10 +97,10 @@ const updateAccommodationDocument = async (
   const { targetAccommodation, name, location, startDate, endDate } =
     req.body.out
 
-  targetAccommodation.name ||= name
-  targetAccommodation.location ||= location
-  targetAccommodation.startDate ||= startDate
-  targetAccommodation.endDate ||= endDate
+  targetAccommodation.name = name || targetAccommodation.name
+  targetAccommodation.location = location || targetAccommodation.location
+  targetAccommodation.startDate = startDate || targetAccommodation.startDate
+  targetAccommodation.endDate = endDate || targetAccommodation.endDate
 
   const updatedAccommodation = await AccommodationModel.findOneAndUpdate(
     { _id: targetAccommodation._id },

@@ -60,6 +60,7 @@ const createActivityDocument = async (
     startDate,
     duration,
     location,
+    done: false,
   }).then(async (activity) => {
     await DestinationModel.findOneAndUpdate(
       { _id: targetDestination._id },
@@ -94,10 +95,10 @@ const updateActivityDocument = async (
 ) => {
   const { targetActivity, name, startDate, duration, location } = req.body.out
 
-  targetActivity.name ||= name
-  targetActivity.startDate ||= startDate
-  targetActivity.duration ||= duration
-  targetActivity.location ||= location
+  targetActivity.name = name || targetActivity.name
+  targetActivity.startDate = startDate || targetActivity.startDate
+  targetActivity.duration = duration || targetActivity.duration
+  targetActivity.location = location || targetActivity.location
 
   const updatedActivity = await ActivityModel.findOneAndUpdate(
     { _id: targetActivity._id },
