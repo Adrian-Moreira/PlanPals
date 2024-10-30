@@ -1,14 +1,15 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { z } from 'zod'
+
 export const ValidCollections = [
+  'Accommodation',
   'Activity',
-  'Planner',
-  'User',
-  'Vote',
   'Comment',
   'Destination',
+  'Planner',
   'Transport',
-  'Accommodation',
+  'User',
+  'Vote',
 ]
 
 export const ValidCollectionSchema = z
