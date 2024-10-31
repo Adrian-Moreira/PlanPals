@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:planpals/comment_page.dart';
 import 'package:planpals/features/home/views/home_page.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/profile/views/login_page.dart';
 import 'package:planpals/features/profile/views/signup_page.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/planners_view.dart';
+import 'package:planpals/features/vote/vote_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 
@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => PlannerViewModel()),
         ChangeNotifierProvider(create: (context) => UserViewModel()),
+        ChangeNotifierProvider(create: (context) => VoteViewModel()),
       ],
 
       child: SafeArea(
@@ -37,13 +38,11 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.blue,
             ),
             initialRoute: '/login', // Set the initial route to login
-            // initialRoute: '/comment',
             routes: {
               '/home': (context) => HomePage(),
               '/login': (context) => LoginPage(),
               '/signup': (context) => SignUpPage(),
               '/planners': (context) => const PlannersView(),
-              '/comment': (context) => CommentPage(),
             },
           ),
         ),

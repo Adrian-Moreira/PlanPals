@@ -1,3 +1,4 @@
+import 'package:planpals/features/vote/vote_model.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class Activity {
@@ -8,8 +9,7 @@ class Activity {
   String location;
   DateTime startDate; // startDate as String
   double duration; // Duration of the activity in minutes
-  List<String>? votes;
-  List<String>? comments;
+  Vote vote;
 
   Activity({
     this.activityId,
@@ -19,9 +19,8 @@ class Activity {
     required this.startDate,
     required this.duration,
     required this.location,
-    this.votes,
-    this.comments,
-  });
+    Vote? vote, // make this parameter nullable
+  }) : vote = vote ?? Vote(createdBy: createdBy, id: '', objectId: destinationId, type: 'Destination', upVotes: [], downVotes: []);
 
   // Factory method to create Activity from JSON
   factory Activity.fromJson(Map<String, dynamic> json) {
@@ -33,9 +32,6 @@ class Activity {
       startDate: DateTime.parse(json['startDate']),
       duration: json['duration'].toDouble(),
       location: json['location'],
-      votes: json['votes'] != null ? List<String>.from(json['votes']) : null,
-      comments:
-          json['comments'] != null ? List<String>.from(json['comments']) : null,
     );
   }
 
@@ -49,8 +45,6 @@ class Activity {
       'startDate': DateTimeToIso.formatToUtcIso(startDate),
       'duration': duration,
       'location': location,
-      'votes': votes,
-      'comments': comments,
     };
   }
 
@@ -64,8 +58,6 @@ class Activity {
         '  startDate: $startDate,\n'
         '  duration: $duration,\n'
         '  location: $location,\n'
-        '  votes: $votes,\n'
-        '  comments: $comments\n'
         '}';
   }
 
@@ -74,7 +66,5 @@ class Activity {
     startDate = updatedActivity.startDate;
     duration = updatedActivity.duration;
     location = updatedActivity.location;
-    votes = updatedActivity.votes;
-    comments = updatedActivity.comments;
   }
 }

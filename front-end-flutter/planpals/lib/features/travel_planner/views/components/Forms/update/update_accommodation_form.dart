@@ -150,7 +150,6 @@ class _UpdateAccommodationFormState extends State<UpdateAccommodationForm> {
                         address: _addressController.text,
                         checkInDate: _checkIn!,
                         checkOutDate: _checkOut!,
-                        location: accommodation.location,
                         createdBy: accommodation.createdBy,
                       ),
                       destination.plannerId,

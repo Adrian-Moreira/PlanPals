@@ -82,10 +82,32 @@ class ApiService {
   Future<http.Response> delete(String endpoint) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
+      print('url: $url');
       final response = await http.delete(url);
 
       // Check for successful response
       _handleResponse(response);
+      return response;
+    } catch (error) {
+      throw Exception('Failed to delete data: $error');
+    }
+  }
+
+  Future<http.Response> deleteWithBody(String endpoint, Map<String, dynamic> data) async {
+    try {
+      final url = Uri.parse('$baseUrl$endpoint');
+      final response = await http.delete(
+        url,
+        body: json.encode(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      // Check for successful response  
+      _handleResponse(response);
+
+      print('SUCCESS: REMOVED VOTE: ${response.body}');
       return response;
     } catch (error) {
       throw Exception('Failed to delete data: $error');
@@ -100,4 +122,5 @@ class ApiService {
       throw Exception('Failed to load data: ${response.statusCode}');
     }
   }
+
 }

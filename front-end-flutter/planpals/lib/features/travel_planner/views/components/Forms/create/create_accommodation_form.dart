@@ -125,7 +125,6 @@ class _CreateAccommodationFormState extends State<CreateAccommodationForm> {
                         checkOutDate: _checkOut!,
                         destinationId: destination.destinationId, 
                         accommodationId: '',
-                        location: '',
                         createdBy: user!.id
                       ),
                       destination.plannerId,
@@ -144,6 +143,7 @@ class _CreateAccommodationFormState extends State<CreateAccommodationForm> {
                         const SnackBar(content: Text('Accommodation added successfully!')),
                       );
                       destination.accommodations.add(newAccommodation.accommodationId); // Add the new Accommodation ID to the destination
+                      destination.accommodationList.add(newAccommodation);
                     }
 
 
@@ -158,5 +158,12 @@ class _CreateAccommodationFormState extends State<CreateAccommodationForm> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    super.dispose();
   }
 }

@@ -5,7 +5,7 @@ import 'package:planpals/features/travel_planner/models/transport_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/update/update_transport_form.dart';
 import 'package:planpals/shared/components/delete_message.dart';
-import 'package:planpals/shared/components/generic_list_tile.dart';
+import 'package:planpals/shared/components/generic_card.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:provider/provider.dart';
 
@@ -22,35 +22,36 @@ class TransportCard extends StatelessWidget {
         Provider.of<PlannerViewModel>(context, listen: false);
     User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
 
-    return Card(
-        child: GenericListTile(
-            title: Text(transport.type,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    'Departure: ${DateTimeFormat.formatDateTime(transport.departureTime)}'),
-                Text(
-                    'Arrival: ${DateTimeFormat.formatDateTime(transport.arrivalTime)}'),
-              ],
-            ),
-            onDelete: () {
-              showDialog(
-                  context: context,
-                  builder: (context) => DeleteMessage(onDelete: () {
-                        // Delete Transport
-                        plannerViewModel.deleteTransport(transport, user.id);
-                      }));
-            },
-            onEdit: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      UpdateTransportForm(transport: transport),
-                ),
-              );
-            }));
-  }
+    return GenericCard(
+      title: Text(transport.type,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Departure: ${DateTimeFormat.formatDateTime(transport.departureTime)}'),
+          Text(
+              'Arrival: ${DateTimeFormat.formatDateTime(transport.arrivalTime)}'),
+        ],
+      ),
+      onDelete: () {
+        showDialog(
+            context: context,
+            builder: (context) => DeleteMessage(onDelete: () {
+                  // Delete Transport
+                  plannerViewModel.deleteTransport(transport, user.id);
+                }));
+      },
+      onEdit: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UpdateTransportForm(transport: transport),
+          ),
+        );
+      }, 
+      vote: transport.vote,
+      functional: functional,
+    );
+    }
 }

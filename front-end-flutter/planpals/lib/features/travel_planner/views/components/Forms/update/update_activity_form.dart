@@ -110,8 +110,6 @@ class _UpdateActivityFormState extends State<UpdateActivityForm> {
                       duration: double.parse(_selectedDuration!),
                       destinationId: activity.destinationId,
                       location: activity.location,
-                      votes: activity.votes,
-                      comments: activity.comments, 
                       createdBy: user.id,
                     );
 

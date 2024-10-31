@@ -1,3 +1,4 @@
+import 'package:planpals/features/vote/vote_model.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class Accommodation {
@@ -8,7 +9,7 @@ class Accommodation {
   String address;
   DateTime checkInDate; // Date as a string
   DateTime checkOutDate; // Date as a string
-  String location;
+  Vote vote;
 
   Accommodation({
     required this.accommodationId,
@@ -17,9 +18,9 @@ class Accommodation {
     required this.address,
     required this.checkInDate,
     required this.checkOutDate,
-    required this.location,
     required this.createdBy,
-  });
+    Vote? vote, // make this parameter nullable
+  }) : vote = vote ?? Vote(createdBy: createdBy, id: '', objectId: accommodationId, type: 'Accommodation', upVotes: [], downVotes: []);
 
   // Factory method to create an Accommodation from a JSON map
   factory Accommodation.fromJson(Map<String, dynamic> json) {
@@ -27,10 +28,9 @@ class Accommodation {
       accommodationId: json['_id'] ?? '',
       destinationId: json['destinationId'] ?? '',
       name: json['name'] ?? '',
-      address: json['address'] ?? '',
+      address: json['location'] ?? '',
       checkInDate: DateTime.parse(json['startDate']), // Parsing DateTime
       checkOutDate: DateTime.parse(json['endDate']), // Parsing DateTime
-      location: json['location'] ?? '',
       createdBy: json['createdBy'] ?? '',
     );
   }
@@ -41,10 +41,9 @@ class Accommodation {
       '_id': accommodationId,
       'destinationId': destinationId,
       'name': name,
-      'address': address,
+      'location': address,
       'startDate': DateTimeToIso.formatToUtcIso(checkInDate),
       'endDate': DateTimeToIso.formatToUtcIso(checkOutDate),
-      'location': location,
       'createdBy': createdBy,
     };
   }
@@ -58,7 +57,6 @@ class Accommodation {
         '  address: $address,\n'
         '  checkInDate: $checkInDate,\n'
         '  checkOutDate: $checkOutDate\n'
-        '  location: $location\n'
         '  createdBy: $createdBy\n'
         '}';
   }
@@ -68,6 +66,5 @@ class Accommodation {
     address = updatedAccommodation.address;
     checkInDate = updatedAccommodation.checkInDate;
     checkOutDate = updatedAccommodation.checkOutDate;
-    location = updatedAccommodation.location;
   }
 }

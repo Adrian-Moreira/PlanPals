@@ -21,9 +21,9 @@ class PlannerViewModel extends ChangeNotifier {
   // Getters
   List<Planner> get planners => _planners;
   List<Destination> get destinations => _destinations;
-  List<Activity> get activities => _activities;
   List<Transport> get transports => _transports;
   List<Accommodation> get accommodations => _accommodations;
+  List<Activity> get activities => _activities;
   bool get isLoading => _isLoading; // Get loading state
   String? get errorMessage => _errorMessage; // Get error message
 
@@ -71,6 +71,25 @@ class PlannerViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchDestinationsAndTransportsByPlannerId(String plannerId, String userId) async {
+    print('PLANNERVIEWMODEL: FETCHING DESTINATIONS AND TRANSPORTS by plannerId: $plannerId');
+    _isLoading = true;
+    _transports = [];
+    _destinations = [];
+    notifyListeners();
+
+    try {
+      _transports = await _plannerService.fetchAllTransportsByUserId(plannerId, userId);
+      _destinations = await _plannerService.fetchAllDestinationsByUserId(plannerId, userId);
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = "Failed to fetch destinations and transports";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // Fetch all transports by planner ID
   Future<void> fetchTransportsByPlannerId(String plannerId, String userId) async {
     _isLoading = true;
@@ -98,6 +117,7 @@ class PlannerViewModel extends ChangeNotifier {
 
     try {
       _destinations = await _plannerService.fetchAllDestinationsByUserId(plannerId, userId);
+
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -136,10 +156,8 @@ class PlannerViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print('PLANNERVIEWMODEL: FETCHING ALL ACCOMMODATIONS by destinationIdAA: $destinationId');
       _accommodations =
           await _plannerService.fetchAccommodationsByDestinationId(plannerId, destinationId, userId);
-      print(_accommodations);
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -453,7 +471,6 @@ class PlannerViewModel extends ChangeNotifier {
   }
 
 
-
   void logout() {
     _planners = [];
     _destinations = [];
@@ -462,5 +479,10 @@ class PlannerViewModel extends ChangeNotifier {
     _accommodations = [];
     _errorMessage = null;
     notifyListeners();
+    dispose();
+  }
+
+  void dispose() {
+    super.dispose();
   }
 }

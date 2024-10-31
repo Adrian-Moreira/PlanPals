@@ -1,19 +1,29 @@
 class Vote {
-  final String objectId;
+  String id;
+  String objectId;
   final String type;
-  final List<String> upVotes;
-  final List<String> downVotes;
+  final String createdBy;
+  List<String> upVotes;
+  List<String> downVotes;
+  bool upVoted;
+  bool downVoted;
 
   Vote(
-      {required this.objectId,
+      {required this.id,
+      required this.objectId,
       required this.type,
+      required this.createdBy,
       required this.upVotes,
-      required this.downVotes});
+      required this.downVotes,
+      this.upVoted = false,
+      this.downVoted = false});
 
   factory Vote.fromJson(Map<String, dynamic> json) {
     return Vote(
-      objectId: json['objectId'],
-      type: json['type'],
+      id: json['_id'] ?? '',
+      objectId: json['objectId']['id'] ?? '',
+      type: json['objectId']['collection'] ?? '',
+      createdBy: json['createdBy'] ?? '',
       upVotes: List<String>.from(json['upVotes']),
       downVotes: List<String>.from(json['downVotes']),
     );
@@ -23,6 +33,7 @@ class Vote {
     return {
       'objectId': objectId,
       'type': type,
+      'createdBy': createdBy,
       'upVotes': upVotes,
       'downVotes': downVotes
     };
@@ -30,9 +41,23 @@ class Vote {
 
   @override
   String toString() {
-    return 'Vote{objectId: $objectId,'
+    return 'Vote{id: $id,'
+        'objectId: $objectId,'
         'type: $type,'
+        'createdBy: $createdBy,'
         'upVotes: $upVotes,'
-        'downVotes: $downVotes}';
+        'downVotes: $downVotes,' 
+        'upVoted: $upVoted,'
+        'downVoted: $downVoted}';
+  }
+
+  void updateFromJson(Map<String, dynamic> json) {
+    id = json['_id'] ?? '';
+    objectId = json['objectId']['id'] ?? '';
+    upVotes = List<String>.from(json['upVotes']);
+    downVotes = List<String>.from(json['downVotes']);
+
+    upVoted = upVotes.contains(createdBy);
+    downVoted = downVotes.contains(createdBy);
   }
 }

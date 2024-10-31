@@ -7,10 +7,13 @@ import 'package:planpals/features/travel_planner/models/destination_model.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/create/create_accommodation_form.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/create/create_activity_form.dart';
+import 'package:planpals/features/travel_planner/views/components/Forms/update/update_destination_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/accommodation_card.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/activity_card.dart';
+import 'package:planpals/features/vote/vote_model.dart';
+import 'package:planpals/features/vote/vote_viewmodel.dart';
 import 'package:planpals/shared/components/delete_message.dart';
-import 'package:planpals/shared/components/generic_list_tile.dart';
+import 'package:planpals/shared/components/generic_card.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:provider/provider.dart';
@@ -19,91 +22,93 @@ class DestinationCard extends StatefulWidget {
   final Destination destination;
   final bool functional;
 
-  const DestinationCard(
-      {super.key, required this.destination, required this.functional});
+  const DestinationCard({
+    Key? key,
+    required this.destination,
+    required this.functional,
+  }) : super(key: key);
 
   @override
   State<DestinationCard> createState() => _DestinationCardState();
 }
 
 class _DestinationCardState extends State<DestinationCard> {
-  User? user;
+  late User user;
+  late Destination destination;
 
-  bool _hasFetchedData = false;
+  final PlannerViewModel _plannerViewModel = PlannerViewModel();
 
   @override
   void initState() {
     super.initState();
+
+    destination = widget.destination;
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Destination destination = widget.destination;
-      if (!_hasFetchedData) {
-        user = Provider.of<UserViewModel>(context, listen: false).currentUser;
-        destination.accommodationList =
-            await Provider.of<PlannerViewModel>(context, listen: false)
-                .fetchAccommodationsByDestinationId(
-                    destination.plannerId, destination.destinationId, user!.id);
-        destination.activityList =
-            await Provider.of<PlannerViewModel>(context, listen: false)
-                .fetchActivitiesByDestinationId(
-                    destination.plannerId, destination.destinationId, user!.id);
-        _hasFetchedData = true; // Set the flag to true after fetching
-      }
+      user = Provider.of<UserViewModel>(context, listen: false)
+          .currentUser!; // get user from provider
+      await _plannerViewModel.fetchAccommodationsByDestinationId(
+          destination.plannerId, destination.destinationId, user.id);
+      await _plannerViewModel.fetchActivitiesByDestinationId(
+          destination.plannerId, destination.destinationId, user.id);
+
+      setState(() {
+        destination.accommodationList = _plannerViewModel.accommodations;
+        destination.activityList = _plannerViewModel.activities;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
-    User? user = Provider.of<UserViewModel>(context).currentUser;
+    final User? user =
+        Provider.of<UserViewModel>(context, listen: false).currentUser;
 
     Destination destination = widget.destination;
 
-    return Column(
-      children: [
-        Card(
-            child: GenericListTile(
-          title: Text(destination.name, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                  'Departure: ${DateTimeFormat.formatDateTime(destination.startDate)}'),
-              Text(
-                  'Arrival: ${DateTimeFormat.formatDateTime(destination.endDate)}'),
-            ],
+    return GenericCard(
+      title: Text(
+        widget.destination.name,
+        style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Departure: ${DateTimeFormat.formatDateTime(widget.destination.startDate)}'),
+          Text(
+              'Arrival: ${DateTimeFormat.formatDateTime(widget.destination.endDate)}'),
+        ],
+      ),
+      extraInfo: _buildCollapsableContent(context, widget.destination),
+      onDelete: () {
+        showDialog(
+          context: context,
+          builder: (context) => DeleteMessage(onDelete: () {
+            // Delete destination
+            _plannerViewModel.deleteDestination(widget.destination, user!.id);
+
+            // Show Snackbar based on success or error
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(_plannerViewModel.errorMessage ??
+                  'Destination deleted successfully!'),
+            ));
+          }),
+        );
+      },
+      onEdit: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                UpdateDestinationForm(destination: widget.destination),
           ),
-          extraInfo: _buildCollapsableContent(context, destination),
-          onDelete: () {
-            showDialog(
-                          context: context, 
-                          builder: (context) => DeleteMessage(onDelete: () {
-                            
-                            // Delete Transport
-                            plannerViewModel.deleteDestination(destination, user!.id);
-
-                            if (plannerViewModel.errorMessage != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text(plannerViewModel.errorMessage!),
-                              ));
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text('Destination deleted successfully!'),
-                              ));
-
-                              
-                            }
-
-                          }));
-
-          },
-          onEdit: () {
-
-          },
-        )),
-      ],
+        );
+      },
+      vote: destination.vote,
+      functional: widget.functional,
     );
   }
-
 
   Widget _buildCollapsableContent(
       BuildContext context, Destination destination) {
@@ -111,9 +116,9 @@ class _DestinationCardState extends State<DestinationCard> {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${destination.accommodations.length} accommodations',
+          Text('${destination.accommodationList.length} accommodations',
               style: const TextStyle(fontSize: 15)),
-          Text('${destination.activities.length} activities',
+          Text('${destination.activityList.length} activities',
               style: const TextStyle(fontSize: 15)),
         ],
       ),
@@ -124,8 +129,6 @@ class _DestinationCardState extends State<DestinationCard> {
           itemBuilder: (accommodation) => AccommodationCard(
             destination: destination,
             accommodation: accommodation,
-            onEdit: () {},
-            onDelete: () {},
             functional: widget.functional,
           ),
           functional: widget.functional,
@@ -136,9 +139,9 @@ class _DestinationCardState extends State<DestinationCard> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => CreateAccommodationForm(
-                        destination: destination,
-                      )),
+                builder: (context) =>
+                    CreateAccommodationForm(destination: destination),
+              ),
             );
           },
           headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -157,15 +160,15 @@ class _DestinationCardState extends State<DestinationCard> {
           ),
           functional: widget.functional,
           headerTitle: "Activities",
-          headerIcon: Icons.hotel,
+          headerIcon: Icons.event,
           emptyMessage: "No Activities",
           onAdd: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => CreateActivityForm(
-                        destination: destination,
-                      )),
+                builder: (context) =>
+                    CreateActivityForm(destination: destination),
+              ),
             );
           },
           headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -177,4 +180,9 @@ class _DestinationCardState extends State<DestinationCard> {
     );
   }
 
+  @override
+  void dispose() {
+    _plannerViewModel.dispose();
+    super.dispose();
+  }
 }

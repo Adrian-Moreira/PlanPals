@@ -38,10 +38,13 @@ class VoteService {
   ///
   /// [objectId] - The ID of the object.
   /// [type] - The type of the object.
-  Future<Vote> fetchVote(String objectId, String type) async {
+  Future<Vote> fetchVote(Vote vote) async {
     try {
-      final response = await _apiService.get('/vote?objectId=$objectId&type=$type');
-      return Vote.fromJson(jsonDecode(response.body)['data']);
+      print('FETCHING VOTE: $vote');
+      final response = await _apiService.get('/vote?objectId=${vote.objectId}&type=${vote.type}');
+      vote.updateFromJson(jsonDecode(response.body)['data']);
+      print('FETCHED VOTE: $vote');
+      return vote;
     } catch (e) {
       throw Exception('Failed to fetch vote: $e');
     }
@@ -61,8 +64,11 @@ class VoteService {
   /// [vote] - The vote data to upvote with.
   Future<Vote> upVote(Vote vote) async {
     try {
+      print('VOTE SERVICE, UPVOTING: $vote');
       final response = await _apiService.post('/vote/up', vote.toJson());
-      return Vote.fromJson(jsonDecode(response.body)['data']);
+      vote.updateFromJson(jsonDecode(response.body)['data']);
+      print('VOTE SERVICE, UPVOTED: $vote');
+      return vote;
     } catch (e) {
       throw Exception('Failed to upvote: $e');
     }
@@ -83,7 +89,8 @@ class VoteService {
   Future<Vote> downVote(Vote vote) async {
     try {
       final response = await _apiService.post('/vote/down', vote.toJson());
-      return Vote.fromJson(jsonDecode(response.body)['data']);
+      vote.updateFromJson(jsonDecode(response.body)['data']);
+      return vote;
     } catch (e) {
       throw Exception('Failed to downvote: $e');
     }
@@ -99,11 +106,14 @@ class VoteService {
   ///
   /// [vote] - The vote data to delete.
   /// [userId] - The ID of the user whose vote is to be deleted.
-  Future<void> deleteVote(Vote vote, String userId) async {
+  Future<Vote> removeVote(Vote vote) async {
     try {
-      await _apiService.delete('/vote?userId=$userId');
+      final response = await _apiService.deleteWithBody('/vote?userId=${vote.createdBy}', vote.toJson());
+      vote.updateFromJson(jsonDecode(response.body)['data']);
+      return vote;
     } catch (e) {
       throw Exception('Failed to delete vote: $e');
     }
   }
+
 }

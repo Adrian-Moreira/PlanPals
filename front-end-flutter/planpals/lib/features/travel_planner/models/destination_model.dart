@@ -1,5 +1,6 @@
 import 'package:planpals/features/travel_planner/models/accommodation_model.dart';
 import 'package:planpals/features/travel_planner/models/activity_model.dart';
+import 'package:planpals/features/vote/vote_model.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class Destination {
@@ -13,6 +14,7 @@ class Destination {
   final List<String> accommodations; // List of associated accommodation IDs
   List<Activity> activityList = [];
   List<Accommodation> accommodationList = [];
+  Vote vote;
 
   // Constructor
   Destination({
@@ -24,7 +26,8 @@ class Destination {
     required this.endDate,
     required this.activities,
     required this.accommodations,
-  });
+    Vote? vote, // make this parameter nullable
+  }) : vote = vote ?? Vote(createdBy: createdBy, id: '', objectId: destinationId, type: 'Destination', upVotes: [], downVotes: []);
 
   // Factory method to create a Destination from JSON
   factory Destination.fromJson(Map<String, dynamic> json) {
