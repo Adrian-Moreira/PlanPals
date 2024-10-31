@@ -1,20 +1,19 @@
 import RequestUtils, { ReqAttrSchema } from '../utils/RequestUtils'
-import { ObjectIdStringSchema } from '../models/Planner'
+import { ObjectIdStringSchema, ValidCollectionSchema } from '../models/Planner'
 import z from 'zod'
 
 const CommentRouteSchema = {
   newComment: ReqAttrSchema.extend({
     body: z.object({
-      type: z.string(),
+      type: ValidCollectionSchema,
       objectId: ObjectIdStringSchema,
       createdBy: ObjectIdStringSchema,
-      title: z.string().min(1, 'Title is required'),
       content: z.string().min(1, 'Content is required'),
     }),
   }),
   removeComment: ReqAttrSchema.extend({
     body: z.object({
-      type: z.string(),
+      type: ValidCollectionSchema,
       objectId: ObjectIdStringSchema,
     }),
     query: z.object({
@@ -26,7 +25,7 @@ const CommentRouteSchema = {
   }),
   getCommentsByObjectId: ReqAttrSchema.extend({
     query: z.object({
-      type: z.string(),
+      type: ValidCollectionSchema,
       objectId: ObjectIdStringSchema,
     }),
   }),

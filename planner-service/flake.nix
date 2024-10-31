@@ -21,7 +21,7 @@
           typescript
         ];
         npmBuildScript = "build";
-        npmDepsHash = "sha256-xHK6yVxT0+YbNHn3VwFegbahlIvYxHjBT71jlE8ESZI=";
+        npmDepsHash = "sha256-HeOTIVCCijrlgP5pwzo2+FlM1MlxFCHE+qtx+aSabWY=";
         nodejs = pkgs.nodejs_20;
       };
     in
@@ -41,6 +41,7 @@
             nodePackages.ts-node
             typescript-language-server
             prefetch-npm-deps
+            awscli2
           ];
         };
       };

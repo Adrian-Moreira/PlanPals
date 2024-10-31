@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import { CommentModel, CommentsModel } from '../models/Comment'
-import { Types } from 'mongoose'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { StatusCodes } from 'http-status-codes'
 

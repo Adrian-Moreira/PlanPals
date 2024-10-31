@@ -6,7 +6,7 @@ import { UserModel } from '../../src/models/User'
 import { PlannerModel } from '../../src/models/Planner'
 import { DestinationModel } from '../../src/models/Destination'
 import { ActivityModel } from '../../src/models/Activity'
-import { CommentModel, CommentsModel } from '../../src/models/Comment'
+import { VoteModel } from '../../src/models/Vote'
 
 let app: PlanPals
 
@@ -24,10 +24,10 @@ let testDestination2: any
 let testActivity1: any
 let testActivity2: any
 
-let newComment: any
-let existingComments: any
+let newVote: any
+let existingVotes: any
 
-describe('Integration Test: Comment API', () => {
+describe('Integration Test: Vote API', () => {
   beforeAll(async () => {
     const mongoURI = process.env.MONGO_URL
     app = new PlanPals({ dbURI: mongoURI })
@@ -38,8 +38,7 @@ describe('Integration Test: Comment API', () => {
     await PlannerModel.deleteMany({})
     await DestinationModel.deleteMany({})
     await ActivityModel.deleteMany({})
-    await CommentsModel.deleteMany({})
-    await CommentModel.deleteMany({})
+    await VoteModel.deleteMany({})
 
     testUser1 = await UserModel.create({
       userName: 'TUser1',
@@ -121,14 +120,10 @@ describe('Integration Test: Comment API', () => {
       done: false,
     })
 
-    newComment = await CommentModel.create({
-      createdBy: testUser1._id,
-      content: 'test',
-    })
-
-    existingComments = await CommentsModel.create({
+    existingVotes = await VoteModel.create({
       objectId: { id: testDestination1._id, collection: 'Destination' },
-      comments: [newComment._id],
+      upVotes: [testUser1._id],
+      downVotes: [testUser2._id],
     })
 
     testPlanner.destinations.push(testDestination1._id)
@@ -145,10 +140,10 @@ describe('Integration Test: Comment API', () => {
     await app.stopServer()
   })
 
-  describe('perform GET from /comment for destination with existing comments', () => {
-    it('should return OK and get Comments for destination', async () => {
+  describe('perform GET from /vote for destination with existing votes', () => {
+    it('should return OK and get Votes for destination', async () => {
       const response = await request(app.app)
-        .get(`/comment`)
+        .get(`/vote`)
         .query({
           type: 'Destination',
           objectId: testDestination1._id.toString(),
@@ -157,17 +152,19 @@ describe('Integration Test: Comment API', () => {
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0]._id.toString()).toBe(
-        newComment._id.toString(),
+      expect(response.body.data.upVotes).toHaveLength(
+        existingVotes.upVotes.length,
+      )
+      expect(response.body.data.downVotes).toHaveLength(
+        existingVotes.downVotes.length,
       )
     })
   })
 
-  describe('perform GET from /comment for destination with no existing comments', () => {
-    it('should return OK and get Comments for destination', async () => {
+  describe('perform GET from /vote for destination with no existing votes', () => {
+    it('should return OK and get Votes for destination', async () => {
       const response = await request(app.app)
-        .get(`/comment`)
+        .get(`/vote`)
         .query({
           type: 'Destination',
           objectId: testDestination2._id.toString(),
@@ -176,80 +173,154 @@ describe('Integration Test: Comment API', () => {
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data).toHaveLength(0)
+      expect(response.body.data.upVotes).toHaveLength(0)
+      expect(response.body.data.downVotes).toHaveLength(0)
     })
   })
 
-  describe('perform GET from /comment with commentId', () => {
-    it('should return OK and get the Comment', async () => {
+  describe('perform GET from /vote for users', () => {
+    it('should return OK and get Votes for user', async () => {
       const response = await request(app.app)
-        .get(`/comment/${newComment._id.toString()}`)
+        .get(`/vote/${testUser1._id.toString()}`)
+        .query({
+          type: 'Destination',
+          objectId: testDestination1._id.toString(),
+        })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data._id.toString()).toBe(newComment._id.toString())
+      expect(response.body.data.upVoted).toBe(true)
+      expect(response.body.data.downVoted).toBe(false)
     })
-  })
 
-  describe('perform GET from /comment with invalid commentId', () => {
-    it('should return OK and get the Comment', async () => {
+    it('should return OK and get Votes for user', async () => {
       const response = await request(app.app)
-        .get(`/comment/${testDestination1._id.toString()}`)
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.NOT_FOUND)
-
-      expect(response.body.success).toBe(false)
-    })
-  })
-
-  describe('perform POST to /comment', () => {
-    it('should return OK and create the Comment', async () => {
-      const response = await request(app.app)
-        .post(`/comment`)
-        .send({
-          objectId: testActivity1._id.toString(),
-          type: 'Activity',
-          content: 'test',
-          createdBy: testUser1._id.toString(),
+        .get(`/vote/${testUser2._id.toString()}`)
+        .query({
+          type: 'Destination',
+          objectId: testDestination1._id.toString(),
         })
         .expect('Content-Type', /json/)
-        .expect(StatusCodes.CREATED)
+        .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data._id).toBeDefined()
+      expect(response.body.data.upVoted).toBe(false)
+      expect(response.body.data.downVoted).toBe(true)
+    })
+
+    it('should return OK and get Votes for user', async () => {
+      const response = await request(app.app)
+        .get(`/vote/${testUser3._id.toString()}`)
+        .query({
+          type: 'Destination',
+          objectId: testDestination1._id.toString(),
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.OK)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.upVoted).toBe(false)
+      expect(response.body.data.downVoted).toBe(false)
     })
   })
 
-  describe('perform POST to /comment with invalid objectId', () => {
-    it('should return OK and create the Comment', async () => {
+  describe('perform POST to /vote', () => {
+    it('should return OK and create the upVote', async () => {
       const response = await request(app.app)
-        .post(`/comment`)
+        .post(`/vote/up`)
         .send({
           objectId: testDestination1._id.toString(),
-          type: 'Activity',
-          content: 'test',
+          type: 'Destination',
           createdBy: testUser1._id.toString(),
         })
         .expect('Content-Type', /json/)
-        .expect(StatusCodes.NOT_FOUND)
+        .expect(StatusCodes.OK)
 
-      expect(response.body.success).toBe(false)
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.upVotes).toContain(testUser1._id.toString())
+    })
+
+    it('should return OK and change the upVote to downVote', async () => {
+      const response = await request(app.app)
+        .post(`/vote/down`)
+        .send({
+          objectId: testDestination1._id.toString(),
+          type: 'Destination',
+          createdBy: testUser1._id.toString(),
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.OK)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.upVotes).not.toContain(testUser1._id.toString())
+      expect(response.body.data.downVotes).toContain(testUser1._id.toString())
     })
   })
 
-  describe('perform POST to /comment with invalid object type', () => {
-    it('should return OK and create the Comment', async () => {
+  describe('perform DELETE to /vote', () => {
+    it('should return OK and remove the vote for the user', async () => {
       const response = await request(app.app)
-        .post(`/comment`)
+        .delete(`/vote`)
         .send({
           objectId: testDestination1._id.toString(),
-          type: 'Dest',
-          content: 'test',
-          createdBy: testUser1._id.toString(),
+          type: 'Destination',
+        })
+        .query({
+          userId: testUser1._id.toString(),
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.OK)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.upVotes).not.toContain(testUser1._id.toString())
+      expect(response.body.data.downVotes).not.toContain(
+        testUser1._id.toString(),
+      )
+    })
+  })
+
+  it('should return OK and remove the vote for the user', async () => {
+    const response = await request(app.app)
+      .delete(`/vote`)
+      .send({
+        objectId: testDestination1._id.toString(),
+        type: 'Destination',
+      })
+      .query({
+        userId: testUser4._id.toString(),
+      })
+      .expect('Content-Type', /json/)
+      .expect(StatusCodes.OK)
+
+    expect(response.body.success).toBe(true)
+    expect(response.body.data.upVotes).not.toContain(testUser4._id.toString())
+    expect(response.body.data.downVotes).not.toContain(testUser4._id.toString())
+  })
+
+  describe('perform GET from /vote with invalid input', () => {
+    it('should return BAD_REQUEST', async () => {
+      const response = await request(app.app)
+        .get(`/vote`)
+        .query({
+          type: 'Invalid',
+          objectId: testDestination1._id.toString(),
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.BAD_REQUEST)
+
+      expect(response.body.success).toBe(false)
+    })
+
+    it('should return NOT_FOUND', async () => {
+      const response = await request(app.app)
+        .get(`/vote`)
+        .query({
+          type: 'Destination',
+          objectId: testUser1._id.toString(),
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.NOT_FOUND)
 
       expect(response.body.success).toBe(false)
     })

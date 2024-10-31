@@ -5,6 +5,7 @@ import UserService from '../services/user'
 const userRouter = express.Router({ mergeParams: true })
 
 userRouter.post('/', UserValidator.createUser, UserService.createUserDocument)
+
 userRouter.get(
   '/search',
   UserValidator.getUserByUserName,

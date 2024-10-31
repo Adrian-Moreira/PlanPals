@@ -5,5 +5,11 @@ node_modules
 junit.xml
 lambda
 .env
+.sst
 .direnv
 result
+front-end-flutter/planpals/android/app/google-services.json
+front-end-flutter/planpals/ios/Runner/GoogleService-Info.plist
+front-end-flutter/planpals/macos/Runner/GoogleService-Info.plist
+front-end-flutter/planpals/lib/firebase_options.dart
+planner-service/src/services/firebase/auth_key.json

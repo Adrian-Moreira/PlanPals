@@ -9,10 +9,6 @@ const CommentMongoSchema = new Schema<Comment>(
       required: true,
       ref: 'User',
     },
-    title: {
-      type: String,
-      required: true,
-    },
     content: {
       type: String,
       required: true,
@@ -48,7 +44,6 @@ export const CommentSchema = z.object({
   updatedAt: z.string().datetime(),
 
   createdBy: ObjectIdSchema,
-  title: z.string().min(1, 'Title is required'),
   content: z.string().min(1, 'Content is required'),
 })
 
