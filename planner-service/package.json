@@ -6,11 +6,13 @@
   "bin": "out/app.js",
   "scripts": {
     "build": "tsc",
-    "start": "nodemon",
     "debug": "nodemon --inspect=0.0.0.0:9229",
-    "test": "jest --maxWorkers=1"
+    "start": "nodemon",
+    "test": "jest --maxWorkers=1",
+    "sso": "aws sso login --sso-session=pp"
   },
   "dependencies": {
+    "@pulumi/mongodbatlas": "^3.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "http-status-codes": "^2.3.0",
@@ -23,7 +25,7 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@shelf/jest-mongodb": "^4.3.2",
-    "@types/aws-lambda": "^8.10.145",
+    "@types/aws-lambda": "8.10.145",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/mongoose": "^5.11.96",
@@ -36,6 +38,7 @@
     "mongod": "^2.0.0",
     "nodemon": "^3.1.7",
     "sinon": "^19.0.2",
+    "sst": "^3.2.70",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5"
   }
