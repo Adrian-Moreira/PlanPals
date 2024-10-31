@@ -20,7 +20,9 @@ import { TransportModel } from './Transport'
 import { ActivityModel } from './Activity'
 import { AccommodationModel } from './Accommodation'
 import { VoteModel } from './Vote'
-import { CommentModel } from './Comment'
+import { CommentModel, CommentsModel } from './Comment'
+import { DestinationModel } from './Destination'
+import { Document } from 'mongoose'
 
 export const ObjectIdSchema = z
   .instanceof(Types.ObjectId)
@@ -93,44 +95,37 @@ export const PlannerSchema = z.object({
   invites: z.array(ObjectIdSchema).optional(),
 })
 
+export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema)
+
 PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
   const plannerId = this.getQuery()['_id']
+  const plannerObjectId = {
+    objectId: { id: plannerId, collection: 'Planner' },
+  }
 
-  const destinations = await DestinationModel.find({ plannerId })
-  const destinationIds = destinations.map((dest) => dest._id)
+  try {
+    const planner = await PlannerModel.findOne({
+      _id: plannerId,
+    })
 
-  // Delete Destinations
-  await DestinationModel.deleteMany({ plannerId })
+    await Promise.all(
+      planner!.destinations!.map((id: Types.ObjectId) =>
+        DestinationModel.findOneAndDelete({ _id: id }),
+      ),
+    )
 
-  // Delete associated Transports for the Planner
-  await TransportModel.deleteMany({ plannerId })
+    await Promise.all(
+      planner!.transportations!.map((id: Types.ObjectId) =>
+        TransportModel.findOneAndDelete({ _id: id }),
+      ),
+    )
 
-  // Delete associated Activities and Accommodations for each Destination
-  await ActivityModel.deleteMany({ destinationId: { $in: destinationIds } })
-  await AccommodationModel.deleteMany({
-    destinationId: { $in: destinationIds },
-  })
-
-  // Step 4: Delete Votes and Comments associated with the Planner, Destinations, Activities, and Accommodations
-  await VoteModel.deleteMany({
-    $or: [
-      { plannerId },
-      { destinationId: { $in: destinationIds } },
-      { activityId: { $in: destinationIds } },
-      { accommodationId: { $in: destinationIds } },
-    ],
-  })
-
-  await CommentModel.deleteMany({
-    $or: [
-      { plannerId },
-      { destinationId: { $in: destinationIds } },
-      { activityId: { $in: destinationIds } },
-      { accommodationId: { $in: destinationIds } },
-    ],
-  })
-
+    await CommentsModel.findOneAndDelete(plannerObjectId)
+    await VoteModel.findOneAndDelete(plannerObjectId)
+  } catch (err: any) {
+    next(err)
+  }
   next()
 })
-export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema)
+
 export type Planner = z.infer<typeof PlannerSchema>

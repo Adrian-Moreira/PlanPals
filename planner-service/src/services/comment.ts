@@ -112,17 +112,12 @@ const removeCommentDocument = async (
     next(req.body.err)
   }
 
-  commentsDocument.comments = commentsDocument.comments.filter(
-    (cid: any) => cid.toString() != commentId.toString(),
-  )
-
-  await CommentsModel.findOneAndUpdate(
-    { _id: commentsDocument._id },
-    commentsDocument,
-    { new: true },
-  )
-
-  req.body.result = await CommentModel.findOneAndDelete({ _id: commentId })
+  req.body.result = await CommentModel.findOneAndDelete({
+    _id: commentId,
+  }).catch((err) => {
+    req.body.err = err
+    next(req.body.err)
+  })
   req.body.status = StatusCodes.OK
   next()
 }

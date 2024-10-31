@@ -130,18 +130,12 @@ const deleteAccommodationDocument = async (
 ): Promise<void> => {
   const { targetAccommodation, targetDestination } = req.body.out
 
-  targetDestination.accommodation = targetDestination.accommodations.filter(
-    (aid: any) => aid.toString() != targetAccommodation._id.toString(),
-  )
-
-  await DestinationModel.findOneAndUpdate(
-    { _id: targetDestination._id },
-    { accommodations: targetDestination.accommodation },
-    { new: true },
-  )
-
   const deletedAccommodation = await AccommodationModel.findOneAndDelete({
     _id: targetAccommodation._id,
+    destinationId: targetDestination._id,
+  }).catch((err) => {
+    req.body.err = err
+    next(req.body.err)
   })
 
   if (!deletedAccommodation) {

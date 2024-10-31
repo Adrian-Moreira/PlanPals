@@ -125,29 +125,28 @@ const deleteDestinationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { targetDestination, targetPlanner  } = req.body.out;
+  const { targetDestination, targetPlanner } = req.body.out
 
-  try {
-    // Delete the destination and let the middleware handle the cascade deletion
-    const deletedDestination = await DestinationModel.findOneAndDelete({
-      _id: targetDestination._id,
-      plannerId: targetPlanner._id,
-    });
+  const deletedDestination = await DestinationModel.findOneAndDelete({
+    _id: targetDestination._id,
+    plannerId: targetPlanner._id,
+  }).catch((err) => {
+    req.body.err = err
+    next(req.body.err)
+  })
 
-    if (!deletedDestination) {
-      throw new RecordNotFoundException({
-        recordType: 'destination',
-        recordId: targetDestination._id,
-      });
-    }
-
-    req.body.result = deletedDestination;
-    req.body.status = StatusCodes.OK;
-    next();
-  } catch (error) {
-    next(error);
+  if (!deletedDestination) {
+    throw new RecordNotFoundException({
+      recordType: 'destination',
+      recordId: targetDestination._id,
+    })
   }
-};
+
+  req.body.result = deletedDestination
+  req.body.status = StatusCodes.OK
+
+  next()
+}
 /**
  * Retrieves an existing destination document from the database.
  *

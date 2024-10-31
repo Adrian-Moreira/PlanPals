@@ -101,37 +101,26 @@ export const deletePlannerDocument = async (
   next: NextFunction,
 ): Promise<void> => {
   const { targetPlanner } = req.body.out
-  try {
-  // Delete the planner
-  const planner = await PlannerModel.findOneAndDelete({ _id: targetPlanner._id })
-  if (!planner) {
-    return next(new RecordNotFoundException({ recordType: 'planner', recordId: targetPlanner._id }))
-  }
 
-  // Cascade delete related records
-  await DestinationModel.deleteMany({ plannerId: planner._id })
-  await ActivityModel.deleteMany({ destinationId: { $in: planner.destinations } })
-  await AccommodationModel.deleteMany({ destinationId: { $in: planner.destinations } })
-  await VoteModel.deleteMany({
-    $or: [
-      { plannerId: planner._id },
-      { destinationId: { $in: planner.destinations } },
-    ],
+  const planner = await PlannerModel.findOneAndDelete({
+    _id: targetPlanner._id,
+  }).catch((err) => {
+    req.body.err = err
+    next(req.body.err)
   })
-  await CommentModel.deleteMany({
-    $or: [
-      { plannerId: planner._id },
-      { destinationId: { $in: planner.destinations } },
-    ],
-  })
+
+  if (!planner) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'planner',
+      recordId: targetPlanner._id,
+    })
+    next(req.body.err)
+  }
 
   req.body.result = planner
   req.body.status = StatusCodes.OK
   next()
-}catch (error) {
-  next(error);
 }
-} 
 /**
  * Retrieves all planner documents for a given user ID.
  *
@@ -150,17 +139,16 @@ export const getPlannerDocumentsByUserId = async (
 
   let resultPlanners
 
-  if (access) {
-    switch (access) {
-      case 'rw':
-        resultPlanners = await PlannerModel.find({ rwUsers: targetUser._id })
-        break
-      case 'ro':
-        resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })
-        break
-    }
-  } else {
-    resultPlanners = await PlannerModel.find({ createdBy: targetUser._id })
+  switch (access) {
+    case 'rw':
+      resultPlanners = await PlannerModel.find({ rwUsers: targetUser._id })
+      break
+    case 'ro':
+      resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })
+      break
+    default:
+      resultPlanners = await PlannerModel.find({ createdBy: targetUser._id })
+      break
   }
 
   if (!resultPlanners || resultPlanners.length === 0) {
@@ -174,7 +162,6 @@ export const getPlannerDocumentsByUserId = async (
   req.body.result = resultPlanners
   req.body.status = StatusCodes.OK
   next()
-  
 }
 
 /**

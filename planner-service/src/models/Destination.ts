@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { ObjectIdSchema } from './Planner'
-import mongoose, { Schema } from 'mongoose'
+import { ObjectIdSchema, PlannerModel } from './Planner'
+import mongoose, { Schema, Types } from 'mongoose'
 import { ActivityModel } from './Activity'
 import { AccommodationModel } from './Accommodation'
 import { VoteModel } from './Vote'
-import { CommentModel } from './Comment'
+import { CommentModel, CommentsModel } from './Comment'
 
 const DestinationMongoSchema = new Schema<Destination>(
   {
@@ -61,28 +61,48 @@ export const DestinationSchema = z.object({
   plannerId: ObjectIdSchema,
 })
 
-
-
-// Middleware to handle cascade deletion when a Destination is deleted
-DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
-  console.log('Cascade deletion middleware triggered for Destination');
-  const destinationId = this.getQuery()["_id"];
-
-  if (!destinationId) {
-    return next(new Error('Destination ID is required for cascade deletion'));
-  }
-  // Delete all associated Activities and Accommodations
-  await ActivityModel.deleteMany({ destinationId });
-  await AccommodationModel.deleteMany({ destinationId });
-
-  // Delete Votes and Comments associated with the Destination
-  await VoteModel.deleteMany({ destinationId });
-  await CommentModel.deleteMany({ destinationId });
-
-  next();
-});
 export const DestinationModel = mongoose.model<Destination>(
   'Destination',
   DestinationMongoSchema,
 )
+
+DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
+  const destinationId = this.getQuery()['_id']
+  const plannerId = this.getQuery()['plannerId']
+  const destinationObjectId = {
+    objectId: { id: destinationId, collection: 'Destination' },
+  }
+
+  try {
+    const destination = await DestinationModel.findOne({
+      _id: destinationId,
+    })
+
+    await PlannerModel.findOneAndUpdate(
+      { _id: plannerId },
+      { $pull: { destinations: destinationId } },
+      { new: true },
+    )
+
+    await Promise.all(
+      destination!.activities.map((id: Types.ObjectId) =>
+        ActivityModel.findOneAndDelete({ _id: id }),
+      ),
+    )
+
+    await Promise.all(
+      destination!.accommodations.map((id: Types.ObjectId) =>
+        AccommodationModel.findOneAndDelete({ _id: id }),
+      ),
+    )
+
+    await CommentsModel.findOneAndDelete(destinationObjectId)
+    await VoteModel.findOneAndDelete(destinationObjectId)
+  } catch (err: any) {
+    next(err)
+  }
+
+  next()
+})
+
 export type Destination = z.infer<typeof DestinationSchema>
