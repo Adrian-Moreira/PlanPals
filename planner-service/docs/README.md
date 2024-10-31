@@ -865,7 +865,7 @@ Introduction: to be generated
 
   | Parameter  | Type   | Required | Description                             |
   | ---------- | ------ | -------- | --------------------------------------- |
-  | `type`     | string | Yes      | The type of the object (e.g., 'post').  |
+  | `type`     | string | Yes      | The type of the object.  |
   | `objectId` | string | Yes      | The ID of the object.                   |
 
 - **Response:**
@@ -884,7 +884,6 @@ Introduction: to be generated
   | `type`      | string | Yes      | The type of the object.                  |
   | `objectId`  | string | Yes      | The ID of the object.                    |
   | `createdBy` | string | Yes      | ID of the user creating the comment.     |
-  | `title`     | string | Yes      | Title of the comment.                    |
   | `content`   | string | Yes      | Content of the comment.                  |
 
 - **Response:**

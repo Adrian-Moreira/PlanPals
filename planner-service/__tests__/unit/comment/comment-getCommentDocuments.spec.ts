@@ -26,7 +26,6 @@ describe('Comment->getCommentDocuments', () => {
 
   const existingComment = {
     createdBy: targetUser._id,
-    title: 'test',
     content: 'test',
     _id: new Types.ObjectId('671d119e14be184dbc5c0d90'),
   }
@@ -69,7 +68,6 @@ describe('Comment->getCommentDocuments', () => {
 
     commentMock.verify()
     expect(req.body.result).toBeDefined()
-    expect(req.body.result[0].title).toEqual('test')
     expect(req.body.result[0].content).toEqual('test')
     expect(req.body.status).toEqual(StatusCodes.OK)
   })

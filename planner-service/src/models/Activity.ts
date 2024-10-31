@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
-import { DestinationModel } from './Destination'
 
 const ActivityMongoSchema = new Schema<Activity>(
   {
