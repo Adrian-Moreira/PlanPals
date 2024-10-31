@@ -1,0 +1,17 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      atlasOwnerUsername:
+        description: 'My email address'
+        default: ${{ secrets.MONGODB_ATLAS_OWNER_USERNAME }}
+        required: true
+        type: string
+
+jobs:
+  deploy-me-daddy:
+    runs-on: ubuntu-latest # EWW
+    steps:
+      - name: Do Stuff
+        run: echo "Hello ${{ inputs.atlasOwnerUsername }}"
