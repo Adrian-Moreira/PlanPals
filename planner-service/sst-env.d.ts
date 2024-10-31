@@ -10,5 +10,10 @@ declare module "sst" {
       "bastion": string
       "type": "sst.aws.Vpc"
     }
+    "PlanPalsService": {
+      "service": string
+      "type": "sst.aws.Service"
+      "url": string
+    }
   }
 }

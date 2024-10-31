@@ -8,7 +8,8 @@
     "build": "tsc",
     "debug": "nodemon --inspect=0.0.0.0:9229",
     "start": "nodemon",
-    "test": "jest --maxWorkers=1"
+    "test": "jest --maxWorkers=1",
+    "sso": "aws sso login --sso-session=pp"
   },
   "dependencies": {
     "@pulumi/mongodbatlas": "^3.20.3",
@@ -18,7 +19,6 @@
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.0",
     "planner-service": "file:",
-    "sst": "3.2.67",
     "ts-node": "^10.9.2",
     "zod": "^3.23.8"
   },
@@ -38,6 +38,7 @@
     "mongod": "^2.0.0",
     "nodemon": "^3.1.7",
     "sinon": "^19.0.2",
+    "sst": "^3.2.70",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5"
   }
