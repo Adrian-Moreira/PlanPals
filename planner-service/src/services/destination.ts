@@ -13,6 +13,7 @@ import { PlannerModel } from '../models/Planner'
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
+ * @throws {RecordNotFoundException} If the destination does not exist.
  */
 async function verifyDestinationExists(
   req: Request,
@@ -124,28 +125,29 @@ const deleteDestinationDocument = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { targetDestination, targetPlanner } = req.body.out
+  const { targetDestination, targetPlanner  } = req.body.out;
 
-  targetPlanner.destinations = targetPlanner.destinations.filter(
-    (did: any) => did.toString() != targetDestination._id.toString(),
-  )
+  try {
+    // Delete the destination and let the middleware handle the cascade deletion
+    const deletedDestination = await DestinationModel.findOneAndDelete({
+      _id: targetDestination._id,
+      plannerId: targetPlanner._id,
+    });
 
-  await PlannerModel.findOneAndUpdate(
-    { _id: targetPlanner._id },
-    { destinations: targetPlanner.destinations },
-    { new: true },
-  )
+    if (!deletedDestination) {
+      throw new RecordNotFoundException({
+        recordType: 'destination',
+        recordId: targetDestination._id,
+      });
+    }
 
-  const deletedDestination = await DestinationModel.findOneAndDelete({
-    _id: targetDestination._id,
-  })
-
-  req.body.result = deletedDestination
-  req.body.status = StatusCodes.OK
-
-  next()
-}
-
+    req.body.result = deletedDestination;
+    req.body.status = StatusCodes.OK;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 /**
  * Retrieves an existing destination document from the database.
  *

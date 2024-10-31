@@ -2,6 +2,12 @@ import { PlannerModel } from '../models/Planner'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import { DestinationModel } from '../models/Destination'
+import { TransportModel } from '../models/Transport'
+import { ActivityModel } from '../models/Activity'
+import { AccommodationModel } from '../models/Accommodation'
+import { VoteModel } from '../models/Vote'
+import { CommentModel } from '../models/Comment'
 
 /**
  * Creates a new planner document in the database.
@@ -95,14 +101,37 @@ export const deletePlannerDocument = async (
   next: NextFunction,
 ): Promise<void> => {
   const { targetPlanner } = req.body.out
-  const planner = await PlannerModel.findOneAndDelete({
-    _id: targetPlanner._id,
+  try {
+  // Delete the planner
+  const planner = await PlannerModel.findOneAndDelete({ _id: targetPlanner._id })
+  if (!planner) {
+    return next(new RecordNotFoundException({ recordType: 'planner', recordId: targetPlanner._id }))
+  }
+
+  // Cascade delete related records
+  await DestinationModel.deleteMany({ plannerId: planner._id })
+  await ActivityModel.deleteMany({ destinationId: { $in: planner.destinations } })
+  await AccommodationModel.deleteMany({ destinationId: { $in: planner.destinations } })
+  await VoteModel.deleteMany({
+    $or: [
+      { plannerId: planner._id },
+      { destinationId: { $in: planner.destinations } },
+    ],
   })
+  await CommentModel.deleteMany({
+    $or: [
+      { plannerId: planner._id },
+      { destinationId: { $in: planner.destinations } },
+    ],
+  })
+
   req.body.result = planner
   req.body.status = StatusCodes.OK
   next()
+}catch (error) {
+  next(error);
 }
-
+} 
 /**
  * Retrieves all planner documents for a given user ID.
  *
@@ -145,6 +174,7 @@ export const getPlannerDocumentsByUserId = async (
   req.body.result = resultPlanners
   req.body.status = StatusCodes.OK
   next()
+  
 }
 
 /**
