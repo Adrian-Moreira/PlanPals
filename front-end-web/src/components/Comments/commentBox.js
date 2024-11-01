@@ -7,6 +7,8 @@ import CommentForm from './commentForm';
 import axios from "axios"; // Import axios for API calls
 import { useAuth } from "../../AuthContext";
 
+const POLL_RATE = 2000
+
 const CommentBox = ({objectId, objectType}) => {
 
     const [commentData, setComments] = useState([]);
@@ -66,6 +68,7 @@ const CommentBox = ({objectId, objectType}) => {
 
 
         loadCommentsFromServer();
+        setInterval(loadCommentsFromServer, POLL_RATE)
     }, [])
 
 
