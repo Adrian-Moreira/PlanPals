@@ -94,9 +94,13 @@ export default $config({
     cluster.addService('PlanPalsService', {
       link: [atlasCluster, bucket],
       loadBalancer: {
+        domain: {
+          name: 'api.ppapp.xyz',
+        },
         ports: [
           // { listen: '80/http', forward: '3000/http', container: 'planpals-ui' },
           { listen: '80/http', forward: '8080/http', container: 'planner-service' },
+          { listen: '443/https', forward: '8080/http', container: 'planner-service' },
         ],
       },
       containers: [
