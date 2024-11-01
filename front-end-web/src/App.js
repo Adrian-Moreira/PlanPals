@@ -14,9 +14,6 @@ import Planner from "./pages/planner";
 import Login from "./pages/Login"; // Import the Login page
 import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute
 
-//DELETE ME
-import CommentTest from "./pages/commentTest";
-
 function App() {
   return (
     <Router>
@@ -27,8 +24,6 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/planners" element={<Planners />} />
           <Route path="/planner/:access/:plannerId" element={<Planner />} />
-
-          <Route path="/debug" element={<CommentTest />} /> 
       </Routes>
     </Router>
     
