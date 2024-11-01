@@ -10,8 +10,6 @@ import 'package:planpals/features/travel_planner/views/components/Forms/create/c
 import 'package:planpals/features/travel_planner/views/components/Forms/update/update_destination_form.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/accommodation_card.dart';
 import 'package:planpals/features/travel_planner/views/components/cards/activity_card.dart';
-import 'package:planpals/features/vote/vote_model.dart';
-import 'package:planpals/features/vote/vote_viewmodel.dart';
 import 'package:planpals/shared/components/delete_message.dart';
 import 'package:planpals/shared/components/generic_card.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
@@ -23,10 +21,10 @@ class DestinationCard extends StatefulWidget {
   final bool functional;
 
   const DestinationCard({
-    Key? key,
+    super.key,
     required this.destination,
     required this.functional,
-  }) : super(key: key);
+  });
 
   @override
   State<DestinationCard> createState() => _DestinationCardState();
@@ -36,25 +34,24 @@ class _DestinationCardState extends State<DestinationCard> {
   late User user;
   late Destination destination;
 
-  final PlannerViewModel _plannerViewModel = PlannerViewModel();
-
   @override
   void initState() {
     super.initState();
 
     destination = widget.destination;
+    final PlannerViewModel plannerViewModel = PlannerViewModel();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       user = Provider.of<UserViewModel>(context, listen: false)
           .currentUser!; // get user from provider
-      await _plannerViewModel.fetchAccommodationsByDestinationId(
+      await plannerViewModel.fetchAccommodationsByDestinationId(
           destination.plannerId, destination.destinationId, user.id);
-      await _plannerViewModel.fetchActivitiesByDestinationId(
+      await plannerViewModel.fetchActivitiesByDestinationId(
           destination.plannerId, destination.destinationId, user.id);
 
       setState(() {
-        destination.accommodationList = _plannerViewModel.accommodations;
-        destination.activityList = _plannerViewModel.activities;
+        destination.accommodationList = plannerViewModel.accommodations;
+        destination.activityList = plannerViewModel.activities;
       });
     });
   }
@@ -63,6 +60,9 @@ class _DestinationCardState extends State<DestinationCard> {
   Widget build(BuildContext context) {
     final User? user =
         Provider.of<UserViewModel>(context, listen: false).currentUser;
+
+    final PlannerViewModel _plannerViewModel =
+        Provider.of<PlannerViewModel>(context, listen: false);
 
     Destination destination = widget.destination;
 
@@ -124,65 +124,68 @@ class _DestinationCardState extends State<DestinationCard> {
       ),
       children: [
         // Display Accommodations
-        GenericListView(
-          itemList: destination.accommodationList,
-          itemBuilder: (accommodation) => AccommodationCard(
-            destination: destination,
-            accommodation: accommodation,
-            functional: widget.functional,
-          ),
-          functional: widget.functional,
-          headerTitle: "Accommodations",
-          headerIcon: Icons.hotel,
-          emptyMessage: "No Accommodations",
-          onAdd: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    CreateAccommodationForm(destination: destination),
-              ),
-            );
-          },
-          headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          headerIconSize: 25,
-        ),
+        _buildAccommodationList(destination.accommodationList),
+
+        const SizedBox(height: 15),
 
         // Display Activities
-        GenericListView(
-          itemList: destination.activityList,
-          itemBuilder: (activity) => ActivityCard(
-            destination: destination,
-            activity: activity,
-            onEdit: () {},
-            onDelete: () {},
-            functional: widget.functional,
-          ),
-          functional: widget.functional,
-          headerTitle: "Activities",
-          headerIcon: Icons.event,
-          emptyMessage: "No Activities",
-          onAdd: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    CreateActivityForm(destination: destination),
-              ),
-            );
-          },
-          headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          headerIconSize: 25,
-        ),
+        _buildActivityList(destination.activityList),
 
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }
 
-  @override
-  void dispose() {
-    _plannerViewModel.dispose();
-    super.dispose();
+  Widget _buildAccommodationList(List<Accommodation> accommodations) {
+    return GenericListView(
+      itemList: destination.accommodationList,
+      itemBuilder: (accommodation) => AccommodationCard(
+        destination: destination,
+        accommodation: accommodation,
+        functional: widget.functional,
+      ),
+      functional: widget.functional,
+      headerTitle: "Accommodations",
+      headerIcon: Icons.hotel,
+      emptyMessage: "No Accommodations",
+      onAdd: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                CreateAccommodationForm(destination: destination),
+          ),
+        );
+      },
+      headerStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+      headerIconSize: 25,
+    );
+  }
+
+  Widget _buildActivityList(List<Activity> activities) {
+    return GenericListView(
+      itemList: destination.activityList,
+      itemBuilder: (activity) => ActivityCard(
+        destination: destination,
+        activity: activity,
+        onEdit: () {},
+        onDelete: () {},
+        functional: widget.functional,
+      ),
+      functional: widget.functional,
+      headerTitle: "Activities",
+      headerIcon: Icons.event,
+      emptyMessage: "No Activities",
+      onAdd: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateActivityForm(destination: destination),
+          ),
+        );
+      },
+      headerStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+      headerIconSize: 25,
+    );
   }
 }

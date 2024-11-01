@@ -19,8 +19,8 @@ class CreateActivityForm extends StatefulWidget {
 class _CreateActivityFormState extends State<CreateActivityForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _activityNameController = TextEditingController();
+  final TextEditingController _activityDurationController = TextEditingController();
   DateTime? _selectedDate;
-  String? _selectedDuration; // Store the time as a string
 
   @override
   Widget build(BuildContext context) {
@@ -71,17 +71,19 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
 
               // Time Field
               TextFormField(
+                controller: _activityDurationController,
                 decoration: const InputDecoration(labelText: 'Duration in Minutes'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the duration';
                   }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
                   return null;
                 },
-                onChanged: (value) {
-                  _selectedDuration = value;
-                },
+
               ),
 
               const SizedBox(height: 20), // Margin
@@ -97,9 +99,10 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
 
                     newActivity = await plannerViewModel.addActivity(
                       Activity(
+                        activityId: '',
                         name: _activityNameController.text,
                         startDate: _selectedDate!,
-                        duration: double.parse(_selectedDuration!),
+                        duration: double.parse(_activityDurationController.text),
                         destinationId: destination.destinationId,
                         createdBy: user!.id, 
                         location: '',

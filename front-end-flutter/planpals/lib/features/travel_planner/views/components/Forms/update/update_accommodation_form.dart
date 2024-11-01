@@ -127,22 +127,7 @@ class _UpdateAccommodationFormState extends State<UpdateAccommodationForm> {
                       return;
                     }
 
-
-                    // // Create Updated Accommodoation
-                    // final Accommodation updatedAccommodation = 
-                    // Accommodation(
-                    //   accommodationId: accommodation.accommodationId,
-                    //   destinationId: destination.destinationId,
-                    //   name: _nameController.text,
-                    //   address: _addressController.text,
-                    //   checkInDate: _checkIn!,
-                    //   checkOutDate: _checkOut!,
-                    // );
-
-                    // // Update Accommodation
-                    // await plannerViewModel.updateAccommodation(updatedAccommodation, destination.plannerId, user.id);
-
-                    Accommodation? updatedAccommodation = await plannerViewModel.updateAccommodation(
+                    await plannerViewModel.updateAccommodation(
                       Accommodation(
                         accommodationId: accommodation.accommodationId,
                         destinationId: destination.destinationId,
@@ -156,18 +141,15 @@ class _UpdateAccommodationFormState extends State<UpdateAccommodationForm> {
                       user.id
                     );
 
-                    if (updatedAccommodation != null) {
+                    if (plannerViewModel.errorMessage != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Accommodation Updated')),
+                        SnackBar(content: Text(plannerViewModel.errorMessage!)),
                       );
-                      
-                      destination.updateAnAccommodation(updatedAccommodation);  // Update the Accommodation in the Destination
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to update accommodation')),
+                        const SnackBar(content: Text('Accommodation updated successfully!')),
                       );
                     }
-
 
                     // Close the form screen
                     Navigator.pop(context);

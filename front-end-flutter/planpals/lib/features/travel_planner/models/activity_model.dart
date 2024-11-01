@@ -2,7 +2,7 @@ import 'package:planpals/features/vote/vote_model.dart';
 import 'package:planpals/shared/utils/date_utils.dart';
 
 class Activity {
-  final String? activityId;
+  final String activityId;
   final String destinationId;
   final String createdBy;
   String name;
@@ -12,7 +12,7 @@ class Activity {
   Vote vote;
 
   Activity({
-    this.activityId,
+    required this.activityId,
     required this.createdBy,
     required this.destinationId,
     required this.name,
@@ -20,13 +20,13 @@ class Activity {
     required this.duration,
     required this.location,
     Vote? vote, // make this parameter nullable
-  }) : vote = vote ?? Vote(createdBy: createdBy, id: '', objectId: destinationId, type: 'Destination', upVotes: [], downVotes: []);
+  }) : vote = vote ?? Vote(createdBy: createdBy, id: '', objectId: activityId, type: 'Activity', upVotes: [], downVotes: []);
 
   // Factory method to create Activity from JSON
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
       createdBy: json['createdBy'],
-      activityId: json['activityId'],
+      activityId: json['_id'],
       destinationId: json['destinationId'],
       name: json['name'],
       startDate: DateTime.parse(json['startDate']),

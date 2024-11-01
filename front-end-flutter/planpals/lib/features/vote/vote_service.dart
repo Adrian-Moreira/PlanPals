@@ -40,10 +40,8 @@ class VoteService {
   /// [type] - The type of the object.
   Future<Vote> fetchVote(Vote vote) async {
     try {
-      print('FETCHING VOTE: $vote');
       final response = await _apiService.get('/vote?objectId=${vote.objectId}&type=${vote.type}');
       vote.updateFromJson(jsonDecode(response.body)['data']);
-      print('FETCHED VOTE: $vote');
       return vote;
     } catch (e) {
       throw Exception('Failed to fetch vote: $e');
@@ -64,10 +62,8 @@ class VoteService {
   /// [vote] - The vote data to upvote with.
   Future<Vote> upVote(Vote vote) async {
     try {
-      print('VOTE SERVICE, UPVOTING: $vote');
       final response = await _apiService.post('/vote/up', vote.toJson());
       vote.updateFromJson(jsonDecode(response.body)['data']);
-      print('VOTE SERVICE, UPVOTED: $vote');
       return vote;
     } catch (e) {
       throw Exception('Failed to upvote: $e');

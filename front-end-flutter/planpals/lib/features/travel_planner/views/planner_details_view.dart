@@ -57,7 +57,6 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
 
   Widget _buildPlanner(BuildContext context, Planner planner) {
     PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
-    print('ISLOADING: ${plannerViewModel.isLoading}');
 
     List<Destination> destinations = plannerViewModel.destinations;
     List<Transport> transportations = plannerViewModel.transports;
@@ -184,24 +183,9 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                           ],
                         ),
                       ),
-                      GenericListView(
-                        itemList: destinations,
-                        itemBuilder: (destination) => DestinationCard(
-                          destination: destination,
-                          functional: functional,
-                        ),
-                        onAdd: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      CreateDestinationForm(planner: planner)));
-                        },
-                        headerTitle: "Destinations",
-                        headerIcon: Icons.landscape,
-                        emptyMessage: "There is no destination",
-                        functional: functional,
-                      ),
+                      
+                      _buildDestinationList(destinations),
+
                       const SizedBox(
                         height: 20,
                       ),
@@ -209,26 +193,9 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                       const SizedBox(
                         height: 10,
                       ),
-                      GenericListView(
-                        itemList: transportations,
-                        itemBuilder: (transport) => TransportCard(
-                          transport: transport,
-                          functional: functional,
-                        ),
-                        onAdd: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateTransportForm(
-                                        planner: planner,
-                                      )));
-                        },
-                        headerTitle: "Transportations",
-                        headerIcon: Icons.emoji_transportation,
-                        emptyMessage: "There is no transportation",
-                        functional: functional,
-                        scrollable: false,
-                      ),
+                      
+                      _buildTransportationList(transportations),
+
                       const SizedBox(
                         height: 20,
                       ),
@@ -245,5 +212,46 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
               ),
             ],
           );
+  }
+
+  Widget _buildDestinationList(List<Destination> destinations) {
+    return GenericListView(
+      itemList: destinations,
+      itemBuilder: (destination) => DestinationCard(
+        destination: destination,
+        functional: functional,
+      ),
+      onAdd: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CreateDestinationForm(planner: planner)));
+      },
+      headerTitle: "Destinations",
+      headerIcon: Icons.landscape,
+      emptyMessage: "There is no destination",
+      functional: functional,
+    );
+  }
+
+  Widget _buildTransportationList(List<Transport> transportations) {
+    return GenericListView(
+      itemList: transportations,
+      itemBuilder: (transportation) => TransportCard(
+        transport: transportation,
+        functional: functional,
+      ),
+      onAdd: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CreateTransportForm(planner: planner)));
+      },
+      headerTitle: "Transportations",
+      headerIcon: Icons.emoji_transportation,
+      emptyMessage: "There is no transportation",
+      functional: functional,
+      scrollable: false,
+    );
   }
 }

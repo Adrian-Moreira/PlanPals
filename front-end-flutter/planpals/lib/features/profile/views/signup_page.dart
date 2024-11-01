@@ -125,6 +125,20 @@ class _SignUpPageState extends State<SignUpPage> {
                         );
                         userViewModel.addUser(user);
 
+                        if (userViewModel.errorMessage != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to sign up.'),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Successfully signed up.'),
+                            ),
+                          );
+                        }
+
                         // Navigate to the home page
                         Navigator.pushReplacementNamed(context, '/login');
                       

@@ -40,6 +40,12 @@ class TransportCard extends StatelessWidget {
             builder: (context) => DeleteMessage(onDelete: () {
                   // Delete Transport
                   plannerViewModel.deleteTransport(transport, user.id);
+
+                  // Show Snackbar based on success or error
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(plannerViewModel.errorMessage ??
+                        'Transportation deleted successfully!'),
+                  ));
                 }));
       },
       onEdit: () {
@@ -49,9 +55,9 @@ class TransportCard extends StatelessWidget {
             builder: (context) => UpdateTransportForm(transport: transport),
           ),
         );
-      }, 
+      },
       vote: transport.vote,
       functional: functional,
     );
-    }
+  }
 }

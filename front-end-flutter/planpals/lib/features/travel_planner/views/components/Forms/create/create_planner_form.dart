@@ -119,7 +119,10 @@ class _CreatePlannerFormState extends State<CreatePlannerForm> {
                       }
 
                       // Set description if empty
-                      _descriptionController.text = _descriptionController.text == '' ? "No Description" : _descriptionController.text;
+                      _descriptionController.text =
+                          _descriptionController.text == ''
+                              ? "No Description"
+                              : _descriptionController.text;
 
                       Planner newPlanner = Planner(
                           plannerId: '',
@@ -133,21 +136,27 @@ class _CreatePlannerFormState extends State<CreatePlannerForm> {
                           destinations: [],
                           transportations: []);
 
-                      try {
-                        newPlanner = await viewModel.addPlanner(newPlanner);
-                      } catch (e) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString())));
-                      }
+                      newPlanner = await viewModel.addPlanner(newPlanner);
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              PlannerDetailsView(travelPlanner: newPlanner),
-                        ),
-                      );
+                      if (viewModel.errorMessage != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(viewModel.errorMessage!)),
+                        );
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Travel plan created successfully!'),
+                          ),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PlannerDetailsView(travelPlanner: newPlanner),
+                          ),
+                        );
+                      }
                     },
                     child: const Text('Create Travel Plan'),
                   ),
