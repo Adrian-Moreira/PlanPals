@@ -4,12 +4,9 @@ import { StatusCodes } from 'http-status-codes'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { BasicUser, UserModel } from '../models/User'
+import { db } from '../config/db'
 
-const verifyUserExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> => {
+const verifyUserExists = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   let { userId, createdBy }: { userId: any; createdBy: any } = req.body.out
   userId ||= createdBy // Assuming either userId or createdBy is provided
 
@@ -36,13 +33,10 @@ const verifyUserExists = async (
  *
  * @throws {RecordConflictException} If the user already exists.
  */
-const createUserDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> => {
+const createUserDocument = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const newUser: BasicUser = req.body.out as BasicUser
-  const userCreated = await UserModel.create(newUser).catch(() => {
+  const userCreated = await UserModel.create(newUser).catch((err) => {
+    console.log(err)
     req.body.err = new RecordConflictException({
       requestType: 'createUser',
       conflict: 'User already exists',
@@ -63,23 +57,15 @@ const createUserDocument = async (
  *
  * @throws {RecordConflictException} If the user already exists.
  */
-const updateUserDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> => {
+const updateUserDocument = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const { targetUser, userName, preferredName } = req.body.out
 
-  const userUpdated = await UserModel.findOneAndUpdate(
-    { _id: targetUser._id },
-    {
-      userName,
-      preferredName,
-    },
-    {
-      new: true,
-    },
-  ).catch((err) => {
+  targetUser.userName = userName || targetUser.userName
+  targetUser.preferredName = preferredName || targetUser.preferredName
+
+  const userUpdated = await UserModel.findOneAndUpdate({ _id: targetUser._id }, targetUser, {
+    new: true,
+  }).catch((err) => {
     req.body.err = new RecordConflictException({
       requestType: 'updateUser',
       conflict: 'User with name ' + userName + ' already exists ' + err.message,
@@ -110,11 +96,7 @@ const updateUserDocument = async (
  *
  * @throws {RecordNotFoundException} If the user does not exist.
  */
-const deleteUserDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> => {
+const deleteUserDocument = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const { targetUser } = req.body.out
   const userDeleted = await UserModel.findOneAndDelete({ _id: targetUser._id })
 
@@ -133,11 +115,7 @@ const deleteUserDocument = async (
  *
  * @throws {RecordNotFoundException} If the user does not exist.
  */
-const getUserDocumentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> => {
+const getUserDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const { targetUser } = req.body.out
   req.body.result = targetUser
   req.body.status = StatusCodes.OK
@@ -153,11 +131,7 @@ const getUserDocumentById = async (
  *
  * @throws {RecordNotFoundException} If the user does not exist.
  */
-const getUserDocumentByName = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<any> => {
+const getUserDocumentByName = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const { userName }: { userName: string } = req.body.out
   const user = await UserModel.findOne({ userName })
   if (!user) {

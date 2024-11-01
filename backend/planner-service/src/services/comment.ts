@@ -14,11 +14,7 @@ import { StatusCodes } from 'http-status-codes'
  *
  * @throws {RecordNotFoundException} If the object does not exist.
  */
-export async function findOrCreateCommentsDocument(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function findOrCreateCommentsDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { type, objectId } = req.body.out
   let commentsDocument = await CommentsModel.findOne({
     objectId: { id: objectId, collection: type },
@@ -43,11 +39,7 @@ export async function findOrCreateCommentsDocument(
  *
  * @throws {RecordNotFoundException} If the comments document does not exist.
  */
-const createCommentDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const createCommentDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetUser, title, content, commentsDocument } = req.body.out
   const commentDocument = await CommentModel.create({
     createdBy: targetUser._id,
@@ -58,11 +50,7 @@ const createCommentDocument = async (
   if (!commentsDocument.comments.includes(commentDocument._id)) {
     commentsDocument.comments.push(commentDocument._id)
   }
-  await CommentsModel.findOneAndUpdate(
-    { _id: commentsDocument._id },
-    commentsDocument,
-    { new: true },
-  )
+  await CommentsModel.findOneAndUpdate({ _id: commentsDocument._id }, commentsDocument, { new: true })
 
   req.body.result = commentDocument
   req.body.status = StatusCodes.CREATED
@@ -80,11 +68,7 @@ const createCommentDocument = async (
  * @throws {RecordNotFoundException} If the comment document does not exist.
  * @throws {RecordNotFoundException} If the user does not own the comment.
  */
-const removeCommentDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const removeCommentDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { commentId, targetUser, commentsDocument } = req.body.out
 
   const targetComment = await CommentModel.findOne({ _id: commentId })
@@ -125,18 +109,10 @@ const removeCommentDocument = async (
  *
  * @throws {RecordNotFoundException} If the comments document does not exist.
  */
-const getCommentsByObjectId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getCommentsByObjectId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { commentsDocument } = req.body.out
-  const comments = commentsDocument.comments.map((cid: any) =>
-    CommentModel.findById(cid),
-  )
-  req.body.result = await Promise.all(comments).then((results) =>
-    results.filter((comment) => comment !== null),
-  )
+  const comments = commentsDocument.comments.map((cid: any) => CommentModel.findById(cid))
+  req.body.result = await Promise.all(comments).then((results) => results.filter((comment) => comment !== null))
   req.body.status = StatusCodes.OK
   next()
 }
@@ -150,11 +126,7 @@ const getCommentsByObjectId = async (
  *
  * @throws {RecordNotFoundException} If the comment document does not exist.
  */
-const getCommentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getCommentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { commentId } = req.body.out
   const comment = await CommentModel.findById(commentId)
   if (!comment) {

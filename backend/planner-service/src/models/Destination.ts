@@ -4,7 +4,7 @@ import mongoose, { Schema, Types } from 'mongoose'
 import { ActivityModel } from './Activity'
 import { AccommodationModel } from './Accommodation'
 import { VoteModel } from './Vote'
-import { CommentModel, CommentsModel } from './Comment'
+import { CommentsModel } from './Comment'
 
 const DestinationMongoSchema = new Schema<Destination>(
   {
@@ -76,22 +76,14 @@ DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
       _id: destinationId,
     })
 
-    await PlannerModel.findOneAndUpdate(
-      { _id: plannerId },
-      { $pull: { destinations: destinationId } },
-      { new: true },
-    )
+    await PlannerModel.findOneAndUpdate({ _id: plannerId }, { $pull: { destinations: destinationId } }, { new: true })
     await Promise.all(
-      destination!.activities.map(
-        async (id: Types.ObjectId) =>
-          await ActivityModel.findOneAndDelete({ _id: id }),
-      ),
+      destination!.activities.map(async (id: Types.ObjectId) => await ActivityModel.findOneAndDelete({ _id: id })),
     )
 
     await Promise.all(
       destination!.accommodations.map(
-        async (id: Types.ObjectId) =>
-          await AccommodationModel.findOneAndDelete({ _id: id }),
+        async (id: Types.ObjectId) => await AccommodationModel.findOneAndDelete({ _id: id }),
       ),
     )
   } catch (err: any) {
@@ -101,9 +93,6 @@ DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
   next()
 })
 
-export const DestinationModel = mongoose.model<Destination>(
-  'Destination',
-  DestinationMongoSchema,
-)
+export const DestinationModel = mongoose.model<Destination>('Destination', DestinationMongoSchema)
 
 export type Destination = z.infer<typeof DestinationSchema>

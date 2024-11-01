@@ -53,11 +53,5 @@ destinationRouter.delete(
   DestinationService.deleteDestinationDocument,
 )
 
-destinationRouter.use(
-  '/:destinationId([0-9a-fA-F]{24})/accommodation',
-  accommodationRouter,
-)
-destinationRouter.use(
-  '/:destinationId([0-9a-fA-F]{24})/activity',
-  activityRouter,
-)
+destinationRouter.use('/:destinationId([0-9a-fA-F]{24})/accommodation', accommodationRouter)
+destinationRouter.use('/:destinationId([0-9a-fA-F]{24})/activity', activityRouter)

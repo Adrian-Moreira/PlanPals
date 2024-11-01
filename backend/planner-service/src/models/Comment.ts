@@ -91,15 +91,9 @@ CommentMongoSchema.pre('findOneAndDelete', async function (next) {
   }
 })
 
-export const CommentModel = mongoose.model<Comment>(
-  'Comment',
-  CommentMongoSchema,
-)
+export const CommentModel = mongoose.model<Comment>('Comment', CommentMongoSchema)
 
-export const CommentsModel = mongoose.model<Comments>(
-  'Comments',
-  CommentsMongoSchema,
-)
+export const CommentsModel = mongoose.model<Comments>('Comments', CommentsMongoSchema)
 
 export type Comment = z.infer<typeof CommentSchema>
 

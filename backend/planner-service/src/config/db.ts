@@ -1,8 +1,7 @@
 import mongoose, { Mongoose } from 'mongoose'
 import config from '.'
 
-export const mongoURI =
-  config.database.connectionString || 'mongodb://localhost:27017'
+export const mongoURI = config.database.connectionString || 'mongodb://localhost:27017'
 export let db: Mongoose
 /**
  * Connects to MongoDB using Mongoose.
@@ -11,12 +10,13 @@ export let db: Mongoose
  * @returns {Promise<void>} A promise that resolves when the connection is established.
  * @throws {Error} If there is a problem connecting to MongoDB.
  */
-export async function connectToMongoDB(
-  uri: string = mongoURI,
-): Promise<Mongoose> {
+export async function connectToMongoDB(uri: string = mongoURI): Promise<Mongoose> {
   try {
     if (mongoose.connection.readyState === 0) {
-      db = await mongoose.connect(uri)
+      db = await mongoose.connect(uri + '/planner')
+
+      console.log('Connected to MongoDB')
+
       return db
     }
   } catch (err) {

@@ -51,10 +51,7 @@ plannerRouter.post(
   PlannerService.verifyUserCanEditPlanner,
 )
 
-plannerRouter.use(
-  '/:plannerId([0-9a-fA-F]{24})/transportation',
-  transportationRouter,
-)
+plannerRouter.use('/:plannerId([0-9a-fA-F]{24})/transportation', transportationRouter)
 plannerRouter.use('/:plannerId([0-9a-fA-F]{24})/destination', destinationRouter)
 
 export default plannerRouter

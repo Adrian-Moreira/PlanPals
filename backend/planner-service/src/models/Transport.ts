@@ -70,11 +70,7 @@ TransportMongoSchema.pre('findOneAndDelete', async function (next) {
     await CommentsModel.findOneAndDelete(transportObjectId)
     await VoteModel.findOneAndDelete(transportObjectId)
 
-    await PlannerModel.findOneAndUpdate(
-      { _id: plannerId },
-      { $pull: { transportations: transportId } },
-      { new: true },
-    )
+    await PlannerModel.findOneAndUpdate({ _id: plannerId }, { $pull: { transportations: transportId } }, { new: true })
   } catch (err: any) {
     next(err)
   }
@@ -82,9 +78,6 @@ TransportMongoSchema.pre('findOneAndDelete', async function (next) {
   next()
 })
 
-export const TransportModel = mongoose.model<Transport>(
-  'Transport',
-  TransportMongoSchema,
-)
+export const TransportModel = mongoose.model<Transport>('Transport', TransportMongoSchema)
 
 export type Transport = z.infer<typeof TransportSchema>

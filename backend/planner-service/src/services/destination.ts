@@ -15,11 +15,7 @@ import { PlannerModel } from '../models/Planner'
  * @param {NextFunction} next - The next function in the middleware chain.
  * @throws {RecordNotFoundException} If the destination does not exist.
  */
-async function verifyDestinationExists(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+async function verifyDestinationExists(req: Request, res: Response, next: NextFunction) {
   const { destinationId, targetPlanner } = req.body.out
   const targetDestination = await DestinationModel.findOne({
     _id: destinationId,
@@ -48,11 +44,7 @@ async function verifyDestinationExists(
  *
  * @throws {RecordConflictException} If a destination with the same details already exists.
  */
-const createDestinationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const createDestinationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetUser, startDate, endDate, name, targetPlanner } = req.body.out
 
   const newDestination = await DestinationModel.create({
@@ -88,22 +80,16 @@ const createDestinationDocument = async (
  *
  * @throws {RecordNotFoundException} If the destination does not exist.
  */
-const updateDestinationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const updateDestinationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetDestination, name, startDate, endDate } = req.body.out
 
-  const savedDestination = await DestinationModel.findOneAndUpdate(
-    { _id: targetDestination._id },
-    {
-      name,
-      startDate,
-      endDate,
-    },
-    { new: true },
-  )
+  targetDestination.name = name || targetDestination.name
+  targetDestination.startDate = startDate || targetDestination.startDate
+  targetDestination.endDate = endDate || targetDestination.endDate
+
+  const savedDestination = await DestinationModel.findOneAndUpdate({ _id: targetDestination._id }, targetDestination, {
+    new: true,
+  })
 
   req.body.result = savedDestination
   req.body.status = StatusCodes.OK
@@ -120,11 +106,7 @@ const updateDestinationDocument = async (
  *
  * @throws {RecordNotFoundException} If the destination does not exist.
  */
-const deleteDestinationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const deleteDestinationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetDestination, targetPlanner } = req.body.out
 
   const deletedDestination = await DestinationModel.findOneAndDelete({
@@ -146,11 +128,7 @@ const deleteDestinationDocument = async (
  *
  * @throws {RecordNotFoundException} If the destination does not exist.
  */
-const getDestinationDocumentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getDestinationDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetDestination } = req.body.out
   req.body.result = targetDestination
   req.body.status = StatusCodes.OK
@@ -166,20 +144,14 @@ const getDestinationDocumentById = async (
  * @returns {Promise<void>} - A promise that resolves when the middleware chain
  *     has been exhausted.
  */
-const getDestinationDocumentsByPlannerId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getDestinationDocumentsByPlannerId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetPlanner } = req.body.out
 
   const resultDestinations = targetPlanner.destinations.map((did: any) => {
     return DestinationModel.findById(did)
   })
 
-  req.body.result = await Promise.all(resultDestinations).then((results) =>
-    results.filter((dest) => dest !== null),
-  )
+  req.body.result = await Promise.all(resultDestinations).then((results) => results.filter((dest) => dest !== null))
   req.body.status = StatusCodes.OK
   next()
 }

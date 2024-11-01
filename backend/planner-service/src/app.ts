@@ -1,6 +1,7 @@
 #!/usr/bin/env ts-node
 
-import express, { Express, NextFunction, Request, Response } from 'express'
+import { inspect } from 'node:util'
+import express, { Express } from 'express'
 import { createServer, Server } from 'node:http'
 import config from './config'
 import { closeMongoConnection, connectToMongoDB } from './config/db'
@@ -20,8 +21,7 @@ class PlanPals {
   constructor({ dbURI, testing }: any) {
     this.app = express()
     this.server = createServer(this.app)
-    this.dbURI =
-      dbURI || config.database.connectionString || 'mongodb://localhost:27017'
+    this.dbURI = dbURI || config.database.connectionString || 'mongodb://localhost:27017'
     this.testing = testing || false
     this.initRoutes()
   }
@@ -41,7 +41,7 @@ class PlanPals {
   public async startServer(overridePort: number | null): Promise<void> {
     await connectToMongoDB(this.dbURI)
     this.server.listen(overridePort || port, () => {
-      console.log(`PP erected on port ${port}`)
+      console.log(`PP server listening on ${inspect(this.server.address())}`)
     })
   }
 

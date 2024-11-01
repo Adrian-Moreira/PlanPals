@@ -1,5 +1,9 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { z } from 'zod'
+import { TransportModel } from './Transport'
+import { VoteModel } from './Vote'
+import { CommentsModel } from './Comment'
+import { DestinationModel } from './Destination'
 
 export const ValidCollections = [
   'Accommodation',
@@ -12,23 +16,12 @@ export const ValidCollections = [
   'Vote',
 ]
 
-export const ValidCollectionSchema = z
-  .string()
-  .refine((val) => ValidCollections.includes(val))
+export const ValidCollectionSchema = z.string().refine((val) => ValidCollections.includes(val))
 // .transform((val: string) => mongoose.models[val!])
-import { TransportModel } from './Transport'
-import { ActivityModel } from './Activity'
-import { AccommodationModel } from './Accommodation'
-import { VoteModel } from './Vote'
-import { CommentModel, CommentsModel } from './Comment'
-import { DestinationModel } from './Destination'
-import { Document } from 'mongoose'
 
-export const ObjectIdSchema = z
-  .instanceof(Types.ObjectId)
-  .refine((val) => Types.ObjectId.isValid(val), {
-    message: 'Invalid ObjectId',
-  })
+export const ObjectIdSchema = z.instanceof(Types.ObjectId).refine((val) => Types.ObjectId.isValid(val), {
+  message: 'Invalid ObjectId',
+})
 
 export const ObjectIdStringSchema = z
   .string()
@@ -110,15 +103,11 @@ PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
     })
 
     await Promise.all(
-      planner!.destinations!.map((id: Types.ObjectId) =>
-        DestinationModel.findOneAndDelete({ _id: id }),
-      ),
+      planner!.destinations!.map((id: Types.ObjectId) => DestinationModel.findOneAndDelete({ _id: id })),
     )
 
     await Promise.all(
-      planner!.transportations!.map((id: Types.ObjectId) =>
-        TransportModel.findOneAndDelete({ _id: id }),
-      ),
+      planner!.transportations!.map((id: Types.ObjectId) => TransportModel.findOneAndDelete({ _id: id })),
     )
   } catch (err: any) {
     next(err)

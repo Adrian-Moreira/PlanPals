@@ -16,11 +16,7 @@ import { DestinationModel } from '../models/Destination'
  *
  * @throws {RecordNotFoundException} If the accommodation does not exist.
  */
-async function verifyAccommodationExists(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+async function verifyAccommodationExists(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { accommodationId } = req.body.out
   const targetAccommodation = await AccommodationModel.findOne({
     _id: accommodationId,
@@ -48,13 +44,8 @@ async function verifyAccommodationExists(
  *
  * @throws {RecordConflictException} If the accommodation already exists.
  */
-const createAccommodationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  const { targetDestination, targetUser, name, location, startDate, endDate } =
-    req.body.out
+const createAccommodationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { targetDestination, targetUser, name, location, startDate, endDate } = req.body.out
 
   const createdAccommodation = await AccommodationModel.create({
     createdBy: targetUser._id,
@@ -89,13 +80,8 @@ const createAccommodationDocument = async (
  *
  * @throws {RecordNotFoundException} If the accommodation does not exist.
  */
-const updateAccommodationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  const { targetAccommodation, name, location, startDate, endDate } =
-    req.body.out
+const updateAccommodationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { targetAccommodation, name, location, startDate, endDate } = req.body.out
 
   targetAccommodation.name = name || targetAccommodation.name
   targetAccommodation.location = location || targetAccommodation.location
@@ -123,11 +109,7 @@ const updateAccommodationDocument = async (
  *
  * @throws {RecordNotFoundException} If the accommodation does not exist.
  */
-const deleteAccommodationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const deleteAccommodationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetAccommodation, targetDestination } = req.body.out
 
   const deletedAccommodation = await AccommodationModel.findOneAndDelete({
@@ -158,11 +140,7 @@ const deleteAccommodationDocument = async (
  *
  * @throws {RecordNotFoundException} If the accommodation does not exist.
  */
-const getAccommodationDocumentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getAccommodationDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetAccommodation } = req.body.out
   req.body.result = targetAccommodation
   req.body.status = StatusCodes.OK
@@ -186,15 +164,11 @@ const getAccommodationDocumentsByDestinationId = async (
 ): Promise<void> => {
   const { targetDestination } = req.body.out
 
-  const resultAccommodations = targetDestination.accommodations.map(
-    (aid: any) => {
-      return AccommodationModel.findById(aid)
-    },
-  )
+  const resultAccommodations = targetDestination.accommodations.map((aid: any) => {
+    return AccommodationModel.findById(aid)
+  })
 
-  req.body.result = await Promise.all(resultAccommodations).then((results) =>
-    results.filter((acc) => acc !== null),
-  )
+  req.body.result = await Promise.all(resultAccommodations).then((results) => results.filter((acc) => acc !== null))
   req.body.status = StatusCodes.OK
 
   next()

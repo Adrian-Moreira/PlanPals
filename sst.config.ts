@@ -61,6 +61,10 @@ export default $config({
       roles: [
         {
           roleName: 'readWrite',
+          databaseName: 'test',
+        },
+        {
+          roleName: 'readWrite',
           databaseName: 'planner',
         },
         {
@@ -76,49 +80,50 @@ export default $config({
       ],
     })
 
-    const atlasAllowAll = new mongodbatlas.ProjectIpAccessList(
-      'PlanPalsAllowAll',
-      {
-        projectId: atlasProject.id.apply((id) => id),
-        ipAddress: '0.0.0.0',
-        comment: 'Allowing all IPs',
-      },
-    )
+    const atlasAllowAll = new mongodbatlas.ProjectIpAccessList('PlanPalsAllowAll', {
+      projectId: atlasProject.id.apply((id) => id),
+      ipAddress: '0.0.0.0',
+    })
 
     const connectionString = (uri: string) =>
       `mongodb+srv://${atlasUserName}:${atlasPassword}@${uri}/?retryWrites=true&w=majority&appName=${atlasClusterName}`
-    const stdSrv = atlasCluster.connectionStrings[0].standardSrv.apply(
-      (srv) => {
-        return connectionString(srv.replaceAll('mongodb+srv://', ''))
-      },
-    )
+    const stdSrv = atlasCluster.connectionStrings[0].standardSrv.apply((srv) => {
+      return connectionString(srv.replaceAll('mongodb+srv://', ''))
+    })
 
     cluster.addService('PlanPalsService', {
       link: [atlasCluster, bucket],
       loadBalancer: {
-        ports: [{ listen: '80/http', forward: '8080/http' }],
-      },
-      environment: {
-        DATABASE_CONNECTIONSTRING: stdSrv,
+        ports: [
+          // { listen: '80/http', forward: '3000/http', container: 'planpals-ui' },
+          { listen: '80/http', forward: '8080/http', container: 'planner-service' },
+        ],
       },
       containers: [
         {
           name: 'planner-service',
           image: {
-            context: './planner-service',
-            dockerfile: 'Dockerfile',
+            context: './backend/planner-service',
+            dockerfile: './backend/planner-service/Dockerfile',
           },
           environment: {
             DATABASE_CONNECTIONSTRING: stdSrv,
           },
         },
-        {
-          name: 'planpals-ui',
-          image: {
-            context: './front-end-web',
-            dockerfile: 'Dockerfile',
-          },
-        },
+        // {
+        //   name: 'planpals-web',
+        //   image: {
+        //     context: './front-end-web',
+        //     dockerfile: './front-end-web/Dockerfile',
+        //   },
+        //   environment: {
+        //     DATABASE_CONNECTIONSTRING: stdSrv,
+        //     CLUSTER_ARN: cluster.nodes.cluster.arn,
+        //     CLUSTER_URN: cluster.nodes.cluster.urn,
+        //     CLUSTER_NAME: cluster.nodes.cluster.name,
+        //     BUCKET_NAME: bucket.name,
+        //   },
+        // },
       ],
       dev: {
         command: 'npm i && npm run start',

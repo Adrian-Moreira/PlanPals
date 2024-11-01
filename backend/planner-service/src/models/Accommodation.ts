@@ -82,9 +82,6 @@ AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
   next()
 })
 
-export const AccommodationModel = mongoose.model<Accommodation>(
-  'Accommodation',
-  AccommodationMongoSchema,
-)
+export const AccommodationModel = mongoose.model<Accommodation>('Accommodation', AccommodationMongoSchema)
 
 export type Accommodation = z.infer<typeof AccommodationSchema>

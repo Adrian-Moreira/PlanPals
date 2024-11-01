@@ -12,11 +12,7 @@ import { PlannerModel } from '../models/Planner'
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-async function verifyTransportationExists(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+async function verifyTransportationExists(req: Request, res: Response, next: NextFunction) {
   const { targetPlanner, transportationId } = req.body.out
   const targetTransportation = await TransportModel.findOne({
     _id: transportationId,
@@ -44,21 +40,8 @@ async function verifyTransportationExists(
  *
  * @throws {RecordConflictException} If a transportation with the same details already exists.
  */
-const createTransportationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  const {
-    plannerId,
-    targetUser,
-    type,
-    details,
-    departureTime,
-    arrivalTime,
-    vehicleId,
-    targetPlanner,
-  } = req.body.out
+const createTransportationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { plannerId, targetUser, type, details, departureTime, arrivalTime, vehicleId, targetPlanner } = req.body.out
 
   const createdTransportation = await TransportModel.create({
     plannerId,
@@ -91,25 +74,14 @@ const createTransportationDocument = async (
  *
  * @throws {RecordNotFoundException} If the transportation does not exist.
  */
-const updateTransportationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  let {
-    type,
-    details,
-    departureTime,
-    arrivalTime,
-    vehicleId,
-    targetTransportation,
-  } = req.body.out
+const updateTransportationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  let { type, details, departureTime, arrivalTime, vehicleId, targetTransportation } = req.body.out
 
-  targetTransportation.type ||= type
-  targetTransportation.details ||= details
-  targetTransportation.departureTime ||= departureTime
-  targetTransportation.arrivalTime ||= arrivalTime
-  targetTransportation.vehicleId ||= vehicleId
+  targetTransportation.type = type || targetTransportation.type
+  targetTransportation.details = details || targetTransportation.details
+  targetTransportation.departureTime = departureTime || targetTransportation.departureTime
+  targetTransportation.arrivalTime = arrivalTime || targetTransportation.arrivalTime
+  targetTransportation.vehicleId = vehicleId || targetTransportation.vehicleId
 
   const updatedTransportation = await TransportModel.findOneAndUpdate(
     { _id: targetTransportation._id },
@@ -132,11 +104,7 @@ const updateTransportationDocument = async (
  *
  * @throws {RecordNotFoundException} If the transportation does not exist.
  */
-const deleteTransportationDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const deleteTransportationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetPlanner, targetTransportation } = req.body.out
 
   const deletedTransportation = await TransportModel.findOneAndDelete({
@@ -160,11 +128,7 @@ const deleteTransportationDocument = async (
  * @returns {Promise<void>} - A promise that resolves when the middleware chain
  *     has been exhausted.
  */
-const getTransportationDocumentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getTransportationDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetTransportation } = req.body.out
 
   req.body.result = targetTransportation
@@ -188,10 +152,9 @@ const getTransportationDocumentsByPlannerId = async (
   next: NextFunction,
 ): Promise<void> => {
   const { targetPlanner } = req.body.out
-  const resultTransportations: Transport[] =
-    await targetPlanner.transportations.map((tid: any) =>
-      TransportModel.findById(tid),
-    )
+  const resultTransportations: Transport[] = await targetPlanner.transportations.map((tid: any) =>
+    TransportModel.findById(tid),
+  )
 
   req.body.result = await Promise.all(resultTransportations).then((results) =>
     results.filter((transportation) => transportation !== null),

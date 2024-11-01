@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "sso": "aws sso login --sso-session=pp"
+  },
+  "devDependencies": {
+    "prettier": "3.3.3",
+    "sst": "^3.2.73"
+  }
+}

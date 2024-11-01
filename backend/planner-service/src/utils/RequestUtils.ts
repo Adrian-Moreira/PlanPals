@@ -14,11 +14,7 @@ import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
  *
  * @throws {RecordNotFoundException} If the object does not exist.
  */
-export async function verifyObjectExistInCollection(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function verifyObjectExistInCollection(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { objectId, type } = req.body.out
   const object = await mongoose.models[type].findById(objectId)
   if (!object) {
@@ -44,11 +40,7 @@ export async function verifyObjectExistInCollection(
 function mkRequestParser<T>(
   schema: z.ZodSchema<T>,
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     await schema
       .parseAsync(req)
       .then((value: any) => {
@@ -84,15 +76,9 @@ function mkRequestParser<T>(
  */
 function mkRequestParsers(
   schemas: Record<string, z.ZodSchema<any>>,
-): Record<
-  string,
-  (req: Request, res: Response, next: NextFunction) => Promise<void>
-> {
+): Record<string, (req: Request, res: Response, next: NextFunction) => Promise<void>> {
   return Object.fromEntries(
-    Object.entries(schemas).map(([key, schema]) => [
-      key,
-      mkRequestParser(schema as z.ZodSchema<any>),
-    ]),
+    Object.entries(schemas).map(([key, schema]) => [key, mkRequestParser(schema as z.ZodSchema<any>)]),
   )
 }
 
@@ -125,12 +111,7 @@ export function mkSuccessJSON<T>(data: T): ResponseMessage {
  * `RecordConflictException`, sends a response with the error's status code
  * and message. Otherwise, sends a 500 response with a generic error message.
  */
-async function mkErrorResponse(
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+async function mkErrorResponse(err: any, req: Request, res: Response, next: NextFunction): Promise<void> {
   if (err) {
     switch (err.name) {
       case 'SyntaxError':
@@ -184,11 +165,7 @@ async function mkErrorResponse(
  * @param res - The response object.
  * @param next - The next middleware in the chain.
  */
-async function mkSuccessResponse<T>(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+async function mkSuccessResponse<T>(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (req.body.err || !req.body.result) {
     next(req.body.err)
   } else {

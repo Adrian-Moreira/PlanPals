@@ -16,11 +16,7 @@ import { StatusCodes } from 'http-status-codes'
  *
  * @throws {RecordNotFoundException} If the object does not exist.
  */
-const upVote = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const upVote = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { objectId, type, targetUser } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
@@ -36,15 +32,9 @@ const upVote = async (
     existingVotes.upVotes.push(targetUser._id)
   }
   if (existingVotes.downVotes.includes(targetUser._id)) {
-    existingVotes.downVotes = existingVotes.downVotes.filter(
-      (id) => id != targetUser._id.toString(),
-    )
+    existingVotes.downVotes = existingVotes.downVotes.filter((id) => id != targetUser._id.toString())
   }
-  existingVotes = await VoteModel.findOneAndUpdate(
-    { _id: existingVotes._id },
-    existingVotes,
-    { new: true },
-  )
+  existingVotes = await VoteModel.findOneAndUpdate({ _id: existingVotes._id }, existingVotes, { new: true })
 
   req.body.result = existingVotes
   req.body.status = StatusCodes.OK
@@ -64,11 +54,7 @@ const upVote = async (
  *
  * @throws {RecordNotFoundException} If the object does not exist.
  */
-const downVote = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const downVote = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { objectId, type, targetUser } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
@@ -84,15 +70,9 @@ const downVote = async (
     existingVotes.downVotes.push(targetUser._id)
   }
   if (existingVotes.upVotes.includes(targetUser._id)) {
-    existingVotes.upVotes = existingVotes.upVotes.filter(
-      (id) => id != targetUser._id.toString(),
-    )
+    existingVotes.upVotes = existingVotes.upVotes.filter((id) => id != targetUser._id.toString())
   }
-  existingVotes = await VoteModel.findOneAndUpdate(
-    { _id: existingVotes._id },
-    existingVotes,
-    { new: true },
-  )
+  existingVotes = await VoteModel.findOneAndUpdate({ _id: existingVotes._id }, existingVotes, { new: true })
 
   req.body.result = existingVotes
   req.body.status = StatusCodes.OK
@@ -112,11 +92,7 @@ const downVote = async (
  *
  * @throws {RecordNotFoundException} If the object does not exist.
  */
-const removeVote = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const removeVote = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { objectId, type, targetUser } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
@@ -130,20 +106,12 @@ const removeVote = async (
     next(err)
   } else {
     if (existingVotes.upVotes.includes(targetUser._id)) {
-      existingVotes.upVotes = existingVotes.upVotes.filter(
-        (id) => id != targetUser._id.toString(),
-      )
+      existingVotes.upVotes = existingVotes.upVotes.filter((id) => id != targetUser._id.toString())
     }
     if (existingVotes.downVotes.includes(targetUser._id)) {
-      existingVotes.downVotes = existingVotes.downVotes.filter(
-        (id) => id != targetUser._id.toString(),
-      )
+      existingVotes.downVotes = existingVotes.downVotes.filter((id) => id != targetUser._id.toString())
     }
-    existingVotes = await VoteModel.findOneAndUpdate(
-      { _id: existingVotes._id },
-      existingVotes,
-      { new: true },
-    )
+    existingVotes = await VoteModel.findOneAndUpdate({ _id: existingVotes._id }, existingVotes, { new: true })
     req.body.result = existingVotes
     req.body.status = StatusCodes.OK
   }
@@ -162,11 +130,7 @@ const removeVote = async (
  *
  * @throws {RecordNotFoundException} If the object does not exist.
  */
-const getVotesByObjectId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getVotesByObjectId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { objectId: oid, type } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: oid, collection: type },
@@ -179,9 +143,7 @@ const getVotesByObjectId = async (
     })
   }
   existingVotes.upVotes = existingVotes.upVotes.filter((vote) => vote !== null)
-  existingVotes.downVotes = existingVotes.downVotes.filter(
-    (vote) => vote !== null,
-  )
+  existingVotes.downVotes = existingVotes.downVotes.filter((vote) => vote !== null)
   req.body.result = existingVotes
   req.body.status = StatusCodes.OK
   next()
@@ -200,11 +162,7 @@ const getVotesByObjectId = async (
  *
  * @throws {RecordNotFoundException} If the vote document does not exist.
  */
-const isUserVoted = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const isUserVoted = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { objectId, type, targetUser } = req.body.out
   const existingVotes = await VoteModel.findOne({
     objectId: { id: objectId, collection: type },
@@ -217,12 +175,8 @@ const isUserVoted = async (
     next(req.body.err)
   } else {
     const voteDoc = existingVotes
-    const upVoted = voteDoc.upVotes.some(
-      (id) => id == targetUser._id.toString(),
-    )
-    const downVoted = voteDoc.downVotes.some(
-      (id) => id == targetUser._id.toString(),
-    )
+    const upVoted = voteDoc.upVotes.some((id) => id == targetUser._id.toString())
+    const downVoted = voteDoc.downVotes.some((id) => id == targetUser._id.toString())
     req.body.result = { upVoted, downVoted }
     req.body.status = StatusCodes.OK
   }

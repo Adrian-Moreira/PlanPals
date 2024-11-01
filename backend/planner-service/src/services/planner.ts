@@ -18,11 +18,7 @@ import { CommentModel } from '../models/Comment'
  *
  * @throws {RecordNotFoundException} If the user does not exist.
  */
-export const createPlannerDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+export const createPlannerDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const {
     targetUser,
     name,
@@ -63,23 +59,15 @@ export const createPlannerDocument = async (
  *
  * @throws {RecordNotFoundException} If the planner does not exist.
  */
-export const updatePlannerDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+export const updatePlannerDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetPlanner, name, description, startDate, endDate } = req.body.out
 
-  const savedPlanner = await PlannerModel.findOneAndUpdate(
-    { _id: targetPlanner._id },
-    {
-      name,
-      description,
-      startDate,
-      endDate,
-    },
-    { new: true },
-  )
+  targetPlanner.name = name || targetPlanner.name
+  targetPlanner.description = description || targetPlanner.description
+  targetPlanner.startDate = startDate || targetPlanner.startDate
+  targetPlanner.endDate = endDate || targetPlanner.endDate
+
+  const savedPlanner = await PlannerModel.findOneAndUpdate({ _id: targetPlanner._id }, targetPlanner, { new: true })
 
   req.body.result = savedPlanner
   req.body.status = StatusCodes.OK
@@ -95,11 +83,7 @@ export const updatePlannerDocument = async (
  * @returns {Promise<void>} - A promise that resolves when the middleware chain
  *     has been exhausted.
  */
-export const deletePlannerDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+export const deletePlannerDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetPlanner } = req.body.out
 
   const planner = await PlannerModel.findOneAndDelete({
@@ -119,11 +103,7 @@ export const deletePlannerDocument = async (
  * @returns {Promise<void>} - A promise that resolves when the middleware chain
  *     has been exhausted.
  */
-export const getPlannerDocumentsByUserId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+export const getPlannerDocumentsByUserId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetUser, access } = req.body.out
 
   let resultPlanners
@@ -162,11 +142,7 @@ export const getPlannerDocumentsByUserId = async (
  * @returns {Promise<void>} - A promise that resolves when the middleware chain
  *     has been exhausted.
  */
-export const getPlannerDocumentByPlannerId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+export const getPlannerDocumentByPlannerId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetPlanner } = req.body.out
   req.body.result = targetPlanner
   req.body.status = StatusCodes.OK
@@ -181,11 +157,7 @@ export const getPlannerDocumentByPlannerId = async (
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-async function verifyPlannerExists(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+async function verifyPlannerExists(req: Request, res: Response, next: NextFunction) {
   const { plannerId } = req.body.out
 
   const targetPlanner = await PlannerModel.findOne({ _id: plannerId })
@@ -210,11 +182,7 @@ async function verifyPlannerExists(
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-async function verifyUserCanEditPlanner(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+async function verifyUserCanEditPlanner(req: Request, res: Response, next: NextFunction) {
   let { plannerId, targetUser, targetPlanner } = req.body.out
 
   if (
@@ -241,11 +209,7 @@ async function verifyUserCanEditPlanner(
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
  */
-async function verifyUserCanViewPlanner(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+async function verifyUserCanViewPlanner(req: Request, res: Response, next: NextFunction) {
   const { targetUser, targetPlanner } = req.body.out
 
   if (

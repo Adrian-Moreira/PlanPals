@@ -1,9 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { Activity, ActivityModel } from '../models/Activity'
-import { Types } from 'mongoose'
 import { DestinationModel } from '../models/Destination'
 
 /**
@@ -17,11 +15,7 @@ import { DestinationModel } from '../models/Destination'
  *
  * @throws {RecordNotFoundException} If the activity does not exist.
  */
-async function verifyActivityExists(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+async function verifyActivityExists(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { activityId } = req.body.out
   const activity = await ActivityModel.findOne({ _id: activityId })
   if (!activity) {
@@ -45,13 +39,8 @@ async function verifyActivityExists(
  *
  * @throws {RecordConflictException} If the activity already exists.
  */
-const createActivityDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { targetDestination, name, startDate, duration, location, targetUser } =
-    req.body.out
+const createActivityDocument = async (req: Request, res: Response, next: NextFunction) => {
+  const { targetDestination, name, startDate, duration, location, targetUser } = req.body.out
 
   const createdActivity = await ActivityModel.create({
     createdBy: targetUser._id,
@@ -88,11 +77,7 @@ const createActivityDocument = async (
  * @throws {RecordNotFoundException} If the activity does not exist.
  * @throws {RecordConflictException} If the activity already exists.
  */
-const updateActivityDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const updateActivityDocument = async (req: Request, res: Response, next: NextFunction) => {
   const { targetActivity, name, startDate, duration, location } = req.body.out
 
   targetActivity.name = name || targetActivity.name
@@ -100,11 +85,9 @@ const updateActivityDocument = async (
   targetActivity.duration = duration || targetActivity.duration
   targetActivity.location = location || targetActivity.location
 
-  const updatedActivity = await ActivityModel.findOneAndUpdate(
-    { _id: targetActivity._id },
-    targetActivity,
-    { new: true },
-  )
+  const updatedActivity = await ActivityModel.findOneAndUpdate({ _id: targetActivity._id }, targetActivity, {
+    new: true,
+  })
 
   req.body.result = updatedActivity
   req.body.status = StatusCodes.OK
@@ -121,11 +104,7 @@ const updateActivityDocument = async (
  *
  * @throws {RecordNotFoundException} If the activity does not exist.
  */
-const deleteActivityDocument = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const deleteActivityDocument = async (req: Request, res: Response, next: NextFunction) => {
   const { targetActivity, targetDestination } = req.body.out
 
   const deletedActivity = await ActivityModel.findByIdAndDelete({
@@ -156,11 +135,7 @@ const deleteActivityDocument = async (
  *
  * @throws {RecordNotFoundException} If the activity does not exist.
  */
-const getActivityDocumentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const getActivityDocumentById = async (req: Request, res: Response, next: NextFunction) => {
   const { targetActivity } = req.body.out
 
   req.body.result = targetActivity
@@ -178,20 +153,12 @@ const getActivityDocumentById = async (
  * @returns {Promise<void>} - A promise that resolves when the middleware chain
  *     has been exhausted.
  */
-const getActivitiyDocumentsByDestinationId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
+const getActivitiyDocumentsByDestinationId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetDestination } = req.body.out
 
-  const resultActivities: Activity[] = targetDestination.activities.map(
-    (aid: any) => ActivityModel.findById(aid),
-  )
+  const resultActivities: Activity[] = targetDestination.activities.map((aid: any) => ActivityModel.findById(aid))
 
-  req.body.result = await Promise.all(resultActivities).then((results) =>
-    results.filter((act) => act !== null),
-  )
+  req.body.result = await Promise.all(resultActivities).then((results) => results.filter((act) => act !== null))
   req.body.status = StatusCodes.OK
 
   next()

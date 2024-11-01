@@ -89,9 +89,6 @@ ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
   next()
 })
 
-export const ActivityModel = mongoose.model<Activity>(
-  'Activity',
-  ActivityMongoSchema,
-)
+export const ActivityModel = mongoose.model<Activity>('Activity', ActivityMongoSchema)
 
 export type Activity = z.infer<typeof ActivitySchema>

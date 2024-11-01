@@ -21,11 +21,7 @@ commentRouter.post(
   CommentService.findOrCreateCommentsDocument,
   CommentService.createCommentDocument,
 )
-commentRouter.get(
-  '/:commentId([0-9a-fA-F]{24})',
-  CommentValidator.getCommentById,
-  CommentService.getCommentById,
-)
+commentRouter.get('/:commentId([0-9a-fA-F]{24})', CommentValidator.getCommentById, CommentService.getCommentById)
 commentRouter.delete(
   '/:commentId([0-9a-fA-F]{24})',
   CommentValidator.removeComment,

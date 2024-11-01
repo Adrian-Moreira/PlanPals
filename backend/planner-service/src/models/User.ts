@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import mongoose, { Schema } from 'mongoose'
 import { ObjectIdSchema } from './Planner'
+
 const UserMongoSchema = new Schema<User>(
   {
     userName: {
