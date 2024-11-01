@@ -13,7 +13,7 @@ export let db: Mongoose
 export async function connectToMongoDB(uri: string = mongoURI): Promise<Mongoose> {
   try {
     if (mongoose.connection.readyState === 0) {
-      db = await mongoose.connect(uri + '/planner')
+      db = await mongoose.connect(uri)
 
       console.log('Connected to MongoDB')
 

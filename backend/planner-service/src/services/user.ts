@@ -36,7 +36,6 @@ const verifyUserExists = async (req: Request, res: Response, next: NextFunction)
 const createUserDocument = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const newUser: BasicUser = req.body.out as BasicUser
   const userCreated = await UserModel.create(newUser).catch((err) => {
-    console.log(err)
     req.body.err = new RecordConflictException({
       requestType: 'createUser',
       conflict: 'User already exists',
