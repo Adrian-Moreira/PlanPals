@@ -289,7 +289,7 @@ const Planner = () => {
     
                 if (response.data.success) {
                     // Update the transportations state with edited transportation data
-                    setDestinations(prev => 
+                    setTransportations(prev => 
                         prev.map(transport => 
                             transport._id === editingTransportationId 
                             ? { ...transport, type: transportationType, details: transportationDetails, departureTime: startDate.toISOString(), arrivalTime: endDate.toISOString(), vehicleId: transportationVehicleId } 
