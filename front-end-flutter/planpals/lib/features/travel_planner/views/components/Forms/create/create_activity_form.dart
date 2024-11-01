@@ -19,8 +19,8 @@ class CreateActivityForm extends StatefulWidget {
 class _CreateActivityFormState extends State<CreateActivityForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _activityNameController = TextEditingController();
+  final TextEditingController _activityDurationController = TextEditingController();
   DateTime? _selectedDate;
-  String? _selectedDuration; // Store the time as a string
 
   @override
   Widget build(BuildContext context) {
@@ -71,17 +71,19 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
 
               // Time Field
               TextFormField(
+                controller: _activityDurationController,
                 decoration: const InputDecoration(labelText: 'Duration in Minutes'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the duration';
                   }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
                   return null;
                 },
-                onChanged: (value) {
-                  _selectedDuration = value;
-                },
+
               ),
 
               const SizedBox(height: 20), // Margin
@@ -93,18 +95,36 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
                     // Validate custom date logic (if needed)
                     // Note: You might want to add validation for the time format as well
 
-                    // Create an Activity object
-                    Activity newActivity = Activity(
-                      name: _activityNameController.text,
-                      date: _selectedDate!,
-                      duration: double.parse(_selectedDuration!),
-                      destinationId: destination.destinationId);
-                   
+                    Activity? newActivity;
+
                     newActivity = await plannerViewModel.addActivity(
-                        newActivity, destination.plannerId, user!.id
+                      Activity(
+                        activityId: '',
+                        name: _activityNameController.text,
+                        startDate: _selectedDate!,
+                        duration: double.parse(_activityDurationController.text),
+                        destinationId: destination.destinationId,
+                        createdBy: user!.id, 
+                        location: '',
+                      ),
+                      destination.plannerId,
+                      user.id,
                     );
-                    
-                    destination.activities.add(newActivity.activityId!);
+
+                    if (newActivity != null) {
+                      // Activity added successfully, do something with the newActivity object
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Activity added successfully!')),
+                      );
+                      
+                      destination.activityList.add(newActivity);  // Add the new activity to the destination
+
+                    } else {
+                      // Failed to add activity
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to add activity!')),
+                      );
+                    }
 
                     // Close the form screen
                     Navigator.pop(context);
