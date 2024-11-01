@@ -139,18 +139,9 @@ const deleteTransportationDocument = async (
 ): Promise<void> => {
   const { targetPlanner, targetTransportation } = req.body.out
 
-  targetPlanner.transportations = targetPlanner.transportations.filter(
-    (tid: any) => tid.toString() != targetTransportation._id.toString(),
-  )
-
-  await PlannerModel.findOneAndUpdate(
-    { _id: targetPlanner._id },
-    { transportations: targetPlanner.transportations },
-    { new: true },
-  )
-
   const deletedTransportation = await TransportModel.findOneAndDelete({
     _id: targetTransportation._id,
+    plannerId: targetPlanner._id,
   })
 
   req.body.result = deletedTransportation

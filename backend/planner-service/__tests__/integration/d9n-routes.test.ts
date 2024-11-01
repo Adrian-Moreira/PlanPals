@@ -5,6 +5,8 @@ import { StatusCodes } from 'http-status-codes'
 import { UserModel } from '../../src/models/User'
 import { PlannerModel } from '../../src/models/Planner'
 import { DestinationModel } from '../../src/models/Destination'
+import { ActivityModel } from '../../src/models/Activity'
+import { AccommodationModel } from '../../src/models/Accommodation'
 
 let app: PlanPals
 
@@ -18,6 +20,9 @@ let testPlanner2: any
 
 let testDestination1: any
 let testDestination2: any
+
+let testActivity1: any
+let testAccommodation1: any
 
 describe('Integration Test: Destination API', () => {
   beforeAll(async () => {
@@ -90,11 +95,36 @@ describe('Integration Test: Destination API', () => {
       endDate: new Date().toISOString(),
     })
 
+    testActivity1 = await ActivityModel.create({
+      name: 'Visiting the largest unfinished Catholic church in the world',
+      createdBy: testUser1._id,
+      location: 'Sagrada Família',
+      destinationId: testDestination1._id,
+      startDate: new Date().toISOString(),
+      duration: 10800, // 3 hours
+      done: false,
+    })
+
+    testAccommodation1 = await AccommodationModel.create({
+      name: 'Hilton Barcelona',
+      createdBy: testUser1._id,
+      location: 'Barcelona',
+      destinationId: testDestination1._id,
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+    })
+
     testPlanner.destinations.push(testDestination1._id)
     testPlanner = await testPlanner.save()
 
     testPlanner2.destinations.push(testDestination2._id)
     testPlanner2 = await testPlanner2.save()
+
+    testDestination1.activities.push(testActivity1._id)
+    testDestination1 = await testDestination1.save()
+
+    testDestination1.accommodations.push(testAccommodation1._id)
+    testDestination1 = await testDestination1.save()
   })
 
   afterAll(async () => {
@@ -381,6 +411,13 @@ describe('Integration Test: Destination API', () => {
       expect(
         await PlannerModel.findOne({ _id: testPlanner._id }),
       ).not.toContain(testDestination1._id)
+      expect(
+        await DestinationModel.findOne({ _id: testDestination1._id }),
+      ).toBeNull()
+      expect(await ActivityModel.findOne({ _id: testActivity1._id })).toBeNull()
+      expect(
+        await AccommodationModel.findOne({ _id: testAccommodation1._id }),
+      ).toBeNull()
     })
   })
 })

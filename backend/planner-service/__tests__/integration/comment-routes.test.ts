@@ -25,6 +25,7 @@ let testActivity1: any
 let testActivity2: any
 
 let newComment: any
+let newComment2: any
 let existingComments: any
 
 describe('Integration Test: Comment API', () => {
@@ -218,6 +219,7 @@ describe('Integration Test: Comment API', () => {
 
       expect(response.body.success).toBe(true)
       expect(response.body.data._id).toBeDefined()
+      newComment2 = response.body.data
     })
   })
 
@@ -252,6 +254,51 @@ describe('Integration Test: Comment API', () => {
         .expect(StatusCodes.BAD_REQUEST)
 
       expect(response.body.success).toBe(false)
+    })
+  })
+
+  describe('perform DELETE to /comment', () => {
+    it('should return OK and delete the Comment', async () => {
+      const response = await request(app.app)
+        .delete(`/comment/${newComment2._id.toString()}`)
+        .query({ userId: testUser1._id.toString() })
+        .send({
+          objectId: testActivity1._id.toString(),
+          type: 'Activity',
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.OK)
+
+      expect(response.body.success).toBe(true)
+      expect(await CommentModel.findOne({ _id: newComment2._id })).toBeNull()
+      expect(
+        await CommentsModel.findOne({
+          objectId: {
+            id: testActivity1._id.toString(),
+            collection: 'Activity',
+          },
+        }),
+      ).toBeNull()
+    })
+  })
+
+  describe('perform delete to destination', () => {
+    it('should return OK and delete the Comment', async () => {
+      const reqStr = `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`
+      const response = await request(app.app)
+        .delete(reqStr)
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.OK)
+
+      expect(response.body.success).toBe(true)
+      expect(
+        await DestinationModel.findOne({ _id: testDestination1._id }),
+      ).toBeNull()
+      expect(await ActivityModel.findOne({ _id: testActivity1._id })).toBeNull()
+      expect(
+        await CommentsModel.findOne({ _id: existingComments._id }),
+      ).toBeNull()
+      expect(await CommentModel.findOne({ _id: newComment._id })).toBeNull()
     })
   })
 })

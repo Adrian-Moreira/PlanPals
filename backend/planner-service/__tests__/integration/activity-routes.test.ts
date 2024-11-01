@@ -335,7 +335,7 @@ describe('Integration Test: Activity API', () => {
       expect(response.body.success).toBe(false)
     })
 
-    it('should return OK and delete destination', async () => {
+    it('should return OK and delete activity', async () => {
       const reqStr = `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}/activity/${testActivity1._id.toString()}`
       const response = await request(app.app)
         .delete(reqStr)

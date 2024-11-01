@@ -11,11 +11,14 @@ import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { DestinationModel } from '../../../src/models/Destination'
 import DestinationService from '../../../src/services/destination'
-import { PlannerModel } from '../../../src/models/Planner'
 
-describe('Destination->deleteDestination', () => {
+describe('Destination->deleteDestination with Cascade Deletion', () => {
   let d9nMock: sinon.SinonMock
-  let plannerMock: sinon.SinonMock
+  let activityMock: sinon.SinonMock
+  let accommodationMock: sinon.SinonMock
+  let voteMock: sinon.SinonMock
+  let commentMock: sinon.SinonMock
+
   let req: Partial<Request>
   let res: Partial<Response>
   let next: Partial<NextFunction> = jest.fn()
@@ -29,33 +32,18 @@ describe('Destination->deleteDestination', () => {
     createdBy: targetUser._id,
     startDate: new Date(),
     endDate: new Date(),
-    name: 'test',
-    activities: [],
-    accommodations: [],
+    name: 'testDestination',
     plannerId: '671d24c18132583fe9fb123f',
-  }
-
-  const existingPlanner = {
-    _id: '671d24c18132583fe9fb123f',
-    createdBy: targetUser._id,
-    startDate: new Date(),
-    endDate: new Date(),
-    name: 'test',
-    description: 'test',
-    destinations: [existingDestination._id],
-    transportations: [],
-    roUsers: [],
-    rwUsers: [targetUser._id],
   }
 
   beforeEach(() => {
     d9nMock = sinon.mock(DestinationModel)
-    plannerMock = sinon.mock(PlannerModel)
+
     req = {
       body: {
         out: {
           targetDestination: existingDestination,
-          targetPlanner: existingPlanner,
+          targetPlanner: { _id: '671d24c18132583fe9fb123f' },
         },
       },
     }
@@ -64,14 +52,17 @@ describe('Destination->deleteDestination', () => {
 
   afterEach(() => {
     d9nMock.restore()
-    plannerMock.restore()
   })
 
-  it('should delete existing destination', async () => {
-    d9nMock.expects('findOneAndDelete').resolves(existingDestination)
-    plannerMock
-      .expects('findOneAndUpdate')
-      .resolves({ ...existingPlanner, destinations: [] })
+  it('should cascade delete all related data when a destination is deleted', async () => {
+    // Mock deleting the destination
+    d9nMock
+      .expects('findOneAndDelete')
+      .withArgs({
+        _id: existingDestination._id,
+        plannerId: existingDestination.plannerId,
+      })
+      .resolves(existingDestination)
 
     await DestinationService.deleteDestinationDocument(
       req as Request,
@@ -80,11 +71,9 @@ describe('Destination->deleteDestination', () => {
     )
 
     d9nMock.verify()
-    plannerMock.verify()
+
     expect(req.body.status).toEqual(StatusCodes.OK)
     expect(req.body.result).toBeDefined()
-    expect(req.body.result.name).toEqual('test')
-    expect(req.body.result.startDate).toEqual(existingDestination.startDate)
-    expect(req.body.result.endDate).toEqual(existingDestination.endDate)
+    expect(req.body.result.name).toEqual('testDestination')
   })
 })

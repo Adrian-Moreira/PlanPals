@@ -13,6 +13,7 @@ import { PlannerModel } from '../models/Planner'
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next function in the middleware chain.
+ * @throws {RecordNotFoundException} If the destination does not exist.
  */
 async function verifyDestinationExists(
   req: Request,
@@ -126,18 +127,9 @@ const deleteDestinationDocument = async (
 ): Promise<void> => {
   const { targetDestination, targetPlanner } = req.body.out
 
-  targetPlanner.destinations = targetPlanner.destinations.filter(
-    (did: any) => did.toString() != targetDestination._id.toString(),
-  )
-
-  await PlannerModel.findOneAndUpdate(
-    { _id: targetPlanner._id },
-    { destinations: targetPlanner.destinations },
-    { new: true },
-  )
-
   const deletedDestination = await DestinationModel.findOneAndDelete({
     _id: targetDestination._id,
+    plannerId: targetPlanner._id,
   })
 
   req.body.result = deletedDestination
@@ -145,7 +137,6 @@ const deleteDestinationDocument = async (
 
   next()
 }
-
 /**
  * Retrieves an existing destination document from the database.
  *
