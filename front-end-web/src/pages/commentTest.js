@@ -1,10 +1,10 @@
 import React from "react";
-import CommentBox from "../components/Comments/commentBox";
+import CommentButton from "../components/Comments/commentButton";
 
 const CommentTest = () => {
     return (
         <div>
-            <CommentBox objectId="fakeID" />
+            <CommentButton id="testID" type="test" />
         </div>
     );
 };

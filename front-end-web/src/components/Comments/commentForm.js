@@ -9,8 +9,7 @@ const CommentForm = ({onSubmit}) => {
 
         //If it's not an empty comment, post it!
         if (comment) {
-            //CHANGE THE AUTHOR NAME WITHT THE USERID LATER PLEASE
-            onSubmit({ body: comment , author:"Adrian"});
+            onSubmit(comment);
             setComment('');
         }
     }

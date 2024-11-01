@@ -1,53 +1,76 @@
-import React, {useState } from "react";
+//A comment box holds all comments submitted for a given objectId
+//Comments are fetched from and sent to the backend
+
+import React, { useEffect, useState } from "react";
 import CommentList from './commentList';
 import CommentForm from './commentForm';
+import axios from "axios"; // Import axios for API calls
+import { useAuth } from "../../AuthContext";
 
-var commentData = [
-    {id:1, author:"Adrian", body:"This is my first comment!"},
-    {id:2, author:"Alvinna", body:"Here's another comment."},
-    {id:3, author:"Adrian", body:"testing Scrollingggggggggggggggggggggggggggg"},
-    {id:4, author:"Adrian", body:"keeeeeep going"},
-    {id:5, author:"Adrian", body:"AAAaaaaaahhhhhhhhhhhhh"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"},
-    {id:6, author:"Adrian", body:"more"}
-];
-
-//Contains a comment list of comments made on an object with the given objectId
-const CommentBox = ({objectId}) => {
+const CommentBox = ({objectId, objectType}) => {
 
     const [commentData, setComments] = useState([]);
+    const { userId } = useAuth(); 
 
-    const handleCommentSubmit = (newComment) => {
+    //Handles submitting a new comment, sending it to the server and updating the comment display
+    const handleCommentSubmit = async (newComment) => {
 
-        //Eventually, do backend comment adding here and only update the comments if it goes through
-        //...but also probably don't update them this way because we'll need the near realtime eventually
+        try {
+            const response = await axios.post(`http://localhost:8080/comment`, {
+                type: objectType,
+                objectId: objectId,
+                createdBy: userId,
+                content: newComment
+            });
 
-        setComments((prevComments) => [...prevComments, newComment]);
+            if (response.data.success) {
+                const comment = {content: newComment, createdBy: userId}
+
+                //Add new comment to the displayed box
+                setComments((prevComments) => [...prevComments, comment]);
+
+            } else {
+                console.error("Error adding comment:", response.data.message); // Log error message
+            }
+        } catch (error) {
+            console.error("Error adding comment:", error.response ? error.response.data : error.message); // Log error if request fails
+        }
     };
+
+
+    //When component is mounted, load comments from the server
+    useEffect(()=>{
+
+        //Loads all comments from the server
+        const loadCommentsFromServer = async () => {
+
+            try {
+                const response = await axios.get(`http://localhost:8080/comment`, {
+                    params: {
+                        type: objectType, //Not sure what type means, ask kin later and fix this
+                        objectId: objectId
+                    }
+                });
+
+                if (response.data.success) {
+                    setComments(response.data.data);
+
+                } else {
+                    console.error("Failed to fetch comments:", response.data.message); // Log error message
+
+                }
+            } catch (error) {
+                console.error("Error fetching comments:", error); // Log error if fetch fails
+            }
+        }
+
+
+        loadCommentsFromServer();
+    }, [])
 
 
     return (
         <div id="commentBox" className="Comment-Container">
-            <h1>
-                displaying comments for objectId: {objectId}
-            </h1>
             <CommentList commentData={commentData} />
             <CommentForm onSubmit={handleCommentSubmit} />
         </div>

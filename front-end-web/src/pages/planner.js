@@ -6,6 +6,7 @@ import { BiSolidBed } from "react-icons/bi"; // Icon for accommodations
 import { BiCalendarEvent } from "react-icons/bi"; // Icon for activities
 import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill, BsFillPinMapFill } from "react-icons/bs";
 import axios from "axios"; // Import axios for API calls
+import CommentButton from "../components/Comments/commentButton";
 
 const Planner = () => {
     // Retrieve plannerId and userId from URL and context
@@ -423,6 +424,7 @@ const Planner = () => {
                                             setShowDestinationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteDestination(dest._id)}><BsTrashFill /></button>
+                                        <CommentButton id={dest._id} type="Destination" />
                                     </div>
                                 )}
                             </div>

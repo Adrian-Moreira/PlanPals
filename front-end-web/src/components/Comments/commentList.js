@@ -5,7 +5,7 @@ const CommentList = ({commentData}) => {
     return (
         <div id="commentList" className="Comment-Scrolling-Box">
             {commentData.map((comment) => (
-                <Comment commentId={comment.id} author={comment.author} body={comment.body}/>
+                <Comment commentId={comment._id} author={comment.createdBy} body={comment.content}/>
             ))}
         </div>
     );
