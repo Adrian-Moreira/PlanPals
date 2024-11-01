@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
+import { DestinationModel } from './Destination'
+import { CommentsModel } from './Comment'
+import { VoteModel } from './Vote'
 
 const ActivityMongoSchema = new Schema<Activity>(
   {
@@ -59,8 +62,36 @@ export const ActivitySchema = z.object({
   destinationId: ObjectIdSchema,
 })
 
+ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
+  const activityId = this.getQuery()['_id']
+  const destinationId = this.getQuery()['destinationId']
+  const activityObjectId = {
+    objectId: { id: activityId, collection: 'Activity' },
+  }
+
+  try {
+    await DestinationModel.findOneAndUpdate(
+      { _id: destinationId },
+      {
+        $pull: {
+          activities: activityId,
+        },
+      },
+      { new: true },
+    )
+
+    await CommentsModel.findOneAndDelete(activityObjectId)
+    await VoteModel.findOneAndDelete(activityObjectId)
+  } catch (err: any) {
+    next(err)
+  }
+
+  next()
+})
+
 export const ActivityModel = mongoose.model<Activity>(
   'Activity',
   ActivityMongoSchema,
 )
+
 export type Activity = z.infer<typeof ActivitySchema>

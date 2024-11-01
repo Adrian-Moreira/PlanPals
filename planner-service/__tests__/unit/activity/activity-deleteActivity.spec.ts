@@ -40,6 +40,7 @@ describe('Activity->deleteActivity', () => {
       body: {
         out: {
           targetActivity: existingActivity,
+          targetDestination: { _id: existingActivity.destinationId },
         },
       },
     }

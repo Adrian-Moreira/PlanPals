@@ -1,0 +1,19 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      atlasOwnerUsername:
+        description: 'My email address'
+        required: true
+        type: string
+
+env:
+  ATLAS_OWNER_USERNAME: ${{ inputs.atlasOwnerUsername }}
+
+jobs:
+  deploy-me-daddy:
+    runs-on: ubuntu-latest # EWW
+    steps:
+      - name: Do Stuff
+        run: echo "Hello $ATLAS_OWNER_USERNAME"

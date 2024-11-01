@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import mongoose, { Schema } from 'mongoose'
 import { ObjectIdSchema, PlannerModel } from './Planner'
+import { CommentsModel } from './Comment'
+import { VoteModel } from './Vote'
 
 const TransportMongoSchema = new Schema<Transport>(
   {
@@ -57,8 +59,32 @@ export const TransportSchema = z.object({
   vehicleId: z.string().optional(),
 })
 
+TransportMongoSchema.pre('findOneAndDelete', async function (next) {
+  const transportId = this.getQuery()['_id']
+  const plannerId = this.getQuery()['plannerId']
+  const transportObjectId = {
+    objectId: { id: transportId, collection: 'Transport' },
+  }
+
+  try {
+    await CommentsModel.findOneAndDelete(transportObjectId)
+    await VoteModel.findOneAndDelete(transportObjectId)
+
+    await PlannerModel.findOneAndUpdate(
+      { _id: plannerId },
+      { $pull: { transportations: transportId } },
+      { new: true },
+    )
+  } catch (err: any) {
+    next(err)
+  }
+
+  next()
+})
+
 export const TransportModel = mongoose.model<Transport>(
   'Transport',
   TransportMongoSchema,
 )
+
 export type Transport = z.infer<typeof TransportSchema>

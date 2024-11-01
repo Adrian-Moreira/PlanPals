@@ -16,6 +16,13 @@ export const ValidCollectionSchema = z
   .string()
   .refine((val) => ValidCollections.includes(val))
 // .transform((val: string) => mongoose.models[val!])
+import { TransportModel } from './Transport'
+import { ActivityModel } from './Activity'
+import { AccommodationModel } from './Accommodation'
+import { VoteModel } from './Vote'
+import { CommentModel, CommentsModel } from './Comment'
+import { DestinationModel } from './Destination'
+import { Document } from 'mongoose'
 
 export const ObjectIdSchema = z
   .instanceof(Types.ObjectId)
@@ -88,5 +95,37 @@ export const PlannerSchema = z.object({
   invites: z.array(ObjectIdSchema).optional(),
 })
 
+PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
+  const plannerId = this.getQuery()['_id']
+  const plannerObjectId = {
+    objectId: { id: plannerId, collection: 'Planner' },
+  }
+
+  try {
+    await CommentsModel.findOneAndDelete(plannerObjectId)
+    await VoteModel.findOneAndDelete(plannerObjectId)
+
+    const planner = await PlannerModel.findOne({
+      _id: plannerId,
+    })
+
+    await Promise.all(
+      planner!.destinations!.map((id: Types.ObjectId) =>
+        DestinationModel.findOneAndDelete({ _id: id }),
+      ),
+    )
+
+    await Promise.all(
+      planner!.transportations!.map((id: Types.ObjectId) =>
+        TransportModel.findOneAndDelete({ _id: id }),
+      ),
+    )
+  } catch (err: any) {
+    next(err)
+  }
+  next()
+})
+
 export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema)
+
 export type Planner = z.infer<typeof PlannerSchema>

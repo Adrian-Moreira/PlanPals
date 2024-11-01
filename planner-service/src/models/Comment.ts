@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 import { ObjectIdSchema } from './Planner'
+import { VoteModel } from './Vote'
 
 const CommentMongoSchema = new Schema<Comment>(
   {
@@ -50,6 +51,44 @@ export const CommentSchema = z.object({
 export const CommentsSchema = z.object({
   objectId: z.object({ id: ObjectIdSchema, collection: z.string() }),
   comments: z.array(ObjectIdSchema),
+})
+
+CommentsMongoSchema.pre('findOneAndDelete', async function (next) {
+  const commentsId = this.getQuery()['objectId']
+
+  try {
+    const comments = await CommentsModel.findOne({
+      objectId: commentsId,
+    })
+
+    if (!comments) {
+      return next()
+    }
+
+    await Promise.all(
+      comments!.comments.map(async (commentId: Types.ObjectId) => {
+        await CommentModel.findOneAndDelete({ _id: commentId })
+      }),
+    )
+  } catch (err: any) {
+    next(err)
+  }
+
+  next()
+})
+
+CommentMongoSchema.pre('findOneAndDelete', async function (next) {
+  const commentId = this.getQuery()['_id']
+  const commentObjectId = {
+    objectId: { id: commentId, collection: 'Comment' },
+  }
+
+  try {
+    await CommentsModel.findOneAndDelete(commentObjectId)
+    await VoteModel.findOneAndDelete(commentObjectId)
+  } catch (err: any) {
+    next(err)
+  }
 })
 
 export const CommentModel = mongoose.model<Comment>(

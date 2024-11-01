@@ -2,6 +2,12 @@ import { PlannerModel } from '../models/Planner'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import { DestinationModel } from '../models/Destination'
+import { TransportModel } from '../models/Transport'
+import { ActivityModel } from '../models/Activity'
+import { AccommodationModel } from '../models/Accommodation'
+import { VoteModel } from '../models/Vote'
+import { CommentModel } from '../models/Comment'
 
 /**
  * Creates a new planner document in the database.
@@ -95,14 +101,15 @@ export const deletePlannerDocument = async (
   next: NextFunction,
 ): Promise<void> => {
   const { targetPlanner } = req.body.out
+
   const planner = await PlannerModel.findOneAndDelete({
     _id: targetPlanner._id,
   })
+
   req.body.result = planner
   req.body.status = StatusCodes.OK
   next()
 }
-
 /**
  * Retrieves all planner documents for a given user ID.
  *
@@ -121,17 +128,16 @@ export const getPlannerDocumentsByUserId = async (
 
   let resultPlanners
 
-  if (access) {
-    switch (access) {
-      case 'rw':
-        resultPlanners = await PlannerModel.find({ rwUsers: targetUser._id })
-        break
-      case 'ro':
-        resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })
-        break
-    }
-  } else {
-    resultPlanners = await PlannerModel.find({ createdBy: targetUser._id })
+  switch (access) {
+    case 'rw':
+      resultPlanners = await PlannerModel.find({ rwUsers: targetUser._id })
+      break
+    case 'ro':
+      resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })
+      break
+    default:
+      resultPlanners = await PlannerModel.find({ createdBy: targetUser._id })
+      break
   }
 
   if (!resultPlanners || resultPlanners.length === 0) {

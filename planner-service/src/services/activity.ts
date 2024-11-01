@@ -126,10 +126,11 @@ const deleteActivityDocument = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { targetActivity } = req.body.out
+  const { targetActivity, targetDestination } = req.body.out
 
   const deletedActivity = await ActivityModel.findByIdAndDelete({
     _id: targetActivity._id,
+    destinationId: targetDestination._id,
   })
 
   if (!deletedActivity) {

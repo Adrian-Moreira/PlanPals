@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { ObjectIdSchema } from './Planner'
 import mongoose, { Schema } from 'mongoose'
 import { DestinationModel } from './Destination'
+import { CommentsModel } from './Comment'
+import { VoteModel } from './Vote'
 
 const AccommodationMongoSchema = new Schema<Accommodation>(
   {
@@ -53,8 +55,36 @@ export const AccommodationSchema = z.object({
   location: z.string().optional(),
 })
 
+AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
+  const accommodationId = this.getQuery()['_id']
+  const destinationId = this.getQuery()['destinationId']
+  const accommodationObjectId = {
+    objectId: { id: accommodationId, collection: 'Accommodation' },
+  }
+
+  try {
+    await DestinationModel.findOneAndUpdate(
+      { _id: destinationId },
+      {
+        $pull: {
+          accommodations: accommodationId,
+        },
+      },
+      { new: true },
+    )
+
+    await CommentsModel.findOneAndDelete(accommodationObjectId)
+    await VoteModel.findOneAndDelete(accommodationObjectId)
+  } catch (err: any) {
+    next(err)
+  }
+
+  next()
+})
+
 export const AccommodationModel = mongoose.model<Accommodation>(
   'Accommodation',
   AccommodationMongoSchema,
 )
+
 export type Accommodation = z.infer<typeof AccommodationSchema>
