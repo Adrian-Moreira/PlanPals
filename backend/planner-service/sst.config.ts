@@ -16,6 +16,9 @@ export default $config({
   async run() {
     const vpc = new sst.aws.Vpc('PlanPalsAWSVPC', { bastion: true })
     const cluster = new sst.aws.Cluster('PlanPalsAWSCluster', { vpc })
+    const bucket = new sst.aws.Bucket('PlanPalsBucket', {
+      access: 'public',
+    })
 
     const atlasOwner = mongodbatlas.getAtlasUser({
       username: process.env.MONGODB_ATLAS_OWNER_USERNAME,
@@ -47,12 +50,12 @@ export default $config({
       providerInstanceSizeName: 'M0',
     })
 
-    const atlasUserName: string = 'PLACE_HOLDER_ACCESS_USERNAME'
-    const atlasPassword: string = 'PLACE_HOLDER_ACCESS_PASSWORD'
+    const atlasUserName: string | undefined = process.env.MONGODB_ATLAS_USERNAME
+    const atlasPassword: string | undefined = process.env.MONGODB_ATLAS_PASSWORD
 
     const atlasUser = new mongodbatlas.DatabaseUser('PlanPalsAtlasUser', {
-      username: atlasUserName,
-      password: atlasPassword,
+      username: atlasUserName!,
+      password: atlasPassword!,
       projectId: atlasProject.id.apply((id) => id),
       authDatabaseName: 'admin',
       roles: [
@@ -91,13 +94,32 @@ export default $config({
     )
 
     cluster.addService('PlanPalsService', {
-      link: [atlasCluster],
+      link: [atlasCluster, bucket],
       loadBalancer: {
         ports: [{ listen: '80/http', forward: '8080/http' }],
       },
       environment: {
         DATABASE_CONNECTIONSTRING: stdSrv,
       },
+      containers: [
+        {
+          name: 'planner-service',
+          image: {
+            context: './planner-service',
+            dockerfile: 'Dockerfile',
+          },
+          environment: {
+            DATABASE_CONNECTIONSTRING: stdSrv,
+          },
+        },
+        {
+          name: 'planpals-ui',
+          image: {
+            context: './front-end-web',
+            dockerfile: 'Dockerfile',
+          },
+        },
+      ],
       dev: {
         command: 'npm i && npm run start',
       },

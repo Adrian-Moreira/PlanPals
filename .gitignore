@@ -5,6 +5,7 @@ node_modules
 junit.xml
 lambda
 .env
+.sst
 .direnv
 result
 front-end-flutter/planpals/android/app/google-services.json
