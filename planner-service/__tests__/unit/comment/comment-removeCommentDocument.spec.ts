@@ -13,7 +13,7 @@ import CommentService from '../../../src/services/comment'
 import { CommentModel, CommentsModel } from '../../../src/models/Comment'
 import { RecordNotFoundException } from '../../../src/exceptions/RecordNotFoundException'
 
-describe.skip('Comment->removeComment', () => {
+describe('Comment->removeComment', () => {
   let commentMock: sinon.SinonMock
   let req: Partial<Request>
   let res: Partial<Response>

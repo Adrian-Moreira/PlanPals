@@ -131,9 +131,6 @@ const deleteActivityDocument = async (
   const deletedActivity = await ActivityModel.findByIdAndDelete({
     _id: targetActivity._id,
     destinationId: targetDestination._id,
-  }).catch((err) => {
-    req.body.err = err
-    next(req.body.err)
   })
 
   if (!deletedActivity) {

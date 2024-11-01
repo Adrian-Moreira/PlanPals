@@ -55,11 +55,6 @@ export const AccommodationSchema = z.object({
   location: z.string().optional(),
 })
 
-export const AccommodationModel = mongoose.model<Accommodation>(
-  'Accommodation',
-  AccommodationMongoSchema,
-)
-
 AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
   const accommodationId = this.getQuery()['_id']
   const destinationId = this.getQuery()['destinationId']
@@ -86,5 +81,10 @@ AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
 
   next()
 })
+
+export const AccommodationModel = mongoose.model<Accommodation>(
+  'Accommodation',
+  AccommodationMongoSchema,
+)
 
 export type Accommodation = z.infer<typeof AccommodationSchema>

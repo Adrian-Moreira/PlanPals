@@ -53,23 +53,17 @@ export const CommentsSchema = z.object({
   comments: z.array(ObjectIdSchema),
 })
 
-export const CommentModel = mongoose.model<Comment>(
-  'Comment',
-  CommentMongoSchema,
-)
-
-export const CommentsModel = mongoose.model<Comments>(
-  'Comments',
-  CommentsMongoSchema,
-)
-
 CommentsMongoSchema.pre('findOneAndDelete', async function (next) {
   const commentsId = this.getQuery()['objectId']
 
   try {
     const comments = await CommentsModel.findOne({
-      _id: commentsId.id,
+      objectId: commentsId,
     })
+
+    if (!comments) {
+      return next()
+    }
 
     await Promise.all(
       comments!.comments.map(async (commentId: Types.ObjectId) => {
@@ -96,6 +90,16 @@ CommentMongoSchema.pre('findOneAndDelete', async function (next) {
     next(err)
   }
 })
+
+export const CommentModel = mongoose.model<Comment>(
+  'Comment',
+  CommentMongoSchema,
+)
+
+export const CommentsModel = mongoose.model<Comments>(
+  'Comments',
+  CommentsMongoSchema,
+)
 
 export type Comment = z.infer<typeof CommentSchema>
 

@@ -4,6 +4,8 @@ import PlanPals from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { UserModel, UserSchema } from '../../src/models/User'
 import { PlannerModel, PlannerSchema } from '../../src/models/Planner'
+import { DestinationModel } from '../../src/models/Destination'
+import { TransportModel } from '../../src/models/Transport'
 
 let app: PlanPals
 let testUser: any
@@ -11,6 +13,8 @@ let testUser2: any
 let testPlanner: any
 
 let userToBeInvited: any
+let testDestination1: any
+let testTransportation1: any
 
 describe('Integration Test: Planner API', () => {
   beforeAll(async () => {
@@ -43,9 +47,25 @@ describe('Integration Test: Planner API', () => {
       destinations: [],
       transportations: [],
     })
-    testUser = await UserSchema.parseAsync(testUser.toObject())
-    testUser2 = await UserSchema.parseAsync(testUser2.toObject())
-    testPlanner = await PlannerSchema.parseAsync(testPlanner.toObject())
+    testDestination1 = await DestinationModel.create({
+      name: 'Barcelona',
+      createdBy: testUser._id,
+      plannerId: testPlanner._id,
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+    })
+    testTransportation1 = await TransportModel.create({
+      type: 'Train',
+      details: 'From Madrid To Barcelona',
+      plannerId: testPlanner._id,
+      createdBy: testUser._id,
+      arrivalTime: new Date().toISOString(),
+      departureTime: new Date().toISOString(),
+      vehicleId: 'AC1234',
+    })
+    testPlanner.destinations.push(testDestination1._id)
+    testPlanner.transportations.push(testTransportation1._id)
+    testPlanner = await testPlanner.save()
   })
 
   afterAll(async () => {
@@ -396,6 +416,9 @@ describe('Integration Test: Planner API', () => {
 
       expect(response.body.success).toBe(true)
       expect(response.body.data).toBeDefined()
+      expect(await PlannerModel.findById(testPlanner._id)).toBeNull()
+      expect(await DestinationModel.findById(testDestination1._id)).toBeNull()
+      expect(await TransportModel.findById(testTransportation1._id)).toBeNull()
     })
 
     it('should return Not Found', async () => {

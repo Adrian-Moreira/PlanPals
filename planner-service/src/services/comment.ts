@@ -87,14 +87,6 @@ const removeCommentDocument = async (
 ): Promise<void> => {
   const { commentId, targetUser, commentsDocument } = req.body.out
 
-  if (!commentsDocument.comments.includes(commentId)) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'comment',
-      recordId: commentId,
-    })
-    next(req.body.err)
-  }
-
   const targetComment = await CommentModel.findOne({ _id: commentId })
 
   if (!targetComment) {
@@ -114,10 +106,8 @@ const removeCommentDocument = async (
 
   req.body.result = await CommentModel.findOneAndDelete({
     _id: commentId,
-  }).catch((err) => {
-    req.body.err = err
-    next(req.body.err)
   })
+
   req.body.status = StatusCodes.OK
   next()
 }

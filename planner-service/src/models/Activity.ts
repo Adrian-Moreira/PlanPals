@@ -62,11 +62,6 @@ export const ActivitySchema = z.object({
   destinationId: ObjectIdSchema,
 })
 
-export const ActivityModel = mongoose.model<Activity>(
-  'Activity',
-  ActivityMongoSchema,
-)
-
 ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
   const activityId = this.getQuery()['_id']
   const destinationId = this.getQuery()['destinationId']
@@ -93,5 +88,10 @@ ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
 
   next()
 })
+
+export const ActivityModel = mongoose.model<Activity>(
+  'Activity',
+  ActivityMongoSchema,
+)
 
 export type Activity = z.infer<typeof ActivitySchema>

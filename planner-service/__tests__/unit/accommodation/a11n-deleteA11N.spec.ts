@@ -14,7 +14,7 @@ import AccommodationService from '../../../src/services/accommodation'
 import { DestinationModel } from '../../../src/models/Destination'
 import { RecordNotFoundException } from '../../../src/exceptions/RecordNotFoundException'
 
-describe.skip('A11N->deleteA11N', () => {
+describe('A11N->deleteA11N', () => {
   let a11nMock: sinon.SinonMock
   let d9nMock: sinon.SinonMock
   let req: Partial<Request>

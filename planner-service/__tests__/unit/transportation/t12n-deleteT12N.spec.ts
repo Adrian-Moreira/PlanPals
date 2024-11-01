@@ -13,7 +13,7 @@ import { TransportModel } from '../../../src/models/Transport'
 import TransportationService from '../../../src/services/transportation'
 import { PlannerModel } from '../../../src/models/Planner'
 
-describe.skip('Transportation->deleteTransportation', () => {
+describe('Transportation->deleteTransportation', () => {
   let t12nMock: sinon.SinonMock
   let plannerMock: sinon.SinonMock
 

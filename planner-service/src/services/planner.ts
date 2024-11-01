@@ -104,18 +104,7 @@ export const deletePlannerDocument = async (
 
   const planner = await PlannerModel.findOneAndDelete({
     _id: targetPlanner._id,
-  }).catch((err) => {
-    req.body.err = err
-    next(req.body.err)
   })
-
-  if (!planner) {
-    req.body.err = new RecordNotFoundException({
-      recordType: 'planner',
-      recordId: targetPlanner._id,
-    })
-    next(req.body.err)
-  }
 
   req.body.result = planner
   req.body.status = StatusCodes.OK

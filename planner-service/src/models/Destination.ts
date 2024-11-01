@@ -61,11 +61,6 @@ export const DestinationSchema = z.object({
   plannerId: ObjectIdSchema,
 })
 
-export const DestinationModel = mongoose.model<Destination>(
-  'Destination',
-  DestinationMongoSchema,
-)
-
 DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
   const destinationId = this.getQuery()['_id']
   const plannerId = this.getQuery()['plannerId']
@@ -74,6 +69,9 @@ DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
   }
 
   try {
+    await CommentsModel.findOneAndDelete(destinationObjectId)
+    await VoteModel.findOneAndDelete(destinationObjectId)
+
     const destination = await DestinationModel.findOne({
       _id: destinationId,
     })
@@ -83,26 +81,29 @@ DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
       { $pull: { destinations: destinationId } },
       { new: true },
     )
-
     await Promise.all(
-      destination!.activities.map((id: Types.ObjectId) =>
-        ActivityModel.findOneAndDelete({ _id: id }),
+      destination!.activities.map(
+        async (id: Types.ObjectId) =>
+          await ActivityModel.findOneAndDelete({ _id: id }),
       ),
     )
 
     await Promise.all(
-      destination!.accommodations.map((id: Types.ObjectId) =>
-        AccommodationModel.findOneAndDelete({ _id: id }),
+      destination!.accommodations.map(
+        async (id: Types.ObjectId) =>
+          await AccommodationModel.findOneAndDelete({ _id: id }),
       ),
     )
-
-    await CommentsModel.findOneAndDelete(destinationObjectId)
-    await VoteModel.findOneAndDelete(destinationObjectId)
   } catch (err: any) {
     next(err)
   }
 
   next()
 })
+
+export const DestinationModel = mongoose.model<Destination>(
+  'Destination',
+  DestinationMongoSchema,
+)
 
 export type Destination = z.infer<typeof DestinationSchema>

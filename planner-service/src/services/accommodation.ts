@@ -133,9 +133,6 @@ const deleteAccommodationDocument = async (
   const deletedAccommodation = await AccommodationModel.findOneAndDelete({
     _id: targetAccommodation._id,
     destinationId: targetDestination._id,
-  }).catch((err) => {
-    req.body.err = err
-    next(req.body.err)
   })
 
   if (!deletedAccommodation) {

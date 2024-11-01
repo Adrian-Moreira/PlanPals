@@ -233,23 +233,10 @@ describe.skip('Planner->deletePlanner with Cascade Deletion', () => {
   })
 
   it('should handle error if vote or comment deletion fails', async () => {
-    // Mock successful planner, destination, and activity deletion
     plannerMock
       .expects('findOneAndDelete')
       .withArgs({ _id: existingPlanner._id })
       .resolves(existingPlanner)
-    destinationMock
-      .expects('deleteMany')
-      .withArgs({ plannerId: existingPlanner._id })
-      .resolves()
-    activityMock
-      .expects('deleteMany')
-      .withArgs({ destinationId: { $in: existingPlanner.destinations } })
-      .resolves()
-    accommodationMock
-      .expects('deleteMany')
-      .withArgs({ destinationId: { $in: existingPlanner.destinations } })
-      .resolves()
 
     // Simulate error on vote deletion
     const error = new Error('Vote deletion failed')

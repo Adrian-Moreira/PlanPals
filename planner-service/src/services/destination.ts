@@ -130,17 +130,7 @@ const deleteDestinationDocument = async (
   const deletedDestination = await DestinationModel.findOneAndDelete({
     _id: targetDestination._id,
     plannerId: targetPlanner._id,
-  }).catch((err) => {
-    req.body.err = err
-    next(req.body.err)
   })
-
-  if (!deletedDestination) {
-    throw new RecordNotFoundException({
-      recordType: 'destination',
-      recordId: targetDestination._id,
-    })
-  }
 
   req.body.result = deletedDestination
   req.body.status = StatusCodes.OK

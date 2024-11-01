@@ -95,8 +95,6 @@ export const PlannerSchema = z.object({
   invites: z.array(ObjectIdSchema).optional(),
 })
 
-export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema)
-
 PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
   const plannerId = this.getQuery()['_id']
   const plannerObjectId = {
@@ -104,6 +102,9 @@ PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
   }
 
   try {
+    await CommentsModel.findOneAndDelete(plannerObjectId)
+    await VoteModel.findOneAndDelete(plannerObjectId)
+
     const planner = await PlannerModel.findOne({
       _id: plannerId,
     })
@@ -119,13 +120,12 @@ PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
         TransportModel.findOneAndDelete({ _id: id }),
       ),
     )
-
-    await CommentsModel.findOneAndDelete(plannerObjectId)
-    await VoteModel.findOneAndDelete(plannerObjectId)
   } catch (err: any) {
     next(err)
   }
   next()
 })
+
+export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema)
 
 export type Planner = z.infer<typeof PlannerSchema>
