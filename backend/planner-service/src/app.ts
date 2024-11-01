@@ -9,6 +9,7 @@ import router from './routes/routers'
 import cors from 'cors'
 import RequestUtils from './utils/RequestUtils'
 import path from 'node:path'
+import { StatusCodes } from 'http-status-codes'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 
@@ -33,6 +34,9 @@ class PlanPals {
     this.app.use(express.static('public'))
     this.app.get('/', (req, res) => {
       res.sendFile(path.join(__dirname, 'public', 'index.html'))
+    })
+    this.app.get('/health', (req, res) => {
+      res.sendStatus(StatusCodes.OK)
     })
     this.app.use(router)
     this.app.use(RequestUtils.mkErrorResponse)

@@ -94,9 +94,12 @@ export default $config({
     cluster.addService('PlanPalsService', {
       link: [atlasCluster, bucket],
       loadBalancer: {
+        domain: {
+          name: 'api.ppapp.xyz',
+        },
         ports: [
-          // { listen: '80/http', forward: '3000/http', container: 'planpals-ui' },
           { listen: '80/http', forward: '8080/http', container: 'planner-service' },
+          { listen: '443/https', forward: '8080/http', container: 'planner-service' },
         ],
       },
       containers: [
@@ -110,20 +113,6 @@ export default $config({
             DATABASE_CONNECTIONSTRING: stdSrv,
           },
         },
-        // {
-        //   name: 'planpals-web',
-        //   image: {
-        //     context: './front-end-web',
-        //     dockerfile: './front-end-web/Dockerfile',
-        //   },
-        //   environment: {
-        //     DATABASE_CONNECTIONSTRING: stdSrv,
-        //     CLUSTER_ARN: cluster.nodes.cluster.arn,
-        //     CLUSTER_URN: cluster.nodes.cluster.urn,
-        //     CLUSTER_NAME: cluster.nodes.cluster.name,
-        //     BUCKET_NAME: bucket.name,
-        //   },
-        // },
       ],
       dev: {
         command: 'npm i && npm run start',

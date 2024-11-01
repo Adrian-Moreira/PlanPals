@@ -8,7 +8,6 @@ lambda
 .sst
 .direnv
 result
-backend
 frontend
 front-end-flutter/planpals/android/app/google-services.json
 front-end-flutter/planpals/ios/Runner/GoogleService-Info.plist
