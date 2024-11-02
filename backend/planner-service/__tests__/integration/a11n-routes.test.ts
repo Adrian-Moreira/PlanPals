@@ -1,11 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { UserModel } from '../../src/models/User'
 import { PlannerModel } from '../../src/models/Planner'
 import { DestinationModel } from '../../src/models/Destination'
 import { AccommodationModel } from '../../src/models/Accommodation'
+import config from '../../src/config'
+import PlanPals, { initServer, startServer, stopServer } from '../../src/app'
 
 let app: PlanPals
 
@@ -25,10 +26,8 @@ let testAccommodation2: any
 
 describe('Integration Test: Accommodation API', () => {
   beforeAll(async () => {
-    const mongoURI = process.env.MONGO_URL
-    app = new PlanPals({ dbURI: mongoURI })
-    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
-    await app.startServer(port)
+    config.database.connectionString = process.env.MONGO_URL
+    app = await initServer().then((app) => startServer(app))
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
@@ -123,16 +122,12 @@ describe('Integration Test: Accommodation API', () => {
     testDestination1 = await testDestination1.save()
   })
 
-  afterAll(async () => {
-    await app.stopServer()
-  })
+  afterAll(async () => await stopServer(app))
 
   describe('perform GET from /accommodation with destinationId', () => {
     it('should return OK and get accommodations for destination', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`)
         .query({ userId: testUser1._id.toString() })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
@@ -143,9 +138,7 @@ describe('Integration Test: Accommodation API', () => {
 
     it('should return Not Found', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`)
         .query({ userId: testUser4._id.toString() })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
@@ -253,9 +246,7 @@ describe('Integration Test: Accommodation API', () => {
   describe('perform POST to /accommodation with plannerId and destinationId', () => {
     it('should return CREATED and create accommodation', async () => {
       const response = await request(app.app)
-        .post(
-          `/planner/${testPlanner2._id.toString()}/destination/${testDestination2._id.toString()}/accommodation`,
-        )
+        .post(`/planner/${testPlanner2._id.toString()}/destination/${testDestination2._id.toString()}/accommodation`)
         .send({
           createdBy: testUser4._id.toString(),
           startDate: new Date().toISOString(),
@@ -271,9 +262,7 @@ describe('Integration Test: Accommodation API', () => {
 
     it('should return Not Found with invalid user', async () => {
       const response = await request(app.app)
-        .post(
-          `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`,
-        )
+        .post(`/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`)
         .send({
           createdBy: testUser4._id.toString(),
           startDate: new Date().toISOString(),
@@ -288,9 +277,7 @@ describe('Integration Test: Accommodation API', () => {
 
     it('should return Not Found with invalid planner', async () => {
       const response = await request(app.app)
-        .post(
-          `/planner/${testUser1._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`,
-        )
+        .post(`/planner/${testUser1._id.toString()}/destination/${testDestination1._id.toString()}/accommodation`)
         .send({
           createdBy: testUser4._id.toString(),
           startDate: new Date().toISOString(),

@@ -1,76 +1,92 @@
 #!/usr/bin/env ts-node
 
+import path from 'node:path'
 import { inspect } from 'node:util'
-import express, { Express } from 'express'
 import { createServer, Server } from 'node:http'
+import express, { Express, Request, Response } from 'express'
+import cors from 'cors'
+import { StatusCodes } from 'http-status-codes'
+import { rateLimit } from 'express-rate-limit'
+import { Mongoose } from 'mongoose'
+
 import config from './config'
 import { closeMongoConnection, connectToMongoDB } from './config/db'
 import router from './routes/routers'
-import cors from 'cors'
 import RequestUtils from './utils/RequestUtils'
-import path from 'node:path'
-import { StatusCodes } from 'http-status-codes'
-import { rateLimit } from 'express-rate-limit'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
+export let MongooseConnection: Mongoose
+export let PPAPP: PlanPals
 
-class PlanPals {
-  public app: Express
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
+
+const healthChecker = (req: Request, res: Response) => {
+  res.status(StatusCodes.OK).send('OK')
+}
+
+const landingPage = (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+}
+
+type PlanPals = {
+  app: Express
   server: Server
-  dbURI: string
-  testing: boolean
+  db: Mongoose
+}
 
-  constructor({ dbURI, testing }: any) {
-    this.app = express()
-    this.server = createServer(this.app)
-    this.dbURI = dbURI || config.database.connectionString || 'mongodb://localhost:27017'
-    this.testing = testing || false
-    this.initRoutes()
-  }
+export function initExpress(app: Express): Express {
+  app.use(express.json())
+  app.use(cors())
+  app.use(express.urlencoded({ extended: false }))
+  app.use(express.static('public'))
+  app.use(rateLimiter)
+  app.get('/', landingPage)
+  app.get('/health', healthChecker)
+  app.use(router)
+  app.use(RequestUtils.mkErrorResponse)
+  return app
+}
 
-  private initRoutes(): void {
-    this.app.use(express.json())
-    this.app.use(cors())
-    this.app.use(express.urlencoded({ extended: false }))
-    this.app.use(express.static('public'))
-    this.app.use(
-      rateLimit({
-        windowMs: 15 * 60 * 1000,
-        limit: 100,
-        standardHeaders: 'draft-7',
-        legacyHeaders: false,
-      }),
-    )
-    this.app.get('/', (req, res) => {
-      res.sendFile(path.join(__dirname, 'public', 'index.html'))
-    })
-    this.app.get('/health', (req, res) => {
-      res.status(StatusCodes.OK).send('OK')
-    })
-    this.app.use(router)
-    this.app.use(RequestUtils.mkErrorResponse)
-  }
+export async function initServer(): Promise<PlanPals> {
+  const db = await connectToMongoDB(config.database.connectionString || 'mongodb://localhost:27017')
 
-  public async startServer(overridePort: number | null): Promise<void> {
-    await connectToMongoDB(this.dbURI)
-    this.server.listen(overridePort || port, () => {
-      console.log(`PP server listening on ${inspect(this.server.address())}`)
-    })
-  }
+  MongooseConnection = db
 
-  public async stopServer(): Promise<void> {
-    await closeMongoConnection()
-    this.server.close()
-  }
+  const app = initExpress(express())
+  const server = createServer(app)
+
+  PPAPP = { app, server, db }
+  return PPAPP
+}
+
+export function startServer(pp: PlanPals) {
+  pp.server.listen(port, () => {
+    console.log(`PP server listening on ${inspect(pp.server!.address())}`)
+  })
+  return pp
+}
+
+export async function stopServer(pp: PlanPals): Promise<void> {
+  await closeMongoConnection(pp.db)
+    .then(() => pp.server.close())
+    .finally(() => console.log('PP server stopped'))
+}
+
+export async function main() {
+  const pp = await initServer()
+  startServer(pp)
+  return () => stopServer(pp)
 }
 
 if (require.main === module) {
-  const pp = new PlanPals({})
-
-  process.on('SIGINT', () => pp.stopServer())
-  process.on('SIGTERM', () => pp.stopServer())
-
-  pp.startServer(port)
+  const stopServer = main()
+  process.on('SIGINT', () => stopServer)
+  process.on('SIGTERM', () => stopServer)
 }
 
 export default PlanPals
