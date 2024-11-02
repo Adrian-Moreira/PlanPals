@@ -21,9 +21,9 @@ class PlannerViewModel extends ChangeNotifier {
   // Getters
   List<Planner> get planners => _planners;
   List<Destination> get destinations => _destinations;
-  List<Activity> get activities => _activities;
   List<Transport> get transports => _transports;
   List<Accommodation> get accommodations => _accommodations;
+  List<Activity> get activities => _activities;
   bool get isLoading => _isLoading; // Get loading state
   String? get errorMessage => _errorMessage; // Get error message
 
@@ -37,8 +37,6 @@ class PlannerViewModel extends ChangeNotifier {
     _isLoading = true;
     _planners = [];
     notifyListeners(); // Notify listeners about the loading state
-
-    print('PLANNERVIEWMODEL: FETCHING ALL PLANNERS');
 
     try {
       _planners = await _plannerService.fetchAllPlanners();
@@ -57,17 +55,32 @@ class PlannerViewModel extends ChangeNotifier {
     _planners = [];
     notifyListeners(); // Notify listeners about the loading state
 
-    print('Fetching Planners by userid:$userId)');
-
     try {
       _planners = await _plannerService.fetchPlannersByUserId(userId);
-      print('PLANNERS: $_planners');
       _errorMessage = null; // Clear any previous error message
     } catch (e) {
       _errorMessage = e.toString(); // Store error message
     } finally {
       _isLoading = false; // Set loading to false
       notifyListeners(); // Notify listeners about the loading state change
+    }
+  }
+
+  Future<void> fetchDestinationsAndTransportsByPlannerId(String plannerId, String userId) async {
+    _isLoading = true;
+    _transports = [];
+    _destinations = [];
+    notifyListeners();
+
+    try {
+      _transports = await _plannerService.fetchAllTransportsByUserId(plannerId, userId);
+      _destinations = await _plannerService.fetchAllDestinationsByUserId(plannerId, userId);
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = "Failed to fetch destinations and transports";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -78,9 +91,7 @@ class PlannerViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print('PLANNERVIEWMODEL: FETCHING ALL TRANSPORTS by plannerId: $plannerId');
       _transports = await _plannerService.fetchAllTransportsByUserId(plannerId, userId);
-      print('PLANNERVIEWMODEL: FETCHED ALL TRANSPORTS by plannerId: $plannerId');
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -98,6 +109,7 @@ class PlannerViewModel extends ChangeNotifier {
 
     try {
       _destinations = await _plannerService.fetchAllDestinationsByUserId(plannerId, userId);
+
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -108,7 +120,7 @@ class PlannerViewModel extends ChangeNotifier {
   }
 
   // Fetch all activities by planner ID and destination ID
-  Future<void> fetchActivitiesByDestinationId(
+  Future<List<Activity>> fetchActivitiesByDestinationId(
       String plannerId, String destinationId, String userId) async {
     _isLoading = true;
     _activities = [];
@@ -124,10 +136,12 @@ class PlannerViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+
+    return _activities;
   }
 
   // Fetch all accommodations by planner ID and destination ID
-  Future<void> fetchAccommodationsByDestinationId(
+  Future<List<Accommodation>> fetchAccommodationsByDestinationId(
       String plannerId, String destinationId, String userId) async {
     _isLoading = true;
     _accommodations = [];
@@ -143,6 +157,7 @@ class PlannerViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+    return _accommodations;
   }
 
 
@@ -178,15 +193,13 @@ class PlannerViewModel extends ChangeNotifier {
 
     Destination newDestination = destination;
     try {
-      print("PLANNERVIEWMODEL: ADDING DESTINATION: $newDestination");
       newDestination =
           await _plannerService.addDestination(newDestination);
       _destinations.add(newDestination); // Add to local state if successful
-            print("PLANNERVIEWMODEL: ADDED DESTINATION: $newDestination");
 
       notifyListeners(); // Notify listeners about the change
     } catch (e) {
-      _errorMessage = 'Failed to add destination: ${e.toString()}';
+      _errorMessage = 'Failed to add destination.}';
     } finally {
       _isLoading = false;
       notifyListeners(); // Notify listeners whether success or failure
@@ -202,15 +215,12 @@ class PlannerViewModel extends ChangeNotifier {
 
     Transport newTransport = transport;
     try {
-      print("PLANNERVIEWMODEL: ADDING TRANSPORT: $newTransport");
       newTransport =
           await _plannerService.addTransport(newTransport);
-
-      print('PLANNERVIEWMODEL: ADDED TRANSPORT: $newTransport');
       _transports.add(newTransport); // Add to local state if successful
       notifyListeners(); // Notify listeners about the change
     } catch (e) {
-      _errorMessage = 'Failed to add transportation: ${e.toString()}';
+      _errorMessage = 'Failed to add transportation.}';
     } finally {
       _isLoading = false;
       notifyListeners(); // Notify listeners whether success or failure
@@ -218,14 +228,14 @@ class PlannerViewModel extends ChangeNotifier {
     return newTransport;
   }
 
-  Future<Accommodation> addAccommodation(Accommodation accommodation, String plannerId, String userId) async {
+  Future<Accommodation?> addAccommodation(Accommodation accommodation, String plannerId, String userId) async {
     _isLoading = true;
     _errorMessage = null; // Reset error message
     notifyListeners();
 
-    Accommodation newAccommodation = accommodation;
+    Accommodation? newAccommodation;
     try {
-      newAccommodation = await _plannerService.addAccommodation(newAccommodation, plannerId, userId);
+      newAccommodation = await _plannerService.addAccommodation(accommodation, plannerId, userId);
       _accommodations.add(newAccommodation); // Add to local state if successful
       notifyListeners(); // Notify listeners about the change
     } catch (e) {
@@ -237,14 +247,14 @@ class PlannerViewModel extends ChangeNotifier {
     return newAccommodation;
   }
 
-  Future<Activity> addActivity(Activity activity, String plannerId, String userId) async {
+  Future<Activity?> addActivity(Activity activity, String plannerId, String userId) async {
     _isLoading = true;
-    _errorMessage = null; // Reset error message
+    _errorMessage = null; // Reset error message1
     notifyListeners();
 
-    Activity newActivity = activity;
+    Activity? newActivity;
     try {
-      newActivity = await _plannerService.addActivity(newActivity, plannerId, userId);
+      newActivity = await _plannerService.addActivity(activity, plannerId, userId);
       _activities.add(newActivity); // Add to local state if successful
       notifyListeners(); // Notify listeners about the change
     } catch (e) {
@@ -295,7 +305,7 @@ class PlannerViewModel extends ChangeNotifier {
               destination.destinationId == updatedDestination.destinationId)
           .update(updatedDestination); // Update local state if successful
     } catch (e) {
-      _errorMessage = 'Failed to update destination: ${e.toString()}';
+      _errorMessage = 'Failed to update destination.';
     } finally {
       _isLoading = false;
       notifyListeners(); // Notify listeners whether success or failure
@@ -312,12 +322,14 @@ class PlannerViewModel extends ChangeNotifier {
     try {
       updatedTransport =
           await _plannerService.updateTransport(updatedTransport, userId);
+
       _transports
           .firstWhere((transport) =>
               transport.id == updatedTransport.id)  
           .update(updatedTransport); // Update local state if successful
+  
     } catch (e) {
-      _errorMessage = 'Failed to update transportation: ${e.toString()}';
+      _errorMessage = 'Failed to update transportation.}';
     } finally {
       _isLoading = false;
       notifyListeners(); // Notify listeners whether success or failure
@@ -325,20 +337,16 @@ class PlannerViewModel extends ChangeNotifier {
     return updatedTransport;
   }
 
-  Future<Accommodation> updateAccommodation(Accommodation accommodation, String plannerId, String userId) async {
+  Future<Accommodation?> updateAccommodation(Accommodation accommodation, String plannerId, String userId) async {
     _isLoading = true;
     _errorMessage = null; // Reset error message
     notifyListeners();
 
-    Accommodation updatedAccommodation = accommodation;
+    Accommodation? updatedAccommodation;
     try {
-      updatedAccommodation = await _plannerService.updateAccommodation(updatedAccommodation, plannerId, userId);
-      _accommodations
-          .firstWhere((accommodation) =>
-              accommodation.accommodationId == updatedAccommodation.accommodationId)
-          .update(updatedAccommodation); // Update local state if successful
+      updatedAccommodation = await _plannerService.updateAccommodation(accommodation, plannerId, userId);
     } catch (e) {
-      _errorMessage = 'Failed to update accommodation: ${e.toString()}';
+      _errorMessage = 'Failed to update accommodation.';
     } finally {
       _isLoading = false;
       notifyListeners(); // Notify listeners whether success or failure
@@ -346,20 +354,16 @@ class PlannerViewModel extends ChangeNotifier {
     return updatedAccommodation;
   }
 
-  Future<Activity> updateActivity(Activity activity, String plannerId, String userId) async {
+  Future<Activity?> updateActivity(Activity activity, String plannerId, String userId) async {
     _isLoading = true;
     _errorMessage = null; // Reset error message
     notifyListeners();
 
-    Activity updatedActivity = activity;
+    Activity? updatedActivity;
     try {
-      updatedActivity = await _plannerService.updateActivity(updatedActivity, plannerId, userId);
-      _activities
-          .firstWhere((activity) =>
-              activity.activityId == updatedActivity.activityId)
-          .update(updatedActivity); // Update local state if successful
+      updatedActivity = await _plannerService.updateActivity(activity, plannerId, userId);
     } catch (e) {
-      _errorMessage = 'Failed to update activity: ${e.toString()}';
+      _errorMessage = 'Failed to update activity.';
     } finally {
       _isLoading = false;
       notifyListeners(); // Notify listeners whether success or failure
@@ -421,6 +425,35 @@ class PlannerViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteAccommodation(Accommodation accommodation, String plannerId, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    try {
+      await _plannerService.deleteAccommodation(accommodation, plannerId, userId);
+    } catch (e) {
+      _errorMessage = 'Failed to delete accommodation: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+  }
+
+  Future<void> deleteActivity(Activity activity, String plannerId, String userId) async {
+    _isLoading = true;
+    _errorMessage = null; // Reset error message
+    notifyListeners();
+
+    try {
+      await _plannerService.deleteActivity(activity, plannerId, userId);
+    } catch (e) {
+      _errorMessage = 'Failed to delete activity: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notify listeners whether success or failure
+    }
+  }
 
 
   void logout() {
@@ -431,5 +464,10 @@ class PlannerViewModel extends ChangeNotifier {
     _accommodations = [];
     _errorMessage = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

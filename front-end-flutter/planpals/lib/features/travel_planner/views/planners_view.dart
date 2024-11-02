@@ -30,32 +30,9 @@ class _PlannersViewState extends State<PlannersView> {
 
   @override
   Widget build(BuildContext context) {
-    PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
-
-    return plannerViewModel.isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : _buildPlannerList(context);
-  }
-
-  Widget _buildPlannerList(BuildContext context) {
-    PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
-
     return Scaffold(
       appBar: const NavigatorAppBar(title: "Travel Planners"),
-      body: SingleChildScrollView(
-        child: GenericListView(
-          itemList: plannerViewModel.planners,
-          itemBuilder: (planner) => PlannerCard(
-            travelPlanner: planner,
-          ),
-          onAdd: () {},
-          headerTitle: "My Travel Planners",
-          headerIcon: Icons.airplanemode_active,
-          emptyMessage: "There are no travel planners",
-          functional: false,
-          scrollable: true,
-        ),
-      ),
+      body: _buildPlannerList(context),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 30.0, right: 20.0),
         child: SizedBox(
@@ -65,7 +42,8 @@ class _PlannersViewState extends State<PlannersView> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const CreatePlannerForm()),
+                MaterialPageRoute(
+                    builder: (context) => const CreatePlannerForm()),
               );
             },
             tooltip: 'Add Travel Planner',
@@ -75,5 +53,26 @@ class _PlannersViewState extends State<PlannersView> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  Widget _buildPlannerList(BuildContext context) {
+    PlannerViewModel plannerViewModel = Provider.of<PlannerViewModel>(context);
+
+    return plannerViewModel.isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+            child: GenericListView(
+              itemList: plannerViewModel.planners,
+              itemBuilder: (planner) => PlannerCard(
+                travelPlanner: planner,
+              ),
+              onAdd: () {},
+              headerTitle: "My Travel Planners",
+              headerIcon: Icons.airplanemode_active,
+              emptyMessage: "There are no travel planners",
+              functional: false,
+              scrollable: true,
+            ),
+          );
   }
 }

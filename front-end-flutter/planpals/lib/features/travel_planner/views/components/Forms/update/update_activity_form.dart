@@ -7,21 +7,22 @@ import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.da
 import 'package:planpals/shared/components/date_time_form.dart';
 import 'package:provider/provider.dart';
 
-class CreateActivityForm extends StatefulWidget {
+class UpdateActivityForm extends StatefulWidget {
   final Destination destination;
   final Activity activity;
 
-  const CreateActivityForm({super.key, required this.destination, required this.activity,});
+  const UpdateActivityForm({super.key, required this.destination, required this.activity,});
 
   @override
-  _CreateActivityFormState createState() => _CreateActivityFormState();
+  _UpdateActivityFormState createState() => _UpdateActivityFormState();
 }
 
-class _CreateActivityFormState extends State<CreateActivityForm> {
+class _UpdateActivityFormState extends State<UpdateActivityForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _activityNameController;
+  late final TextEditingController _activityDurationController;
   DateTime? _selectedDate;
-  String? _selectedDuration; // Store the time as a string
+  
 
   @override
   void initState() {
@@ -29,9 +30,9 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
 
     final Activity activity = widget.activity;
 
-    _activityNameController.text = activity.name;
-    _selectedDate = activity.date;
-    _selectedDuration = activity.duration.toString();
+    _activityNameController = TextEditingController(text: activity.name);
+    _activityDurationController = TextEditingController(text: activity.duration.toString());
+    _selectedDate = activity.startDate;
   }
 
   @override
@@ -81,16 +82,17 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
 
               // Time Field
               TextFormField(
+                controller: _activityDurationController,
                 decoration: const InputDecoration(labelText: 'Duration in Minutes'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the duration';
                   }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
                   return null;
-                },
-                onChanged: (value) {
-                  _selectedDuration = value;
                 },
               ),
 
@@ -102,20 +104,29 @@ class _CreateActivityFormState extends State<CreateActivityForm> {
                   if (_formKey.currentState?.validate() == true) {
                     // TODO: Validate Activity Data
 
-                    // Create an updated Activity
-                    Activity updatedActivity = Activity(
-                      activityId: activity.activityId,
-                      name: _activityNameController.text,
-                      date: _selectedDate!,
-                      duration: double.parse(_selectedDuration!),
-                      destinationId: activity.destinationId,
-                      locations: activity.locations,
-                      votes: activity.votes,
-                      comments: activity.comments,
+                    await plannerViewModel.updateActivity(
+                      Activity(
+                        activityId: activity.activityId,
+                        name: _activityNameController.text,
+                        startDate: _selectedDate!,
+                        duration: double.parse(_activityDurationController.text),
+                        destinationId: activity.destinationId,
+                        location: activity.location,
+                        createdBy: user.id,
+                      ),
+                      destination.plannerId,
+                      user.id
                     );
 
-                    // Update the Activity
-                    await plannerViewModel.updateActivity(updatedActivity, destination.plannerId, user.id);
+                    if (plannerViewModel.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(plannerViewModel.errorMessage!),
+                      ));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Activity updated successfully!'),
+                      ));
+                    }
 
                     // Close the form screen
                     Navigator.pop(context);

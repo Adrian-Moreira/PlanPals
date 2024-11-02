@@ -3,11 +3,21 @@ import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
+
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _usernameController = TextEditingController();
+
   final TextEditingController _preferredNameController =
       TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -115,6 +125,20 @@ class SignUpPage extends StatelessWidget {
                         );
                         userViewModel.addUser(user);
 
+                        if (userViewModel.errorMessage != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to sign up.'),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Successfully signed up.'),
+                            ),
+                          );
+                        }
+
                         // Navigate to the home page
                         Navigator.pushReplacementNamed(context, '/login');
                       
@@ -143,5 +167,13 @@ class SignUpPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _preferredNameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

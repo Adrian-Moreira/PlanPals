@@ -138,6 +138,17 @@ class _UpdateTransportFormState extends State<UpdateTransportForm> {
                     // request update
                     plannerViewModel.updateTransport(updatedTransport, user.id);
 
+                    if (plannerViewModel.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(plannerViewModel.errorMessage!)),
+                      );
+                      return;
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Transport updated successfully!')),
+                      );
+                    }
+
                     // Close the form screen
                     Navigator.pop(context);
                   }

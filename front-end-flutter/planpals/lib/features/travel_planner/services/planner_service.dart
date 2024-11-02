@@ -240,6 +240,7 @@ class PlannerService {
 
   Future<Accommodation> updateAccommodation(Accommodation accommodation, String plannerId,String userId) async {
     try {
+      print('UPDATING ACCOMMODATION: $accommodation');
       final response = await _apiService.patch(
         '/planner/$plannerId/destination/${accommodation.destinationId}/accommodation/${accommodation.accommodationId}?userId=$userId',
         accommodation.toJson(),
@@ -248,6 +249,7 @@ class PlannerService {
       final responseBody = jsonDecode(response.body);
       return Accommodation.fromJson(responseBody['data']);
     } catch (e) {
+      print(e);
       throw Exception('Failed to update the accommodation: $e');
     }
   }

@@ -5,8 +5,10 @@ node_modules
 junit.xml
 lambda
 .env
+.sst
 .direnv
 result
+frontend
 front-end-flutter/planpals/android/app/google-services.json
 front-end-flutter/planpals/ios/Runner/GoogleService-Info.plist
 front-end-flutter/planpals/macos/Runner/GoogleService-Info.plist

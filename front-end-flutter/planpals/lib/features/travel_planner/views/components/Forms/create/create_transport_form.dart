@@ -127,7 +127,16 @@ class _CreateTransportFormState extends State<CreateTransportForm> {
 
                     newTransport = await plannerViewModel.addTransport(newTransport);
 
-                    planner.transportations.add(newTransport.id); // Add new transport's ID to planner
+                    // Display success / failure message
+                    if (plannerViewModel.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(plannerViewModel.errorMessage!)),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Transport added successfully!')),
+                      );
+                    }
 
                     // Close the form screen
                     Navigator.pop(context);

@@ -127,19 +127,29 @@ class _UpdateAccommodationFormState extends State<UpdateAccommodationForm> {
                       return;
                     }
 
-                    // Create Updated Accommodoation
-                    final Accommodation updatedAccommodation = Accommodation(
-                      accommodationId: accommodation.accommodationId,
-                      destinationId: destination.destinationId,
-                      name: _nameController.text,
-                      address: _addressController.text,
-                      checkInDate: _checkIn!,
-                      checkOutDate: _checkOut!,
+                    await plannerViewModel.updateAccommodation(
+                      Accommodation(
+                        accommodationId: accommodation.accommodationId,
+                        destinationId: destination.destinationId,
+                        name: _nameController.text,
+                        address: _addressController.text,
+                        checkInDate: _checkIn!,
+                        checkOutDate: _checkOut!,
+                        createdBy: accommodation.createdBy,
+                      ),
+                      destination.plannerId,
+                      user.id
                     );
 
-                    // Update Accommodation
-                    await plannerViewModel.updateAccommodation(updatedAccommodation, destination.plannerId, user.id);
-
+                    if (plannerViewModel.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(plannerViewModel.errorMessage!)),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Accommodation updated successfully!')),
+                      );
+                    }
 
                     // Close the form screen
                     Navigator.pop(context);
