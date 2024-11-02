@@ -44,6 +44,10 @@ class UserViewModel extends ChangeNotifier {
 
   // Add a new destination to the planner
   Future<void> addUser(User user) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
     try {
       print("USERVIEWMODEL: ADDING USER: $user");
       // Call the service to add the planner
@@ -54,7 +58,10 @@ class UserViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       // Handle the exception and throw an error with a meaningful message
-      throw Exception('Failed to add destination: $e');
+      _errorMessage = 'Failed to add user: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

@@ -112,9 +112,19 @@ class _CreateDestinationFormState extends State<CreateDestinationForm> {
                         accommodations: []);
 
                     newDestination = await plannerViewModel.addDestination(newDestination);
-                    
-                    planner.destinations.add(newDestination.destinationId); // Add destination ID to planner
 
+                    if (plannerViewModel.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(plannerViewModel.errorMessage!)),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Destination added successfully!'),
+                        ),
+                      );
+                    }
+                    
                     // Close the form screen
                     Navigator.pop(context);
                   }
