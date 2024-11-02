@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../../src/app'
+import config from '../../src/config'
+import PlanPals, { initServer, startServer, stopServer } from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { UserModel, UserSchema } from '../../src/models/User'
 import { PlannerModel, PlannerSchema } from '../../src/models/Planner'
@@ -18,10 +19,9 @@ let testTransportation1: any
 
 describe('Integration Test: Planner API', () => {
   beforeAll(async () => {
-    const mongoURI = process.env.MONGO_URL
-    app = new PlanPals({ dbURI: mongoURI })
-    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
-    await app.startServer(port)
+    config.database.connectionString = process.env.MONGO_URL
+    app = await initServer().then((app) => startServer(app))
+
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
     testUser = await UserModel.create({
@@ -68,9 +68,7 @@ describe('Integration Test: Planner API', () => {
     testPlanner = await testPlanner.save()
   })
 
-  afterAll(async () => {
-    await app.stopServer()
-  })
+  afterAll(async () => await stopServer(app))
 
   describe('perform GET from /planner with userId', () => {
     it('should return OK and get planners for user', async () => {
@@ -172,10 +170,7 @@ describe('Integration Test: Planner API', () => {
   describe('perform GET from /planner with plannerId', () => {
     it('should return OK and get planner', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}` +
-            `?userId=${testUser._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}` + `?userId=${testUser._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
@@ -186,10 +181,7 @@ describe('Integration Test: Planner API', () => {
 
     it('should return OK and get planner', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}` +
-            `?userId=${testUser2._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}` + `?userId=${testUser2._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
@@ -200,10 +192,7 @@ describe('Integration Test: Planner API', () => {
 
     it('should return Not Found', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}` +
-            `?userId=${testPlanner._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}` + `?userId=${testPlanner._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
 
@@ -267,12 +256,7 @@ describe('Integration Test: Planner API', () => {
   describe('perform PATCH /planner', () => {
     it('should return OK and update planner', async () => {
       const response = await request(app.app)
-        .patch(
-          '/planner/' +
-            testPlanner._id.toString() +
-            '?userId=' +
-            testUser._id.toString(),
-        )
+        .patch('/planner/' + testPlanner._id.toString() + '?userId=' + testUser._id.toString())
         .send({
           name: 'Trip to England',
           description: '揸兜國',
@@ -284,19 +268,12 @@ describe('Integration Test: Planner API', () => {
       expect(response.body.data).toBeDefined()
       expect(response.body.data.name).toBe('Trip to England')
       expect(response.body.data.description).toBe('揸兜國')
-      expect(response.body.data.startDate).toBe(
-        testPlanner.startDate.toString(),
-      )
+      expect(response.body.data.startDate).toBe(testPlanner.startDate.toString())
     })
 
     it('should return Not Found', async () => {
       const response = await request(app.app)
-        .patch(
-          '/planner/' +
-            testPlanner._id.toString() +
-            '?userId=' +
-            testUser2._id.toString(),
-        )
+        .patch('/planner/' + testPlanner._id.toString() + '?userId=' + testUser2._id.toString())
         .send({
           name: 'Trip to Slovakia',
           description: 'From Kittsee to Kosice',
@@ -314,18 +291,14 @@ describe('Integration Test: Planner API', () => {
         .post('/planner/' + testPlanner._id.toString() + '/invite')
         .send({
           userId: testUser._id.toString(),
-          listOfUserIdWithRole: [
-            { _id: userToBeInvited._id.toString(), access: 'rw' },
-          ],
+          listOfUserIdWithRole: [{ _id: userToBeInvited._id.toString(), access: 'rw' }],
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
       expect(response.body.data).toBeDefined()
-      expect(response.body.data.rwUsers).toContain(
-        userToBeInvited._id.toString(),
-      )
+      expect(response.body.data.rwUsers).toContain(userToBeInvited._id.toString())
     })
 
     it('should return Conflict', async () => {
@@ -333,9 +306,7 @@ describe('Integration Test: Planner API', () => {
         .post('/planner/' + testPlanner._id.toString() + '/invite')
         .send({
           userId: testUser._id.toString(),
-          listOfUserIdWithRole: [
-            { _id: userToBeInvited._id.toString(), access: 'rw' },
-          ],
+          listOfUserIdWithRole: [{ _id: userToBeInvited._id.toString(), access: 'rw' }],
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.CONFLICT)
@@ -348,9 +319,7 @@ describe('Integration Test: Planner API', () => {
         .post('/planner/' + testPlanner._id.toString() + '/invite')
         .send({
           userId: testUser._id.toString(),
-          listOfUserIdWithRole: [
-            { _id: testUser._id.toString(), access: 'rw' },
-          ],
+          listOfUserIdWithRole: [{ _id: testUser._id.toString(), access: 'rw' }],
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.CONFLICT)
@@ -363,9 +332,7 @@ describe('Integration Test: Planner API', () => {
         .post('/planner/' + testPlanner._id.toString() + '/invite')
         .send({
           userId: testUser._id.toString(),
-          listOfUserIdWithRole: [
-            { _id: testUser2._id.toString(), access: 'rw' },
-          ],
+          listOfUserIdWithRole: [{ _id: testUser2._id.toString(), access: 'rw' }],
         })
         .expect('Content-Type', /json/)
         .expect(StatusCodes.CONFLICT)
@@ -377,12 +344,7 @@ describe('Integration Test: Planner API', () => {
   describe('perform DELETE /planner', () => {
     it('should return Bad Request', async () => {
       const response = await request(app.app)
-        .delete(
-          '/planner/' +
-            testPlanner._id.toString() +
-            '?userId=' +
-            'testUser._id.toString()',
-        )
+        .delete('/planner/' + testPlanner._id.toString() + '?userId=' + 'testUser._id.toString()')
         .expect('Content-Type', /json/)
         .expect(StatusCodes.BAD_REQUEST)
 
@@ -391,12 +353,7 @@ describe('Integration Test: Planner API', () => {
 
     it('should return Not Found', async () => {
       const response = await request(app.app)
-        .delete(
-          '/planner/' +
-            testPlanner._id.toString() +
-            '?userId=' +
-            testUser2._id.toString(),
-        )
+        .delete('/planner/' + testPlanner._id.toString() + '?userId=' + testUser2._id.toString())
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
 
@@ -405,12 +362,7 @@ describe('Integration Test: Planner API', () => {
 
     it('should return OK and delete planner', async () => {
       const response = await request(app.app)
-        .delete(
-          '/planner/' +
-            testPlanner._id.toString() +
-            '?userId=' +
-            testUser._id.toString(),
-        )
+        .delete('/planner/' + testPlanner._id.toString() + '?userId=' + testUser._id.toString())
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
@@ -423,24 +375,14 @@ describe('Integration Test: Planner API', () => {
 
     it('should return Not Found', async () => {
       await request(app.app)
-        .delete(
-          '/planner/' +
-            testPlanner._id.toString() +
-            '?userId=' +
-            testUser._id.toString(),
-        )
+        .delete('/planner/' + testPlanner._id.toString() + '?userId=' + testUser._id.toString())
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
     })
 
     it('should return Not Found', async () => {
       await request(app.app)
-        .delete(
-          '/planner/' +
-            'testPlanner._id.toString()' +
-            '?userId=' +
-            testUser._id.toString(),
-        )
+        .delete('/planner/' + 'testPlanner._id.toString()' + '?userId=' + testUser._id.toString())
         .expect(StatusCodes.NOT_FOUND)
     })
   })

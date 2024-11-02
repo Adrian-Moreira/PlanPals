@@ -101,6 +101,14 @@ export default $config({
           { listen: '80/http', forward: '8080/http', container: 'planner-service' },
           { listen: '443/https', forward: '8080/http', container: 'planner-service' },
         ],
+        health: {
+          '8080/http': {
+            path: '/health',
+            interval: '10 seconds',
+            timeout: '10 seconds',
+            unhealthyThreshold: 3,
+          },
+        },
       },
       containers: [
         {

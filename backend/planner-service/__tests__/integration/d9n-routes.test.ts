@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../../src/app'
+import config from '../../src/config'
+import PlanPals, { initServer, startServer, stopServer } from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { UserModel } from '../../src/models/User'
 import { PlannerModel } from '../../src/models/Planner'
@@ -26,10 +27,8 @@ let testAccommodation1: any
 
 describe('Integration Test: Destination API', () => {
   beforeAll(async () => {
-    const mongoURI = process.env.MONGO_URL
-    app = new PlanPals({ dbURI: mongoURI })
-    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
-    await app.startServer(port)
+    config.database.connectionString = process.env.MONGO_URL
+    app = await initServer().then((app) => startServer(app))
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
@@ -127,16 +126,12 @@ describe('Integration Test: Destination API', () => {
     testDestination1 = await testDestination1.save()
   })
 
-  afterAll(async () => {
-    await app.stopServer()
-  })
+  afterAll(async () => await stopServer(app))
 
   describe('perform GET from /destination with plannerId', () => {
     it('should return OK and get destinations for planner', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser1._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}/destination?userId=${testUser1._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
@@ -146,9 +141,7 @@ describe('Integration Test: Destination API', () => {
 
     it('should return OK and get destinations for planner', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser2._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}/destination?userId=${testUser2._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
@@ -158,9 +151,7 @@ describe('Integration Test: Destination API', () => {
 
     it('should return OK and get destinations for planner', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser3._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}/destination?userId=${testUser3._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
@@ -170,9 +161,7 @@ describe('Integration Test: Destination API', () => {
 
     it('should return Not Found', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}/destination?userId=${testUser4._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}/destination?userId=${testUser4._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
 
@@ -190,9 +179,7 @@ describe('Integration Test: Destination API', () => {
 
     it('should return Not Found', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testUser4._id.toString()}/destination?userId=${testUser1._id.toString()}`,
-        )
+        .get(`/planner/${testUser4._id.toString()}/destination?userId=${testUser1._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
 
@@ -201,9 +188,7 @@ describe('Integration Test: Destination API', () => {
 
     it('should return Not Found', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner2._id.toString()}/destination?userId=${testUser1._id.toString()}`,
-        )
+        .get(`/planner/${testPlanner2._id.toString()}/destination?userId=${testUser1._id.toString()}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.NOT_FOUND)
 
@@ -259,9 +244,7 @@ describe('Integration Test: Destination API', () => {
 
     it('should return Not Found with invalid transport', async () => {
       const response = await request(app.app)
-        .get(
-          `/planner/${testPlanner._id.toString()}/destination/${testUser1._id.toString()}?userId=}`,
-        )
+        .get(`/planner/${testPlanner._id.toString()}/destination/${testUser1._id.toString()}?userId=}`)
         .expect('Content-Type', /json/)
         .expect(StatusCodes.BAD_REQUEST)
 
@@ -401,23 +384,14 @@ describe('Integration Test: Destination API', () => {
 
     it('should return OK and delete destination', async () => {
       const reqStr = `/planner/${testPlanner._id.toString()}/destination/${testDestination1._id.toString()}?userId=${testUser1._id.toString()}`
-      const response = await request(app.app)
-        .delete(reqStr)
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.OK)
+      const response = await request(app.app).delete(reqStr).expect('Content-Type', /json/).expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
       expect(response.body.data._id).toBe(testDestination1._id.toString())
-      expect(
-        await PlannerModel.findOne({ _id: testPlanner._id }),
-      ).not.toContain(testDestination1._id)
-      expect(
-        await DestinationModel.findOne({ _id: testDestination1._id }),
-      ).toBeNull()
+      expect(await PlannerModel.findOne({ _id: testPlanner._id })).not.toContain(testDestination1._id)
+      expect(await DestinationModel.findOne({ _id: testDestination1._id })).toBeNull()
       expect(await ActivityModel.findOne({ _id: testActivity1._id })).toBeNull()
-      expect(
-        await AccommodationModel.findOne({ _id: testAccommodation1._id }),
-      ).toBeNull()
+      expect(await AccommodationModel.findOne({ _id: testAccommodation1._id })).toBeNull()
     })
   })
 })
