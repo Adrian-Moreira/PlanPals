@@ -1,0 +1,52 @@
+{
+  "Users": [
+    {
+      "userName": "jdoe",
+      "preferredName": "JDoe",
+      "_id": "6724f6ac7ca1d3d572434f29",
+      "createdAt": "2024-11-01T15:41:32.433Z",
+      "updatedAt": "2024-11-01T15:41:32.433Z",
+      "__v": 0
+    },
+    {
+      "userName": "janedoe",
+      "preferredName": "John Doe",
+      "_id": "6724f68be557305150c03740",
+      "createdAt": "2024-11-01T15:40:59.307Z",
+      "updatedAt": "2024-11-01T15:40:59.307Z",
+      "__v": 0
+    }
+  ],
+  "Planners": [
+    {
+      "createdBy": "6724f6ac7ca1d3d572434f29",
+      "startDate": "2024-10-09T17:08:28.186Z",
+      "endDate": "2024-10-09T17:08:28.186Z",
+      "roUsers": [],
+      "rwUsers": [],
+      "name": "Trip to Spain",
+      "destinations": [],
+      "transportations": [],
+      "invites": [],
+      "_id": "672521617ca1d3d572435026",
+      "createdAt": "2024-11-01T18:43:45.701Z",
+      "updatedAt": "2024-11-01T18:43:45.701Z",
+      "__v": 0
+    }
+  ],
+  "Transports": [
+    {
+      "_id": "672522977ca1d3d57243502b",
+      "plannerId": "672521617ca1d3d572435026",
+      "createdBy": "6724f6ac7ca1d3d572434f29",
+      "type": "Train",
+      "details": "Train to Madrid from Barcelona",
+      "vehicleId": "IDD",
+      "departureTime": "2024-10-09T17:08:28.186Z",
+      "arrivalTime": "2024-10-09T17:08:28.186Z",
+      "createdAt": "2024-11-01T18:48:55.525Z",
+      "updatedAt": "2024-11-01T18:58:30.315Z",
+      "__v": 0
+    }
+  ]
+}

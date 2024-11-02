@@ -1,10 +1,8 @@
-import { Types } from 'mongoose'
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { BasicUser, UserModel } from '../models/User'
-import { db } from '../config/db'
 
 const verifyUserExists = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   let { userId, createdBy }: { userId: any; createdBy: any } = req.body.out

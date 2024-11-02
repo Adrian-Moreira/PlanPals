@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../../src/app'
+import config from '../../src/config'
+import PlanPals, { initServer, startServer, stopServer } from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { UserModel } from '../../src/models/User'
 import { PlannerModel } from '../../src/models/Planner'
@@ -29,10 +30,8 @@ let existingVotes: any
 
 describe('Integration Test: Vote API', () => {
   beforeAll(async () => {
-    const mongoURI = process.env.MONGO_URL
-    app = new PlanPals({ dbURI: mongoURI })
-    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
-    await app.startServer(port)
+    config.database.connectionString = process.env.MONGO_URL
+    app = await initServer().then((app) => startServer(app))
 
     await UserModel.deleteMany({})
     await PlannerModel.deleteMany({})
@@ -136,9 +135,7 @@ describe('Integration Test: Vote API', () => {
     testDestination1 = await testDestination1.save()
   })
 
-  afterAll(async () => {
-    await app.stopServer()
-  })
+  afterAll(async () => await stopServer(app))
 
   describe('perform GET from /vote for destination with existing votes', () => {
     it('should return OK and get Votes for destination', async () => {
@@ -152,12 +149,8 @@ describe('Integration Test: Vote API', () => {
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
-      expect(response.body.data.upVotes).toHaveLength(
-        existingVotes.upVotes.length,
-      )
-      expect(response.body.data.downVotes).toHaveLength(
-        existingVotes.downVotes.length,
-      )
+      expect(response.body.data.upVotes).toHaveLength(existingVotes.upVotes.length)
+      expect(response.body.data.downVotes).toHaveLength(existingVotes.downVotes.length)
     })
   })
 
@@ -274,9 +267,7 @@ describe('Integration Test: Vote API', () => {
 
       expect(response.body.success).toBe(true)
       expect(response.body.data.upVotes).not.toContain(testUser1._id.toString())
-      expect(response.body.data.downVotes).not.toContain(
-        testUser1._id.toString(),
-      )
+      expect(response.body.data.downVotes).not.toContain(testUser1._id.toString())
     })
   })
 

@@ -125,6 +125,17 @@ class _UpdateDestinationFormState extends State<UpdateDestinationForm> {
                     // Update the destination
                     await plannerViewModel.updateDestination(updatedDestination, user.id);
 
+                    if (plannerViewModel.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(plannerViewModel.errorMessage!)),
+                      );
+                      return;
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Destination updated successfully!')),
+                      );
+                    }
+
                     // Close the form screen
                     Navigator.pop(context);
                   }

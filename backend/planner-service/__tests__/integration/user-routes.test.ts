@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import request from 'supertest'
-import PlanPals from '../../src/app'
+import config from '../../src/config'
+import PlanPals, { initServer, startServer, stopServer } from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
 import { BasicUserSchema, UserModel, UserSchema } from '../../src/models/User'
 
@@ -17,19 +18,16 @@ let postUser: any = {
 
 describe('Integration Test: User API', () => {
   beforeAll(async () => {
-    const mongoURI = process.env.MONGO_URL
-    app = new PlanPals({ dbURI: mongoURI })
-    const port = Math.floor(Math.random() * (65535 - 1024 + 1) + 1024)
-    await app.startServer(port)
+    config.database.connectionString = process.env.MONGO_URL
+    app = await initServer().then((app) => startServer(app))
+
     await UserModel.deleteMany({})
 
     testUser = await UserModel.create(testUser)
     testUser = await UserSchema.parseAsync(testUser)
   })
 
-  afterAll(async () => {
-    await app.stopServer()
-  })
+  afterAll(async () => await stopServer(app))
 
   describe('perform GET from /user', () => {
     it('should return OK and get user', async () => {
@@ -61,9 +59,7 @@ describe('Integration Test: User API', () => {
     })
 
     it('should return Not Found', async () => {
-      const response = await request(app.app)
-        .get('/user/6701a389fecd4f214c79183e')
-        .expect(StatusCodes.NOT_FOUND)
+      const response = await request(app.app).get('/user/6701a389fecd4f214c79183e').expect(StatusCodes.NOT_FOUND)
 
       expect(response.body.success).toBe(false)
       expect(response.body.message).toBeDefined()
@@ -187,9 +183,7 @@ describe('Integration Test: User API', () => {
     })
 
     it('should return Not Found', async () => {
-      const response = await request(app.app)
-        .delete('/user/jane')
-        .expect(StatusCodes.NOT_FOUND)
+      const response = await request(app.app).delete('/user/jane').expect(StatusCodes.NOT_FOUND)
     })
   })
 })
