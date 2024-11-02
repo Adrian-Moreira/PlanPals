@@ -7,6 +7,7 @@ import { BiCalendarEvent } from "react-icons/bi"; // Icon for activities
 import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill, BsFillPinMapFill } from "react-icons/bs";
 import axios from "axios"; // Import axios for API calls
 import CommentButton from "../components/Comments/commentButton";
+import VoteButtons from "../components/Votes/voteButtons";
 
 const Planner = () => {
     // Retrieve plannerId and userId from URL and context
@@ -565,6 +566,7 @@ const Planner = () => {
                                             setShowDestinationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteDestination(dest._id)}><BsTrashFill /></button>
+                                        <VoteButtons id={dest._id} type="Destination" />
                                         <CommentButton id={dest._id} type="Destination" />
                                     </div>
                                 )}
@@ -657,6 +659,8 @@ const Planner = () => {
                                             setShowTransportationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteTransportation(transport._id)}><BsTrashFill /></button>
+                                        <VoteButtons id={transport._id} type="Transport" />
+                                        <CommentButton id={transport._id} type="Transport" />
                                     </div>
                                 )}
                             </div>

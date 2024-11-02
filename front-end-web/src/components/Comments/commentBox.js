@@ -49,7 +49,7 @@ const CommentBox = ({objectId, objectType}) => {
             try {
                 const response = await axios.get(`http://localhost:8080/comment`, {
                     params: {
-                        type: objectType, //Not sure what type means, ask kin later and fix this
+                        type: objectType,
                         objectId: objectId
                     }
                 });
@@ -68,7 +68,8 @@ const CommentBox = ({objectId, objectType}) => {
 
 
         loadCommentsFromServer();
-        setInterval(loadCommentsFromServer, POLL_RATE)
+        // //Update comments at a set interval for now
+        // setInterval(loadCommentsFromServer, POLL_RATE)
     }, [])
 
 
