@@ -1,3 +1,5 @@
+import 'package:planpals/features/vote/vote_model.dart';
+
 class Transport {
   final String createdBy;
   final String id; // Unique identifier for the travel item
@@ -7,6 +9,7 @@ class Transport {
   final String vehicleId; // Vehicle identifier (e.g., flight number)
   DateTime departureTime; // Departure time
   DateTime arrivalTime; // Arrival time
+  Vote vote;
 
   Transport({
     required this.createdBy,
@@ -17,7 +20,8 @@ class Transport {
     required this.vehicleId,
     required this.departureTime,
     required this.arrivalTime,
-  });
+    Vote? vote, // make this parameter nullable
+  }) : vote = vote ?? Vote(createdBy: createdBy, id: '', objectId: id, type: 'Transport', upVotes: [], downVotes: []);
 
   // Factory method to create a Transport from JSON
   factory Transport.fromJson(Map<String, dynamic> json) {

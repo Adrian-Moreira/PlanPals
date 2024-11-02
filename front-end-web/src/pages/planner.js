@@ -14,9 +14,10 @@ const Planner = () => {
     const isReadOnly = access === "ro"; //set planner to read only if user has ro access 
     const { userId } = useAuth(); 
     
-    // State variables for planner and destinations
+    // State variables
     const [planner, setPlanner] = useState(null); 
     const [destinations, setDestinations] = useState([]); 
+    const [transportations, setTransportations] = useState([]); 
 
     // State variables for destination form
     const [showDestinationForm, setShowDestinationForm] = useState(false);
@@ -24,6 +25,15 @@ const Planner = () => {
     const [destinationStartDate, setDestinationStartDate] = useState("");
     const [destinationEndDate, setDestinationEndDate] = useState("");
     const [editingDestinationId, setEditingDestinationId] = useState(null); 
+
+    // State variables for transportation form
+    const [showTransportationForm, setShowTransportationForm] = useState(false);
+    const [transportationType, setTransportationType] = useState("");
+    const [transportationDetails, setTransportationDetails] = useState("");
+    const [transportationDepartureTime, setTransportationDepartureTime] = useState("");
+    const [transportationArrivalTime, setTransportationArrivalTime] = useState(""); 
+    const [transportationVehicleId, setTransportationVehicleId] = useState("");
+    const [editingTransportationId, setEditingTransportationId] = useState(null);
 
     // State variables for accommodation form
     const [showAccommodationForm, setShowAccommodationForm] = useState(false);
@@ -76,8 +86,26 @@ const Planner = () => {
             }
         };
 
+        const fetchTransportations = async () => {
+            if (plannerId) {
+                try {
+                    const response = await axios.get(`http://localhost:8080/planner/${plannerId}/transportation`, {
+                        params: { userId }
+                    });
+                    if (response.data.success) {
+                        setTransportations(response.data.data); // Set transportations if fetch is successful
+                    } else {
+                        console.error("Failed to fetch transportations:", response.data.message); // Log error message
+                    }
+                } catch (error) {
+                    console.error("Error fetching transportations:", error); // Log error if fetch fails
+                }
+            }
+        };
+
         fetchPlanner(); // Fetch planner data
         fetchDestinations(); // Fetch destinations data after fetching planner
+        fetchTransportations();// Fetch transportation data after fetching planner
     }, [plannerId, userId]);
 
     // Validate if the provided date range is within the planner's date range
@@ -193,6 +221,119 @@ const Planner = () => {
         setError(""); // Clear any error messages
         setShowDestinationForm(false);
     };
+
+        // Handle adding a new transportation
+        const handleAddTransportation = async (e) => {
+            e.preventDefault(); // Prevent default form submission
+            const startDate = new Date(transportationDepartureTime);
+            const endDate = new Date(transportationArrivalTime);
+    
+            // Validate input fields
+            if (!transportationType || !transportationDetails || !transportationDepartureTime || !transportationArrivalTime || !transportationVehicleId) {
+                alert("Transportation type, details, departure time, arrival time, and vehicle ID are required."); // Alert if fields are empty
+                return;
+            }
+    
+            // Validate date range
+            if (!validateDateRange(startDate, endDate)) {
+                setError("Transportation dates must be within the planner's date range."); // Set error message
+                return;
+            }
+    
+            try {
+                const response = await axios.post(`http://localhost:8080/planner/${plannerId}/transportation`, {
+                    type: transportationType,
+                    details: transportationDetails,
+                    departureTime: startDate.toISOString(),
+                    arrivalTime: endDate.toISOString(),
+                    vehicleId: transportationVehicleId,
+                    createdBy: userId
+                });
+    
+                if (response.data.success) {
+                    setTransportations(prev => [...prev, response.data.data]); // Update transportations state
+                    resetTransportationForm(); // Reset form fields after successful addition
+                } else {
+                    console.error("Error adding transportation:", response.data.message); // Log error message
+                }
+            } catch (error) {
+                console.error("Error adding transportation:", error.response ? error.response.data : error.message); // Log error if request fails
+            }
+        };
+    
+        // Handle editing an existing transportation
+        const handleEditTransportation = async (e) => {
+            e.preventDefault(); // Prevent default form submission
+            const startDate = new Date(transportationDepartureTime);
+            const endDate = new Date(transportationArrivalTime);
+    
+            // Validate input fields
+            if (!transportationType || !transportationDetails || !transportationDepartureTime || !transportationArrivalTime || !transportationVehicleId) {
+                alert("Transportation type, details, departure time, arrival time, and vehicle ID are required."); // Alert if fields are empty
+                return;
+            }
+    
+            // Validate date range
+            if (!validateDateRange(startDate, endDate)) {
+                setError("Transportation dates must be within the planner's date range."); // Set error message
+                return;
+            }
+    
+            try {
+                const response = await axios.patch(`http://localhost:8080/planner/${plannerId}/transportation/${editingTransportationId}?userId=${userId}`, {
+                    type: transportationType,
+                    details: transportationDetails,
+                    departureTime: startDate.toISOString(),
+                    arrivalTime: endDate.toISOString(),
+                    vehicleId: transportationVehicleId,
+                });
+    
+                if (response.data.success) {
+                    // Update the transportations state with edited transportation data
+                    setTransportations(prev => 
+                        prev.map(transport => 
+                            transport._id === editingTransportationId 
+                            ? { ...transport, type: transportationType, details: transportationDetails, departureTime: startDate.toISOString(), arrivalTime: endDate.toISOString(), vehicleId: transportationVehicleId } 
+                            : transport
+                        )
+                    );
+                    resetTransportationForm(); // Reset form fields after successful edit
+                } else {
+                    console.error("Error editing transportation:", response.data.message); // Log error message
+                }
+            } catch (error) {
+                console.error("Error editing transportation:", error.response ? error.response.data : error.message); // Log error if request fails
+            }
+        };
+    
+        // Handle deleting a transportation
+        const handleDeleteTransportation = async (transportationId) => {
+            try {
+                const response = await axios.delete(`http://localhost:8080/planner/${plannerId}/transportation/${transportationId}`, {
+                    params: { userId }
+                });
+                if (response.data.success) {
+                    setTransportations(prev => prev.filter(transport => transport._id !== transportationId)); // Update transportations state after deletion
+                    setError(""); // Clear error message
+                } else {
+                    console.error("Error deleting transportation:", response.data.message); // Log error message
+                }
+            } catch (error) {
+                console.error("Error deleting transportation:", error.response ? error.response.data : error.message); // Log error if request fails
+            }
+        };
+    
+        // Reset destination form fields
+        const resetTransportationForm = () => {
+            setEditingTransportationId(null);
+            setTransportationType("");
+            setTransportationDetails("");
+            setTransportationDepartureTime("");
+            setTransportationArrivalTime("");
+            setTransportationVehicleId("");
+            setError(""); // Clear any error messages
+            setShowTransportationForm(false);
+        };
 
     // Handle adding an accommodation
     const handleAddAccommodation = async (e) => {
@@ -476,6 +617,115 @@ const Planner = () => {
                                 <p/>
                                 <button type="reset">Cancel</button>
                                 <button type="submit">{editingDestinationId ? "Update Destination" : "Add Destination"}</button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+                <p />
+
+                <p/>
+                <div className="List-header">
+                    <BiSolidPlane /> Transportation
+                </div>
+                {transportations.length > 0 ? (
+                    transportations.map(transport => (
+                        <div className="List-item" key={transport._id}>
+                            <div>
+                                <h3>
+                                    {transport.type} 
+                                </h3>
+                                <h4>
+                                    {transport.details}
+                                    <br/>
+                                    {`Departure: ${new Date(transport.departureTime).toLocaleDateString()} at ${new Date(transport.departureTime).toLocaleTimeString()}`}
+                                    <br/>
+                                    {`Arrival: ${new Date(transport.arrivalTime).toLocaleDateString()} at ${new Date(transport.arrivalTime).toLocaleTimeString()}`}
+                                    <br/>
+                                    Vehicle ID: {transport.vehicleId}
+                                </h4>
+                                
+                                {!isReadOnly &&(
+                                    <div>
+                                        <button className="Icon-button" onClick={() => {
+                                            setEditingTransportationId(transport._id);
+                                            setTransportationType(transport.type);
+                                            setTransportationDetails(transport.details);
+                                            setEditingTransportationId(transport._id);
+                                            setTransportationDepartureTime(transport.departureTime.split(":00.000Z")[0]); // Format date for input
+                                            setTransportationArrivalTime(transport.arrivalTime.split(":00.000Z")[0]); // Format date for input
+                                            setTransportationVehicleId(transport.vehicleId);
+                                            setShowTransportationForm(true); // Show form for editing
+                                        }}><BsPencilFill /></button>
+                                        <button className="Icon-button" onClick={() => handleDeleteTransportation(transport._id)}><BsTrashFill /></button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p>No transportation available.</p> // Display message if no transportation
+                )}
+
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button" onClick={() => {
+                            setShowTransportationForm(true)
+                        }}><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
+                
+                
+                {showTransportationForm && (
+                    //create/edit transportation modal
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
+                            <form onSubmit={editingTransportationId ? handleEditTransportation : handleAddTransportation} onReset={resetTransportationForm}>
+                                Transportation Type:
+                                <input
+                                    type="text"
+                                    value={transportationType}
+                                    onChange={(e) => setTransportationType(e.target.value)}
+                                    placeholder="Transportation Type"
+                                    required
+                                />
+                                <p/>
+                                Details:
+                                <input
+                                    type="text"
+                                    value={transportationDetails}
+                                    onChange={(e) => setTransportationDetails(e.target.value)}
+                                    placeholder="Transportation Details"
+                                    required
+                                />
+                                <p/>
+                                Departure Time:
+                                <input
+                                    type="datetime-local"
+                                    value={transportationDepartureTime}
+                                    onChange={(e) => setTransportationDepartureTime(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                Arrival Time:
+                                <input
+                                    type="datetime-local"
+                                    value={transportationArrivalTime}
+                                    onChange={(e) => setTransportationArrivalTime(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                Vehicle ID:
+                                <input
+                                    type="text"
+                                    value={transportationVehicleId}
+                                    onChange={(e) => setTransportationVehicleId(e.target.value)}
+                                    placeholder="Vehicle ID"
+                                    required
+                                />
+                                <p/>
+                                <button type="reset">Cancel</button>
+                                <button type="submit">{editingTransportationId ? "Update Transportation" : "Add Transportation"}</button>
                             </form>
                         </div>
                     </div>

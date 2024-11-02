@@ -3,23 +3,21 @@ version: '3.8'
 services:
   planner-service:
     build:
-      context: ./planner-service
+      context: ./backend/planner-service
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       - LOG_LEVEL=0
       - SERVER_PORT=8080
       - DATABASE_CONNECTIONSTRING=mongodb://mongo:27017/planner
-      - RABBITMQ_CONNECTIONSTRING=amqp://user:password@rabbitmq:5672
     depends_on:
       - mongo
-      - rabbitmq
 
   front-end-react:
     build:
       context: ./front-end-web
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - planner-service
 
@@ -33,19 +31,10 @@ services:
   mongo:
     image: mongo:6
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongodb:/data/db
       - mongodb_config:/data/configdb
-
-  rabbitmq:
-    image: rabbitmq:management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
 
 volumes:
   mongodb:
