@@ -10,6 +10,7 @@ import cors from 'cors'
 import RequestUtils from './utils/RequestUtils'
 import path from 'node:path'
 import { StatusCodes } from 'http-status-codes'
+import { rateLimit } from 'express-rate-limit'
 
 const port: number = config.server.port ? parseInt(config.server.port) : 8080
 
@@ -32,11 +33,19 @@ class PlanPals {
     this.app.use(cors())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(express.static('public'))
+    this.app.use(
+      rateLimit({
+        windowMs: 15 * 60 * 1000,
+        limit: 100,
+        standardHeaders: 'draft-7',
+        legacyHeaders: false,
+      }),
+    )
     this.app.get('/', (req, res) => {
       res.sendFile(path.join(__dirname, 'public', 'index.html'))
     })
     this.app.get('/health', (req, res) => {
-      res.sendStatus(StatusCodes.OK)
+      res.status(StatusCodes.OK).send('OK')
     })
     this.app.use(router)
     this.app.use(RequestUtils.mkErrorResponse)
