@@ -14,10 +14,27 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Bucket"
     }
+    "PlanPalsCognitoIdentityPool": {
+      "id": string
+      "type": "sst.aws.CognitoIdentityPool"
+    }
+    "PlanPalsCognitoUserPool": {
+      "id": string
+      "type": "sst.aws.CognitoUserPool"
+    }
     "PlanPalsService": {
       "service": string
       "type": "sst.aws.Service"
       "url": string
+    }
+    "PlanPalsWeb": {
+      "type": "sst.aws.StaticSite"
+      "url": string
+    }
+    "PlanPalsWebClientCognitoUserPool": {
+      "id": string
+      "secret": string
+      "type": "sst.aws.CognitoUserPoolClient"
     }
   }
 }
