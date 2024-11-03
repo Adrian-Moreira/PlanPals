@@ -6,6 +6,8 @@ import { BiSolidBed } from "react-icons/bi"; // Icon for accommodations
 import { BiCalendarEvent } from "react-icons/bi"; // Icon for activities
 import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill } from "react-icons/bs";
 import axios from "axios"; // Import axios for API calls
+import CommentButton from "../components/Comments/commentButton";
+import VoteButtons from "../components/Votes/voteButtons";
 
 const Planner = () => {
     // Retrieve plannerId and userId from URL and context
@@ -745,6 +747,8 @@ const Planner = () => {
                                             setShowDestinationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteDestination(dest._id)}><BsTrashFill /></button>
+                                        <VoteButtons id={dest._id} type="Destination" />
+                                        <CommentButton id={dest._id} type="Destination" />
                                     </div>
                                 )}
                             </div>
@@ -835,6 +839,8 @@ const Planner = () => {
                                             setShowTransportationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteTransportation(transport._id)}><BsTrashFill /></button>
+                                        <VoteButtons id={transport._id} type="Transport" />
+                                        <CommentButton id={transport._id} type="Transport" />
                                     </div>
                                 )}
                             </div>
@@ -939,6 +945,8 @@ const Planner = () => {
                                             setShowAccommodationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteAccommodation(accommodation._id, accommodation.location)}><BsTrashFill /></button>
+                                        <VoteButtons id={accommodation._id} type="Accommodation" />
+                                        <CommentButton id={accommodation._id} type="Accommodation" />
                                     </div>
                                 )}
                             </div>
@@ -1043,6 +1051,8 @@ const Planner = () => {
                                             setShowActivityForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteActivity(activity._id, activity.location)}><BsTrashFill /></button>
+                                        <VoteButtons id={activity._id} type="Activity" />
+                                        <CommentButton id={activity._id} type="Activity" />
                                     </div>
                                 )}
                             </div>
