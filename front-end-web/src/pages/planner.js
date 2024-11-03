@@ -4,7 +4,7 @@ import { useAuth } from '../AuthContext'; // Import Auth context to get userId
 import { BiSolidPlane } from "react-icons/bi"; // Icon for transport
 import { BiSolidBed } from "react-icons/bi"; // Icon for accommodations
 import { BiCalendarEvent } from "react-icons/bi"; // Icon for activities
-import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill, BsFillPinMapFill } from "react-icons/bs";
+import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill } from "react-icons/bs";
 import axios from "axios"; // Import axios for API calls
 
 const Planner = () => {
@@ -18,6 +18,7 @@ const Planner = () => {
     const [destinations, setDestinations] = useState([]); 
     const [transportations, setTransportations] = useState([]);
     const [accommodations, setAccommodations] = useState([]);  
+    const [activities, setActivities] = useState([]);  
 
     // State variables for destination form
     const [showDestinationForm, setShowDestinationForm] = useState(false);
@@ -49,6 +50,7 @@ const Planner = () => {
     const [activityDate, setActivityDate] = useState("");
     const [activityTime, setActivityTime] = useState("");
     const [activityDestinationId, setActivityDestinationId] = useState(""); 
+    const [editingActivityId, setEditingActivityId] = useState(null);
 
     const [error, setError] = useState(""); // State for error messages
 
@@ -80,21 +82,37 @@ const Planner = () => {
                         //fetch accommodations
                         try {
                             for(const dest of response.data.data){
-                                //if(response.data.data.accommodations.length > 0){
-                                    const AccommodationResponse = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${dest._id}/accommodation`, {
-                                        params: { userId }
-                                    });
-                                    if (AccommodationResponse.data.success) {
-                                        for(const accommodation of AccommodationResponse.data.data){
-                                            setAccommodations(prev => [...prev, accommodation]); // Set Accommodations if fetch is successful
-                                        }
-                                    } else {
-                                        console.error("Failed to fetch accommodations:", response.data.message); // Log error message
+                                const AccommodationResponse = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${dest._id}/accommodation`, {
+                                    params: { userId }
+                                });
+                                if (AccommodationResponse.data.success) {
+                                    for(const accommodation of AccommodationResponse.data.data){
+                                        setAccommodations(prev => [...prev, accommodation]); // Set Accommodations if fetch is successful
                                     }
-                                //}
+                                } else {
+                                    console.error("Failed to fetch accommodations:", response.data.message); // Log error message
+                                }
                             } 
                         } catch (error) {
                             console.error("Error fetching accommodations:", error); // Log error if fetch fails
+                        }
+
+                        //fetch activities
+                        try {
+                            for(const dest of response.data.data){
+                                const ActivityResponse = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${dest._id}/activity`, {
+                                    params: { userId }
+                                });
+                                if (ActivityResponse.data.success) {
+                                    for(const activity of ActivityResponse.data.data){
+                                        setActivities(prev => [...prev, activity]); // Set activities if fetch is successful
+                                    }
+                                } else {
+                                    console.error("Failed to fetch activities:", response.data.message); // Log error message
+                                }
+                            } 
+                        } catch (error) {
+                            console.error("Error fetching activities:", error); // Log error if fetch fails
                         }
                         
                     } else {
@@ -512,29 +530,92 @@ const Planner = () => {
         try {
             const response = await axios.post(`http://localhost:8080/planner/${plannerId}/destination/${activityDestinationId}/activity`, {
                 name: activityName,
-                date: selectedDate.toISOString(),
-                time: activityTime,
-                createdBy: userId // Include the userId of the creator
+                startDate: selectedDate.toISOString(),
+                duration: Number(activityTime),
+                createdBy: userId, // Include the userId of the creator,
+                location: activityDestinationId  // Include the destination ID
             });
 
             if (response.data.success) {
-                setDestinations(prev => prev.map(dest => 
-                    dest.destinationId === activityDestinationId 
-                    ? { ...dest, activities: [...(dest.activities || []), response.data.data] } // Update activities for selected destination
-                    : dest
-                ));
-                // Reset activity form fields after successful addition
-                setActivityName("");
-                setActivityDate("");
-                setActivityTime("");
-                setShowActivityForm(false);
-                setError(""); // Clear any error messages
+                setActivities(prev => [...prev, response.data.data]); // Update activities state
+                resetActivityForm();// Reset form fields after successful addition
             } else {
                 console.error("Error adding activity:", response.data.message); // Log error message
             }
         } catch (error) {
             console.error("Error adding activity:", error.response ? error.response.data : error.message); // Log error if request fails
         }
+    };
+
+    // Handle editing an existing activity
+    const handleEditActivity = async (e) => {
+        e.preventDefault(); // Prevent default form submission
+        const selectedDate = new Date(activityDate);
+
+        // Validate input fields
+        if (!activityName || !activityDate || !activityTime || !activityDestinationId) {
+            alert("All fields are required for the activity."); // Alert if fields are empty
+            return;
+        }
+
+        // Validate that the activity date is within the planner's date range
+        if (!validateDateRange(selectedDate, selectedDate)) {
+            setError("Activity date must be within the planner's date range."); // Set error message
+            return;
+        }
+
+        try {
+            const response = await axios.patch(`http://localhost:8080/planner/${plannerId}/destination/${activityDestinationId}/activity/${editingActivityId}?userId=${userId}`, {
+                name: activityName,
+                startDate: selectedDate.toISOString(),
+                duration: Number(activityTime),
+                location: activityDestinationId  // Include the destination ID
+            });
+
+            if (response.data.success) {
+                // Update the activity state with edited activity data
+                setActivities(prev => 
+                    prev.map(activity => 
+                        activity._id === editingActivityId 
+                        ? { ...activity, name: activityName, startDate: selectedDate.toISOString(), duration: Number(activityTime), location: activityDestinationId } 
+                        : activity
+                    )
+                );
+                resetActivityForm(); // Reset form fields after successful edit
+            } else {
+                console.error("Error editing activity:", response.data.message); // Log error message
+            }
+        } catch (error) {
+            console.error("Error editing activity:", error.response ? error.response.data : error.message); // Log error if request fails
+        }
+    };
+
+    // Handle deleting an activity
+    const handleDeleteActivity = async (activityId, activityDestId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/planner/${plannerId}/destination/${activityDestId}/activity/${activityId}`, {
+                params: { userId }
+            });
+            if (response.data.success) {
+                setActivities(prev => prev.filter(activity => activity._id !== activityId)); // Update activities state after deletion
+                setError(""); // Clear error message
+            } else {
+                console.error("Error deleting activity:", response.data.message); // Log error message
+            }
+        } catch (error) {
+            console.error("Error deleting activity:", error.response ? error.response.data : error.message); // Log error if request fails
+        }
+    };
+
+    // Reset accommodation form fields
+    const resetActivityForm = () => {
+        setEditingActivityId(null);
+        setActivityName("");
+        setActivityDate("");
+        setActivityTime("");
+        setActivityDestinationId("");
+        setError(""); // Clear any error messages
+        setShowActivityForm(false);
     };
 
     // Display loading message while fetching planner data
@@ -554,9 +635,9 @@ const Planner = () => {
                     <p/>
                     {`${new Date(planner.startDate).toLocaleDateString()} To ${new Date(planner.endDate).toLocaleDateString()}`}
                 </div>
-            <header className="Page-header">
+            {/* <header className="Page-header">
 
-                {/* Add Accommodation Form */}
+
                 <button onClick={() => setShowAccommodationForm(!showAccommodationForm)}>
                     {showAccommodationForm ? "❌ Cancel" : "➕ Add Accommodation"}
                 </button>
@@ -596,7 +677,7 @@ const Planner = () => {
                     </form>
                 )}
 
-                {/* Add Activity Form */}
+
                 <button onClick={() => setShowActivityForm(!showActivityForm)}>
                     {showActivityForm ? "❌ Cancel" : "➕ Add Activity"}
                 </button>
@@ -636,8 +717,8 @@ const Planner = () => {
                     </form>
                 )}
 
-                <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
-            </header>
+                <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> 
+            </header> */}
 
                 <p/>
                 <div className="List-header">
@@ -842,9 +923,9 @@ const Planner = () => {
                                 <h4>
                                     Location: {getDestinationName(accommodation.location)}
                                     <br/>
-                                    Check In: {new Date(accommodation.startDate).toLocaleDateString()}
+                                    {`Check In: ${new Date(accommodation.startDate).toLocaleDateString()} at ${new Date(accommodation.startDate).toLocaleTimeString()}`}
                                     <br/>
-                                    Check Out: {new Date(accommodation.endDate).toLocaleDateString()}
+                                    {`Check Out: ${new Date(accommodation.endDate).toLocaleDateString()} at ${new Date(accommodation.endDate).toLocaleTimeString()}`}
                                 </h4>
                                 
                                 {!isReadOnly &&(
@@ -852,8 +933,8 @@ const Planner = () => {
                                         <button className="Icon-button" onClick={() => {
                                             setEditingAccommodationId(accommodation._id);
                                             setAccommodationName(accommodation.name);
-                                            setAccommodationStartDate(accommodation.startDate.split("T")[0]);// Format date for input
-                                            setAccommodationEndDate(accommodation.endDate.split("T")[0]);// Format date for input
+                                            setAccommodationStartDate(accommodation.startDate.split(":00.000Z")[0]);// Format date for input
+                                            setAccommodationEndDate(accommodation.endDate.split(":00.000Z")[0]);// Format date for input
                                             setAccommodationDestinationId(accommodation.location);
                                             setShowAccommodationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
@@ -890,31 +971,36 @@ const Planner = () => {
                                     placeholder="Accommodation Name"
                                     required
                                 />
-                                Destination:
-                                <select 
-                                    onChange={(e) => setAccommodationDestinationId(e.target.value)}
-                                    value={accommodationDestinationId} 
-                                    required
-                                >
-                                    <option value="">Select Destination</option>
-                                    {destinations.map(dest => (
-                                        <option key={dest._id} value={dest._id}>
-                                            {dest.name}
-                                        </option>
-                                    ))}
-                                </select>
                                 <p/>
-                                Check In Date:
+                                {!editingAccommodationId && (
+                                    <div>
+                                        Destination:
+                                        <select 
+                                            onChange={(e) => setAccommodationDestinationId(e.target.value)}
+                                            value={accommodationDestinationId} 
+                                            required
+                                        >
+                                            <option value="">Select Destination</option>
+                                            {destinations.map(dest => (
+                                                <option key={dest._id} value={dest._id}>
+                                                    {dest.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <p/>
+                                    </div>
+                                )}
+                                Check In:
                                 <input
-                                    type="date"
+                                    type="datetime-local"
                                     value={accommodationStartDate}
                                     onChange={(e) => setAccommodationStartDate(e.target.value)}
                                     required
                                 />
                                 <p/>
-                                Check Out Date:
+                                Check Out:
                                 <input
-                                    type="date"
+                                    type="datetime-local"
                                     value={accommodationEndDate}
                                     onChange={(e) => setAccommodationEndDate(e.target.value)}
                                     required
@@ -931,19 +1017,108 @@ const Planner = () => {
                 <div className="List-header">
                     <BiCalendarEvent /> Activities
                 </div>
-                {planner.activities && planner.activities.length > 0 ? (
-                    planner.activities.map(activity => (
+                {activities.length > 0 ? (
+                    activities.map(activity => (
                         <div className="List-item" key={activity._id}>
-                            <div>{activity.name}</div>
-                            <div className="Planner-item">{new Date(activity.date).toLocaleDateString()}</div>
-                            <div className="Planner-item">{activity.time}</div>
-                            <p />
+                            <div>
+                                <h3>
+                                    {activity.name}
+                                </h3>
+                                <h4>
+                                    Location: {getDestinationName(activity.location)}
+                                    <br/>
+                                    {`${new Date(activity.startDate).toLocaleDateString()} at ${new Date(activity.startDate).toLocaleTimeString()}`}
+                                    <br/>
+                                    For {activity.duration} Hours
+                                </h4>
+                                
+                                {!isReadOnly &&(
+                                    <div>
+                                        <button className="Icon-button" onClick={() => {
+                                            setEditingActivityId(activity._id);
+                                            setActivityName(activity.name);
+                                            setActivityDate(activity.startDate.split(":00.000Z")[0]);// Format date for input
+                                            setActivityTime(activity.duration);
+                                            setActivityDestinationId(activity.location);
+                                            setShowActivityForm(true); // Show form for editing
+                                        }}><BsPencilFill /></button>
+                                        <button className="Icon-button" onClick={() => handleDeleteActivity(activity._id, activity.location)}><BsTrashFill /></button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))
                 ) : (
                     <p>No activities available.</p> // Display message if no activities
                 )}
+
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button" onClick={() => {
+                            setShowActivityForm(true)
+                        }}><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
+                
+                
+                {showActivityForm && (
+                    //create/edit activity modal
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
+                            <form onSubmit={editingActivityId ? handleEditActivity : handleAddActivity} onReset={resetActivityForm}>
+                                Activity Name:
+                                <input
+                                    type="text"
+                                    value={activityName}
+                                    onChange={(e) => setActivityName(e.target.value)}
+                                    placeholder="Activity Name"
+                                    required
+                                />
+                                <p/>
+                                {!editingActivityId && (
+                                    <div>
+                                        Destination:
+                                        <select 
+                                            onChange={(e) => setActivityDestinationId(e.target.value)}
+                                            value={activityDestinationId} 
+                                            required
+                                        >
+                                            <option value="">Select Destination</option>
+                                            {destinations.map(dest => (
+                                                <option key={dest._id} value={dest._id}>
+                                                    {dest.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <p/>
+                                    </div>
+                                )}
+                                Start Time:
+                                <input
+                                    type="datetime-local"
+                                    value={activityDate}
+                                    onChange={(e) => setActivityDate(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                Duration:
+                                <input
+                                    type="number"
+                                    value={activityTime}
+                                    onChange={(e) => setActivityTime(e.target.value)}
+                                    required
+                                /> Hours
+                                <p/>
+                                <button type="reset">Cancel</button>
+                                <button type="submit">{editingActivityId ? "Update Activity" : "Add Activity"}</button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+                <p />
             </div>
+            <p/>
         </div>
     );
 };
