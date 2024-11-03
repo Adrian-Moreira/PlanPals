@@ -945,6 +945,8 @@ const Planner = () => {
                                             setShowAccommodationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteAccommodation(accommodation._id, accommodation.location)}><BsTrashFill /></button>
+                                        <VoteButtons id={accommodation._id} type="Accommodation" />
+                                        <CommentButton id={accommodation._id} type="Accommodation" />
                                     </div>
                                 )}
                             </div>
@@ -1049,6 +1051,8 @@ const Planner = () => {
                                             setShowActivityForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteActivity(activity._id, activity.location)}><BsTrashFill /></button>
+                                        <VoteButtons id={activity._id} type="Activity" />
+                                        <CommentButton id={activity._id} type="Activity" />
                                     </div>
                                 )}
                             </div>

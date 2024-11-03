@@ -1,5 +1,10 @@
-//Creates a button which when clicked shows or hides the comment box for a given object
-//objectId must be supplied to show the correct comment box
+/*Creates 2 buttons, allowing the user to up vote or down vote an object (such as a destination or activity)
+  Votes are made on the given objectId under the current userId that is logged in
+
+  CURRENTLY KNOWN ISSUE: if the user is logged in on the same account on multiple windows/devices client side state
+                         may differ from the server state. This won't cause any backend issues but front end may display
+                         incorrectly until refreshed. Will be fixed when real time updating is added.
+*/
 
 import React, { useEffect, useState } from 'react';
 import { BsFillHandThumbsUpFill } from "react-icons/bs";
@@ -18,6 +23,7 @@ const VoteButtons = ({id, type}) => {
 
   const { userId } = useAuth(); 
 
+  //Called when the user presses the upVote button
   const upVote = async() => {
 
     //If the user has not voted this object up, upVote it!
@@ -35,7 +41,7 @@ const VoteButtons = ({id, type}) => {
             setUpVotes(upVotes + 1)
             setHasVotedUp(true)
 
-            //If user has downVoted this object, reflect such by removing the downVote on screen
+            //If the user had previously downVoted this object, remove one from the downVote counter
             if(hasVotedDown)
             {
               setDownVotes(downVotes - 1)
@@ -65,7 +71,6 @@ const VoteButtons = ({id, type}) => {
         if (response.data.success) {
           //Decrement upVote counter
           setUpVotes(upVotes - 1)
-
           setHasVotedUp(false)
             
 
@@ -96,7 +101,7 @@ const VoteButtons = ({id, type}) => {
             setDownVotes(downVotes + 1)
             setHasVotedDown(true)
 
-            //If user has downVoted this object, reflect such by removing the downVote on screen
+            //If the user had previously upVoted this object, remove one from the upVote counter
             if(hasVotedUp)
             {
               setUpVotes(upVotes - 1)
@@ -126,7 +131,6 @@ const VoteButtons = ({id, type}) => {
         if (response.data.success) {
           //Decrement upVote counter
           setDownVotes(downVotes - 1)
-
           setHasVotedDown(false)
             
 
@@ -144,6 +148,9 @@ const VoteButtons = ({id, type}) => {
   useEffect(()=>{
 
     //Loads all votes from the server
+    /*
+      When adding real time capability, will need to call these functions much more often to keep screen up to date
+    */
     const loadVotesFromServer = async () => {
 
         try {
@@ -155,6 +162,7 @@ const VoteButtons = ({id, type}) => {
             });
 
             if (response.data.success) {
+              //Set both vote counters to reflect the amount of votes made on the object
               setUpVotes(response.data.data.upVotes.length)
               setDownVotes(response.data.data.downVotes.length)
 
@@ -167,7 +175,7 @@ const VoteButtons = ({id, type}) => {
         }
     }
     
-      //Loads all votes from the server
+      //Loads current users voting state from the server
       const setVotedState = async () => {
 
         try {
@@ -179,6 +187,7 @@ const VoteButtons = ({id, type}) => {
             });
 
             if (response.data.success) {
+              //Set the voting state as the server provided
               setHasVotedUp(response.data.data.upVoted)
               setHasVotedDown(response.data.data.downVoted)
 
@@ -197,8 +206,7 @@ const VoteButtons = ({id, type}) => {
   }, [])
 
 
-
-
+  //Return the actual voting buttons and counters
   return (
     <div id="comments" style={{display:"inline-block"}}>
 

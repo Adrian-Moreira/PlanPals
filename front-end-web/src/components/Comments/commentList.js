@@ -1,3 +1,5 @@
+//A comment list maps comment data supplied as seperate comments on the screen
+
 import React from 'react';
 import Comment from './comment';
 

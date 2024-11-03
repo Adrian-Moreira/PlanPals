@@ -1,5 +1,11 @@
-//A comment box holds all comments submitted for a given objectId
-//Comments are fetched from and sent to the backend
+/*  A comment box holds all comments submitted for a given objectId
+    Comments are fetched from and sent to the backend
+
+    NOTE: Comments currently only store the userId of the comment creator, as such
+          without making hundreds of backend calls, we cannot display a users username beside
+          a comment. Because of this we are currently displaying userIds in front of comments
+          which is NOT GOOD! (but it works for now)
+*/
 
 import React, { useEffect, useState } from "react";
 import CommentList from './commentList';
