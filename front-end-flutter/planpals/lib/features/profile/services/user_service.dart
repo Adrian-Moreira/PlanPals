@@ -20,6 +20,17 @@ class UserService {
       throw Exception('Failed to load user: ${response.statusCode}');
     }
   }
+
+  Future<User> fetchUserById(String userId) async {
+    final response = await _apiService.get('/user/$userId');
+    if (response.statusCode == 200) {
+      final userJson = json.decode(response.body);
+      return User.fromJson(userJson['data']);
+    } else {
+      throw Exception('Failed to load user: ${response.statusCode}');
+    }
+  }
+
   Future<User> addUser(User user) async {
     try {
       final response = await _apiService.post('/user', user.toJson());
