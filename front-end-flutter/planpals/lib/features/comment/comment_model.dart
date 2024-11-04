@@ -1,6 +1,7 @@
 class Comment {
-  String createdBy;
-  String content;
+  final String id;
+  final String createdBy;
+  final String content;
   String objectId;
   String type;
   String userName;
@@ -10,10 +11,12 @@ class Comment {
       required this.content,
       required this.objectId,
       required this.type,
+      required this.id,
       this.userName = ''});
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
+        id: json['_id'] ?? '',
         createdBy: json['createdBy'] ?? '',
         content: json['content'] ?? '',
         objectId: json['objectId'] ?? '',
@@ -22,19 +25,20 @@ class Comment {
 
   Map<String, dynamic> toJson() {
     return {
+      '_id': id,
       'createdBy': createdBy,
       'content': content,
       'objectId': objectId,
       'type': type
     };
   }
-  
+
   bool isCreatedBy(String userId) {
     return createdBy == userId;
   }
 
   @override
   String toString() {
-    return 'Comment(createdBy: $createdBy, content: $content, objectId: $objectId, type: $type)';
+    return 'Comment(id: $id, createdBy: $createdBy, content: $content, objectId: $objectId, type: $type)';
   }
 }

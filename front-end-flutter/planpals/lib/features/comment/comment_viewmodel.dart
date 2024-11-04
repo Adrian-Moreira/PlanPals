@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/comment/comment_service.dart';
-import 'package:planpals/features/comment/models/comment_model.dart';
+import 'package:planpals/features/comment/comment_model.dart';
 import 'package:planpals/features/profile/services/user_service.dart';
 
 class CommentViewModel extends ChangeNotifier{
@@ -23,6 +23,10 @@ class CommentViewModel extends ChangeNotifier{
     try {
       _comments = await _commentService.fetchComments(objectId, type);
       await _fetchCommentsUserName(); // Fetch usernames for each comment
+      for (var comment in _comments) {
+        comment.objectId = objectId;
+        comment.type = type;
+      }
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
@@ -39,6 +43,8 @@ class CommentViewModel extends ChangeNotifier{
     try {
       Comment newComment = await _commentService.addComment(comment);
       newComment.userName = await _userService.fetchUserById(newComment.createdBy).then((user) => user.preferredName);
+      newComment.objectId = objectId;
+      newComment.type = type;
       _comments.add(newComment);
     } catch (e) {
       _errorMessage = e.toString();
@@ -47,6 +53,24 @@ class CommentViewModel extends ChangeNotifier{
       notifyListeners();
     }
   }
+
+
+  Future<void> deleteComment(Comment comment) async {
+    _isloading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _commentService.deleteComment(comment);
+      _comments.remove(comment);
+    } catch (e) {
+      _errorMessage = 'Failed to delete comment: ${e.toString()}';
+    } finally {
+      _isloading = false;
+      notifyListeners();
+    }
+  }
+
 
 
 
@@ -69,4 +93,5 @@ class CommentViewModel extends ChangeNotifier{
       throw Exception('Failed to fetch usernames');
     }
   }
+
 }
