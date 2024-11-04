@@ -4,8 +4,10 @@ import { useAuth } from '../AuthContext'; // Import Auth context to get userId
 import { BiSolidPlane } from "react-icons/bi"; // Icon for transport
 import { BiSolidBed } from "react-icons/bi"; // Icon for accommodations
 import { BiCalendarEvent } from "react-icons/bi"; // Icon for activities
-import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill, BsFillPinMapFill } from "react-icons/bs";
+import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill, BsFillMapFill, BsChatFill } from "react-icons/bs";
 import axios from "axios"; // Import axios for API calls
+import CommentButton from "../components/Comments/commentButton";
+import VoteButtons from "../components/Votes/voteButtons";
 
 const Planner = () => {
     // Retrieve plannerId and userId from URL and context
@@ -16,7 +18,9 @@ const Planner = () => {
     // State variables
     const [planner, setPlanner] = useState(null); 
     const [destinations, setDestinations] = useState([]); 
-    const [transportations, setTransportations] = useState([]); 
+    const [transportations, setTransportations] = useState([]);
+    const [accommodations, setAccommodations] = useState([]);  
+    const [activities, setActivities] = useState([]);  
 
     // State variables for destination form
     const [showDestinationForm, setShowDestinationForm] = useState(false);
@@ -37,10 +41,10 @@ const Planner = () => {
     // State variables for accommodation form
     const [showAccommodationForm, setShowAccommodationForm] = useState(false);
     const [accommodationName, setAccommodationName] = useState("");
-    const [accommodationAddress, setAccommodationAddress] = useState("");
-    const [accommodationCheckInDate, setAccommodationCheckInDate] = useState("");
-    const [accommodationCheckOutDate, setAccommodationCheckOutDate] = useState("");
-    const [selectedDestinationId, setSelectedDestinationId] = useState(""); 
+    const [accommodationStartDate, setAccommodationStartDate] = useState("");
+    const [accommodationEndDate, setAccommodationEndDate] = useState("");
+    const [accommodationDestinationId, setAccommodationDestinationId] = useState(""); 
+    const [editingAccommodationId, setEditingAccommodationId] = useState(null);
 
     // State variables for activity form
     const [showActivityForm, setShowActivityForm] = useState(false);
@@ -48,6 +52,7 @@ const Planner = () => {
     const [activityDate, setActivityDate] = useState("");
     const [activityTime, setActivityTime] = useState("");
     const [activityDestinationId, setActivityDestinationId] = useState(""); 
+    const [editingActivityId, setEditingActivityId] = useState(null);
 
     const [error, setError] = useState(""); // State for error messages
 
@@ -76,6 +81,42 @@ const Planner = () => {
                     });
                     if (response.data.success) {
                         setDestinations(response.data.data); // Set destinations if fetch is successful
+                        //fetch accommodations
+                        try {
+                            for(const dest of response.data.data){
+                                const AccommodationResponse = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${dest._id}/accommodation`, {
+                                    params: { userId }
+                                });
+                                if (AccommodationResponse.data.success) {
+                                    for(const accommodation of AccommodationResponse.data.data){
+                                        setAccommodations(prev => [...prev, accommodation]); // Set Accommodations if fetch is successful
+                                    }
+                                } else {
+                                    console.error("Failed to fetch accommodations:", response.data.message); // Log error message
+                                }
+                            } 
+                        } catch (error) {
+                            console.error("Error fetching accommodations:", error); // Log error if fetch fails
+                        }
+
+                        //fetch activities
+                        try {
+                            for(const dest of response.data.data){
+                                const ActivityResponse = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${dest._id}/activity`, {
+                                    params: { userId }
+                                });
+                                if (ActivityResponse.data.success) {
+                                    for(const activity of ActivityResponse.data.data){
+                                        setActivities(prev => [...prev, activity]); // Set activities if fetch is successful
+                                    }
+                                } else {
+                                    console.error("Failed to fetch activities:", response.data.message); // Log error message
+                                }
+                            } 
+                        } catch (error) {
+                            console.error("Error fetching activities:", error); // Log error if fetch fails
+                        }
+                        
                     } else {
                         console.error("Failed to fetch destinations:", response.data.message); // Log error message
                     }
@@ -102,9 +143,31 @@ const Planner = () => {
             }
         };
 
+        // const fetchAccommodations = async () => {
+        //     if (plannerId) {
+        //         try {
+        //             if(destinations.length > 0){
+        //                 for(const dest of destinations){
+        //                     const response = await axios.get(`http://localhost:8080/planner/${plannerId}/destination/${dest._id}/accommodation`, {
+        //                         params: { userId }
+        //                     });
+        //                     if (response.data.success) {
+        //                         setAccommodations(prev => [...prev, response.data.data]); // Set Accommodations if fetch is successful
+        //                     } else {
+        //                         console.error("Failed to fetch accommodations:", response.data.message); // Log error message
+        //                     }
+        //                 }
+        //             }
+        //         } catch (error) {
+        //             console.error("Error fetching accommodations:", error); // Log error if fetch fails
+        //         }
+        //     }
+        // };
+
         fetchPlanner(); // Fetch planner data
         fetchDestinations(); // Fetch destinations data after fetching planner
         fetchTransportations();// Fetch transportation data after fetching planner
+        //fetchAccommodations()// Fetch Accommodations data after fetching destinations
     }, [plannerId, userId]);
 
     // Validate if the provided date range is within the planner's date range
@@ -337,46 +400,33 @@ const Planner = () => {
     // Handle adding an accommodation
     const handleAddAccommodation = async (e) => {
         e.preventDefault(); // Prevent default form submission
-        const checkInDate = new Date(accommodationCheckInDate);
-        const checkOutDate = new Date(accommodationCheckOutDate);
+        const startDate = new Date(accommodationStartDate);
+        const endDate = new Date(accommodationEndDate);
     
         // Validate input fields
-        if (!accommodationName || !accommodationAddress || !accommodationCheckInDate || !accommodationCheckOutDate || !selectedDestinationId) {
+        if (!accommodationName || !accommodationStartDate || !accommodationEndDate || !accommodationDestinationId) {
             alert("All fields are required for accommodation."); // Alert if fields are empty
             return;
         }
     
         // Validate date range
-        if (!validateDateRange(checkInDate, checkOutDate)) {
+        if (!validateDateRange(startDate, endDate)) {
             setError("Accommodation dates must be within the planner's date range."); // Set error message
             return;
         }
     
         try {
-            const response = await axios.post(`http://localhost:8080/planner/${plannerId}/destination/${selectedDestinationId}/accommodation`, {
+            const response = await axios.post(`http://localhost:8080/planner/${plannerId}/destination/${accommodationDestinationId}/accommodation`, {
                 name: accommodationName,
-                address: accommodationAddress,
-                checkInDate: checkInDate.toISOString(),
-                checkOutDate: checkOutDate.toISOString(),
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
                 createdBy: userId,  // Include the userId of the creator
-                location: selectedDestinationId  // Include the selected destination ID
+                location: accommodationDestinationId  // Include the destination ID
             });
     
             if (response.data.success) {
-                setDestinations(prev =>
-                    prev.map(dest =>
-                        dest._id === selectedDestinationId
-                            ? { ...dest, accommodations: [...(dest.accommodations || []), response.data.data] } // Update accommodations for selected destination
-                            : dest
-                    )
-                );
-                // Reset accommodation form fields after successful addition
-                setAccommodationName("");
-                setAccommodationAddress("");
-                setAccommodationCheckInDate("");
-                setAccommodationCheckOutDate("");
-                setShowAccommodationForm(false);
-                setError(""); // Clear any error messages
+                setAccommodations(prev => [...prev, response.data.data]); // Update accommodations state
+                resetAccommodationForm();// Reset form fields after successful addition
             } else {
                 console.error("Error adding accommodation:", response.data.message); // Log error message
             }
@@ -384,6 +434,83 @@ const Planner = () => {
             console.error("Error adding accommodation:", error.response ? error.response.data : error.message); // Log error if request fails
         }
     };
+
+    // Handle editing an existing accommodation
+    const handleEditAccommodation = async (e) => {
+        e.preventDefault(); // Prevent default form submission
+        const startDate = new Date(accommodationStartDate);
+        const endDate = new Date(accommodationEndDate);
+
+        // Validate input fields
+        if (!accommodationName || !accommodationStartDate || !accommodationEndDate || !accommodationDestinationId) {
+            alert("All fields are required for accommodation."); // Alert if fields are empty
+            return;
+        }
+    
+        // Validate date range
+        if (!validateDateRange(startDate, endDate)) {
+            setError("Accommodation dates must be within the planner's date range."); // Set error message
+            return;
+        }
+
+        try {
+            const response = await axios.patch(`http://localhost:8080/planner/${plannerId}/destination/${accommodationDestinationId}/accommodation/${editingAccommodationId}?userId=${userId}`, {
+                name: accommodationName,
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString(),
+                location: accommodationDestinationId  // Include the destination ID
+            });
+
+            if (response.data.success) {
+                // Update the accommodations state with edited accommodation data
+                setAccommodations(prev => 
+                    prev.map(accommodation => 
+                        accommodation._id === editingAccommodationId 
+                        ? { ...accommodation, name: accommodationName, startDate: startDate.toISOString(), endDate: endDate.toISOString(), location: accommodationDestinationId } 
+                        : accommodation
+                    )
+                );
+                resetAccommodationForm(); // Reset form fields after successful edit
+            } else {
+                console.error("Error editing accommodation:", response.data.message); // Log error message
+            }
+        } catch (error) {
+            console.error("Error editing accommodation:", error.response ? error.response.data : error.message); // Log error if request fails
+        }
+    };
+
+    // Handle deleting an accommodation
+    const handleDeleteAccommodation = async (accommodationId, accommodationDestId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/planner/${plannerId}/destination/${accommodationDestId}/accommodation/${accommodationId}`, {
+                params: { userId }
+            });
+            if (response.data.success) {
+                setAccommodations(prev => prev.filter(accommodation => accommodation._id !== accommodationId)); // Update accommodations state after deletion
+                setError(""); // Clear error message
+            } else {
+                console.error("Error deleting accommodation:", response.data.message); // Log error message
+            }
+        } catch (error) {
+            console.error("Error deleting accommodation:", error.response ? error.response.data : error.message); // Log error if request fails
+        }
+    };
+
+    // Reset accommodation form fields
+    const resetAccommodationForm = () => {
+        setEditingAccommodationId(null);
+        setAccommodationName("");
+        setAccommodationStartDate("");
+        setAccommodationEndDate("");
+        setAccommodationDestinationId("");
+        setError(""); // Clear any error messages
+        setShowAccommodationForm(false);
+    };
+
+    const getDestinationName = (destinationId) => {
+        const destination = destinations.find((dest) => dest._id === destinationId);
+        return destination ? destination.name : "No Location";
+      };
 
     // Handle adding an activity
     const handleAddActivity = async (e) => {
@@ -405,29 +532,92 @@ const Planner = () => {
         try {
             const response = await axios.post(`http://localhost:8080/planner/${plannerId}/destination/${activityDestinationId}/activity`, {
                 name: activityName,
-                date: selectedDate.toISOString(),
-                time: activityTime,
-                createdBy: userId // Include the userId of the creator
+                startDate: selectedDate.toISOString(),
+                duration: Number(activityTime),
+                createdBy: userId, // Include the userId of the creator,
+                location: activityDestinationId  // Include the destination ID
             });
 
             if (response.data.success) {
-                setDestinations(prev => prev.map(dest => 
-                    dest.destinationId === activityDestinationId 
-                    ? { ...dest, activities: [...(dest.activities || []), response.data.data] } // Update activities for selected destination
-                    : dest
-                ));
-                // Reset activity form fields after successful addition
-                setActivityName("");
-                setActivityDate("");
-                setActivityTime("");
-                setShowActivityForm(false);
-                setError(""); // Clear any error messages
+                setActivities(prev => [...prev, response.data.data]); // Update activities state
+                resetActivityForm();// Reset form fields after successful addition
             } else {
                 console.error("Error adding activity:", response.data.message); // Log error message
             }
         } catch (error) {
             console.error("Error adding activity:", error.response ? error.response.data : error.message); // Log error if request fails
         }
+    };
+
+    // Handle editing an existing activity
+    const handleEditActivity = async (e) => {
+        e.preventDefault(); // Prevent default form submission
+        const selectedDate = new Date(activityDate);
+
+        // Validate input fields
+        if (!activityName || !activityDate || !activityTime || !activityDestinationId) {
+            alert("All fields are required for the activity."); // Alert if fields are empty
+            return;
+        }
+
+        // Validate that the activity date is within the planner's date range
+        if (!validateDateRange(selectedDate, selectedDate)) {
+            setError("Activity date must be within the planner's date range."); // Set error message
+            return;
+        }
+
+        try {
+            const response = await axios.patch(`http://localhost:8080/planner/${plannerId}/destination/${activityDestinationId}/activity/${editingActivityId}?userId=${userId}`, {
+                name: activityName,
+                startDate: selectedDate.toISOString(),
+                duration: Number(activityTime),
+                location: activityDestinationId  // Include the destination ID
+            });
+
+            if (response.data.success) {
+                // Update the activity state with edited activity data
+                setActivities(prev => 
+                    prev.map(activity => 
+                        activity._id === editingActivityId 
+                        ? { ...activity, name: activityName, startDate: selectedDate.toISOString(), duration: Number(activityTime), location: activityDestinationId } 
+                        : activity
+                    )
+                );
+                resetActivityForm(); // Reset form fields after successful edit
+            } else {
+                console.error("Error editing activity:", response.data.message); // Log error message
+            }
+        } catch (error) {
+            console.error("Error editing activity:", error.response ? error.response.data : error.message); // Log error if request fails
+        }
+    };
+
+    // Handle deleting an activity
+    const handleDeleteActivity = async (activityId, activityDestId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/planner/${plannerId}/destination/${activityDestId}/activity/${activityId}`, {
+                params: { userId }
+            });
+            if (response.data.success) {
+                setActivities(prev => prev.filter(activity => activity._id !== activityId)); // Update activities state after deletion
+                setError(""); // Clear error message
+            } else {
+                console.error("Error deleting activity:", response.data.message); // Log error message
+            }
+        } catch (error) {
+            console.error("Error deleting activity:", error.response ? error.response.data : error.message); // Log error if request fails
+        }
+    };
+
+    // Reset accommodation form fields
+    const resetActivityForm = () => {
+        setEditingActivityId(null);
+        setActivityName("");
+        setActivityDate("");
+        setActivityTime("");
+        setActivityDestinationId("");
+        setError(""); // Clear any error messages
+        setShowActivityForm(false);
     };
 
     // Display loading message while fetching planner data
@@ -447,16 +637,16 @@ const Planner = () => {
                     <p/>
                     {`${new Date(planner.startDate).toLocaleDateString()} To ${new Date(planner.endDate).toLocaleDateString()}`}
                 </div>
-            <header className="Page-header">
+            {/* <header className="Page-header">
 
-                {/* Add Accommodation Form */}
+
                 <button onClick={() => setShowAccommodationForm(!showAccommodationForm)}>
                     {showAccommodationForm ? "❌ Cancel" : "➕ Add Accommodation"}
                 </button>
                 {showAccommodationForm && (
                     <form onSubmit={handleAddAccommodation}>
                         <select 
-                            onChange={(e) => setSelectedDestinationId(e.target.value)} 
+                            onChange={(e) => setAccommodationDestinationId(e.target.value)} 
                             required
                         >
                             <option value="">Select Destination</option>
@@ -474,29 +664,22 @@ const Planner = () => {
                             required
                         />
                         <input
-                            type="text"
-                            value={accommodationAddress}
-                            onChange={(e) => setAccommodationAddress(e.target.value)}
-                            placeholder="Address"
+                            type="date"
+                            value={accommodationStartDate}
+                            onChange={(e) => setAccommodationStartDate(e.target.value)}
                             required
                         />
                         <input
                             type="date"
-                            value={accommodationCheckInDate}
-                            onChange={(e) => setAccommodationCheckInDate(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="date"
-                            value={accommodationCheckOutDate}
-                            onChange={(e) => setAccommodationCheckOutDate(e.target.value)}
+                            value={accommodationEndDate}
+                            onChange={(e) => setAccommodationEndDate(e.target.value)}
                             required
                         />
                         <button type="submit">Add Accommodation</button>
                     </form>
                 )}
 
-                {/* Add Activity Form */}
+
                 <button onClick={() => setShowActivityForm(!showActivityForm)}>
                     {showActivityForm ? "❌ Cancel" : "➕ Add Activity"}
                 </button>
@@ -536,8 +719,8 @@ const Planner = () => {
                     </form>
                 )}
 
-                <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
-            </header>
+                <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> 
+            </header> */}
 
                 <p/>
                 <div className="List-header">
@@ -564,6 +747,8 @@ const Planner = () => {
                                             setShowDestinationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteDestination(dest._id)}><BsTrashFill /></button>
+                                        <VoteButtons id={dest._id} type="Destination" />
+                                        <CommentButton id={dest._id} type="Destination" />
                                     </div>
                                 )}
                             </div>
@@ -621,7 +806,6 @@ const Planner = () => {
                 )}
                 <p />
 
-                <p/>
                 <div className="List-header">
                     <BiSolidPlane /> Transportation
                 </div>
@@ -655,6 +839,8 @@ const Planner = () => {
                                             setShowTransportationForm(true); // Show form for editing
                                         }}><BsPencilFill /></button>
                                         <button className="Icon-button" onClick={() => handleDeleteTransportation(transport._id)}><BsTrashFill /></button>
+                                        <VoteButtons id={transport._id} type="Transport" />
+                                        <CommentButton id={transport._id} type="Transport" />
                                     </div>
                                 )}
                             </div>
@@ -733,36 +919,216 @@ const Planner = () => {
                 <div className="List-header">
                     <BiSolidBed /> Accommodations
                 </div>
-                {planner.accommodations && planner.accommodations.length > 0 ? (
-                    planner.accommodations.map(accommodation => (
+                {accommodations.length > 0 ? (
+                    accommodations.map(accommodation => (
                         <div className="List-item" key={accommodation._id}>
-                            <div>{accommodation.name}</div>
-                            <div className="Planner-item">{accommodation.address}</div>
-                            <div className="Planner-item">Check In: {new Date(accommodation.checkInDate).toLocaleDateString()}</div>
-                            <div className="Planner-item">Check Out: {new Date(accommodation.checkOutDate).toLocaleDateString()}</div>
+                            <div>
+                                <h3>
+                                    {accommodation.name}
+                                </h3>
+                                <h4>
+                                    Location: {getDestinationName(accommodation.location)}
+                                    <br/>
+                                    {`Check In: ${new Date(accommodation.startDate).toLocaleDateString()} at ${new Date(accommodation.startDate).toLocaleTimeString()}`}
+                                    <br/>
+                                    {`Check Out: ${new Date(accommodation.endDate).toLocaleDateString()} at ${new Date(accommodation.endDate).toLocaleTimeString()}`}
+                                </h4>
+                                
+                                {!isReadOnly &&(
+                                    <div>
+                                        <button className="Icon-button" onClick={() => {
+                                            setEditingAccommodationId(accommodation._id);
+                                            setAccommodationName(accommodation.name);
+                                            setAccommodationStartDate(accommodation.startDate.split(":00.000Z")[0]);// Format date for input
+                                            setAccommodationEndDate(accommodation.endDate.split(":00.000Z")[0]);// Format date for input
+                                            setAccommodationDestinationId(accommodation.location);
+                                            setShowAccommodationForm(true); // Show form for editing
+                                        }}><BsPencilFill /></button>
+                                        <button className="Icon-button" onClick={() => handleDeleteAccommodation(accommodation._id, accommodation.location)}><BsTrashFill /></button>
+                                        <VoteButtons id={accommodation._id} type="Accommodation" />
+                                        <CommentButton id={accommodation._id} type="Accommodation" />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))
                 ) : (
                     <p>No accommodations available.</p> // Display message if no accommodations
+                )}
+                
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button" onClick={() => {
+                            setShowAccommodationForm(true)
+                        }}><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
+                
+                
+                {showAccommodationForm && (
+                    //create/edit accommodation modal
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
+                            <form onSubmit={editingAccommodationId ? handleEditAccommodation : handleAddAccommodation} onReset={resetAccommodationForm}>
+                                Accommodation Name:
+                                <input
+                                    type="text"
+                                    value={accommodationName}
+                                    onChange={(e) => setAccommodationName(e.target.value)}
+                                    placeholder="Accommodation Name"
+                                    required
+                                />
+                                <p/>
+                                {!editingAccommodationId && (
+                                    <div>
+                                        Destination:
+                                        <select 
+                                            onChange={(e) => setAccommodationDestinationId(e.target.value)}
+                                            value={accommodationDestinationId} 
+                                            required
+                                        >
+                                            <option value="">Select Destination</option>
+                                            {destinations.map(dest => (
+                                                <option key={dest._id} value={dest._id}>
+                                                    {dest.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <p/>
+                                    </div>
+                                )}
+                                Check In:
+                                <input
+                                    type="datetime-local"
+                                    value={accommodationStartDate}
+                                    onChange={(e) => setAccommodationStartDate(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                Check Out:
+                                <input
+                                    type="datetime-local"
+                                    value={accommodationEndDate}
+                                    onChange={(e) => setAccommodationEndDate(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                <button type="reset">Cancel</button>
+                                <button type="submit">{editingAccommodationId ? "Update Accommodation" : "Add Accommodation"}</button>
+                            </form>
+                        </div>
+                    </div>
                 )}
                 <p />
 
                 <div className="List-header">
                     <BiCalendarEvent /> Activities
                 </div>
-                {planner.activities && planner.activities.length > 0 ? (
-                    planner.activities.map(activity => (
+                {activities.length > 0 ? (
+                    activities.map(activity => (
                         <div className="List-item" key={activity._id}>
-                            <div>{activity.name}</div>
-                            <div className="Planner-item">{new Date(activity.date).toLocaleDateString()}</div>
-                            <div className="Planner-item">{activity.time}</div>
-                            <p />
+                            <div>
+                                <h3>
+                                    {activity.name}
+                                </h3>
+                                <h4>
+                                    Location: {getDestinationName(activity.location)}
+                                    <br/>
+                                    {`${new Date(activity.startDate).toLocaleDateString()} at ${new Date(activity.startDate).toLocaleTimeString()}`}
+                                    <br/>
+                                    For {activity.duration} Hours
+                                </h4>
+                                
+                                {!isReadOnly &&(
+                                    <div>
+                                        <button className="Icon-button" onClick={() => {
+                                            setEditingActivityId(activity._id);
+                                            setActivityName(activity.name);
+                                            setActivityDate(activity.startDate.split(":00.000Z")[0]);// Format date for input
+                                            setActivityTime(activity.duration);
+                                            setActivityDestinationId(activity.location);
+                                            setShowActivityForm(true); // Show form for editing
+                                        }}><BsPencilFill /></button>
+                                        <button className="Icon-button" onClick={() => handleDeleteActivity(activity._id, activity.location)}><BsTrashFill /></button>
+                                        <VoteButtons id={activity._id} type="Activity" />
+                                        <CommentButton id={activity._id} type="Activity" />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))
                 ) : (
                     <p>No activities available.</p> // Display message if no activities
                 )}
+
+                {!isReadOnly &&(
+                    <div>
+                        <button className="Icon-button" onClick={() => {
+                            setShowActivityForm(true)
+                        }}><BsFillPlusCircleFill /></button >
+                    </div>
+                )}
+                
+                
+                {showActivityForm && (
+                    //create/edit activity modal
+                    <div className="modal">
+                        <div className="modal-content">
+                            <p>{error && <span style={{ color: 'red' }}>{error}</span>}</p> {/* Display any error messages */}
+                            <form onSubmit={editingActivityId ? handleEditActivity : handleAddActivity} onReset={resetActivityForm}>
+                                Activity Name:
+                                <input
+                                    type="text"
+                                    value={activityName}
+                                    onChange={(e) => setActivityName(e.target.value)}
+                                    placeholder="Activity Name"
+                                    required
+                                />
+                                <p/>
+                                {!editingActivityId && (
+                                    <div>
+                                        Destination:
+                                        <select 
+                                            onChange={(e) => setActivityDestinationId(e.target.value)}
+                                            value={activityDestinationId} 
+                                            required
+                                        >
+                                            <option value="">Select Destination</option>
+                                            {destinations.map(dest => (
+                                                <option key={dest._id} value={dest._id}>
+                                                    {dest.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <p/>
+                                    </div>
+                                )}
+                                Start Time:
+                                <input
+                                    type="datetime-local"
+                                    value={activityDate}
+                                    onChange={(e) => setActivityDate(e.target.value)}
+                                    required
+                                />
+                                <p/>
+                                Duration:
+                                <input
+                                    type="number"
+                                    value={activityTime}
+                                    onChange={(e) => setActivityTime(e.target.value)}
+                                    required
+                                /> Hours
+                                <p/>
+                                <button type="reset">Cancel</button>
+                                <button type="submit">{editingActivityId ? "Update Activity" : "Add Activity"}</button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+                <p />
             </div>
+            <p/>
         </div>
     );
 };
