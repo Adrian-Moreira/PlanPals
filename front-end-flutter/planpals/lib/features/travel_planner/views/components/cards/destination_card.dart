@@ -112,27 +112,32 @@ class _DestinationCardState extends State<DestinationCard> {
 
   Widget _buildCollapsableContent(
       BuildContext context, Destination destination) {
-    return ExpansionTile(
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+      ),
+      child: ExpansionTile(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${destination.accommodationList.length} accommodations',
+                style: const TextStyle(fontSize: 15)),
+            Text('${destination.activityList.length} activities',
+                style: const TextStyle(fontSize: 15)),
+          ],
+        ),
         children: [
-          Text('${destination.accommodationList.length} accommodations',
-              style: const TextStyle(fontSize: 15)),
-          Text('${destination.activityList.length} activities',
-              style: const TextStyle(fontSize: 15)),
+          // Display Accommodations
+          _buildAccommodationList(destination.accommodationList),
+
+          const SizedBox(height: 15),
+
+          // Display Activities
+          _buildActivityList(destination.activityList),
+
+          const SizedBox(height: 20),
         ],
       ),
-      children: [
-        // Display Accommodations
-        _buildAccommodationList(destination.accommodationList),
-
-        const SizedBox(height: 15),
-
-        // Display Activities
-        _buildActivityList(destination.activityList),
-
-        const SizedBox(height: 20),
-      ],
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/comment/comment_viewmodel.dart';
 import 'package:planpals/features/home/views/home_page.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/profile/views/login_page.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => PlannerViewModel()),
         ChangeNotifierProvider(create: (context) => UserViewModel()),
         ChangeNotifierProvider(create: (context) => VoteViewModel()),
+        ChangeNotifierProvider(create: (context) => CommentViewModel()),
       ],
 
       child: SafeArea(

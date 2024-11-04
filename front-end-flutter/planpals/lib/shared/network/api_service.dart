@@ -13,16 +13,12 @@ class ApiService {
       response = await http.get(url);
 
       if (response.statusCode == 200) {
-        print("SUCCESS: ${response.body}");
         return response;
       } else {
-        print(response.body);
-        print('STATUS CODE: ${response.statusCode}');
         throw Exception(
             'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (error) {
-      print(error);
       throw Exception('Failed to load data: $error');
     }
   }
@@ -32,7 +28,6 @@ class ApiService {
     final url = Uri.parse('$baseUrl$endpoint');
 
     try {
-      print('jsonData: $jsonData');
       final response = await http.post(
         url,
         body: jsonEncode(jsonData),
@@ -43,11 +38,8 @@ class ApiService {
 
       _handleResponse(response);
 
-      print("SUCCESS: Status Code: ${response.statusCode}");
-
       return response;
     } catch (error) {
-      print(error);
       throw Exception('Failed to post data: $error');
     }
   }
@@ -65,11 +57,6 @@ class ApiService {
         },
       );
 
-      print('updated data: $data');
-      print('response request: ${response.request}');
-      print('response body: ${response.body}');
-      print('statuc code: ${response.statusCode}');
-
       // Check for successful response
       _handleResponse(response);
       return response;
@@ -82,7 +69,6 @@ class ApiService {
   Future<http.Response> delete(String endpoint) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      print('url: $url');
       final response = await http.delete(url);
 
       // Check for successful response
@@ -106,8 +92,6 @@ class ApiService {
 
       // Check for successful response  
       _handleResponse(response);
-
-      print('SUCCESS: REMOVED VOTE: ${response.body}');
       return response;
     } catch (error) {
       throw Exception('Failed to delete data: $error');
@@ -118,7 +102,6 @@ class ApiService {
   void _handleResponse(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       // Handle error responses
-      print(response.body);
       throw Exception('Failed to load data: ${response.statusCode}');
     }
   }

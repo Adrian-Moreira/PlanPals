@@ -35,6 +35,7 @@ class _GenericCardState extends State<GenericCard> {
   final VoteViewModel _voteViewModel = VoteViewModel();
 
   late Vote vote;
+  bool _voteLoading = true;
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _GenericCardState extends State<GenericCard> {
 
       setState(() {
         vote = _voteViewModel.vote;
+        _voteLoading = _voteViewModel.isloading;
       });
     });
   }
@@ -84,6 +86,7 @@ class _GenericCardState extends State<GenericCard> {
                     },
                     icon: const Icon(Icons.comment)),
               ]),
+              const SizedBox(height: 10),
               widget.extraInfo ?? Container(),
             ],
           ),
