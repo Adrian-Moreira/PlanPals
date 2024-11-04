@@ -58,6 +58,8 @@ class TransportCard extends StatelessWidget {
       },
       vote: transport.vote,
       functional: functional,
+      objectId: transport.id,
+      type: 'Transport',
     );
   }
 }
