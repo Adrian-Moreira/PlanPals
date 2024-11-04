@@ -4,7 +4,7 @@
 }
 
 .Home .lander h1 {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-weight: 600;
   margin-bottom: 1.5rem;
   color: #2d3436;
@@ -18,11 +18,14 @@
   color: #636e72;
   max-width: 680px;
   margin: 0 auto;
+  margin-top: 2em;
+  margin-bottom: 1.25em;
 }
 
 .Home .lander .PPLogo {
   height: 16rem;
-  padding: 1.5rem;
+  padding: 0rem;
+  border-radius: 20px;
   will-change: filter;
   transition: all 300ms ease-in-out;
 }

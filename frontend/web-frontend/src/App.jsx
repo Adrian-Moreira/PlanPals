@@ -1,13 +1,17 @@
-import Navbar from 'react-bootstrap/Navbar'
-import Nav from 'react-bootstrap/Nav'
 import { useNavigate } from 'react-router-dom'
-import { LinkContainer } from 'react-router-bootstrap'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Auth } from 'aws-amplify'
 
 import './App.css'
+import { lightTheme, darkTheme } from './theme'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import ResponsiveAppBar from './components/AppBar'
+import Container from '@mui/material/Container'
+import useMediaQuery from '@mui/material/useMediaQuery'
+
 import Routes from './Routes.jsx'
-import { AppContext } from './lib/contextLib'
+import { AppContext, ThemeContext } from './lib/contextLib'
 import { onError } from './lib/errorLib'
 
 import '@fontsource/roboto/300.css'
@@ -17,14 +21,21 @@ import '@fontsource/roboto/700.css'
 
 function App() {
   const nav = useNavigate()
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const [isAuthenticated, userHasAuthenticated] = useState(false)
   const [isAuthenticating, setIsAuthenticating] = useState(true)
   const [cognitoUser, setCognitoUser] = useState(undefined)
   const [ppUser, setPPUser] = useState(undefined)
+  const [theme, setTheme] = useState(lightTheme)
+
+  const handleThemeChange = useCallback(async () => {
+    setTheme(prefersDarkMode ? darkTheme : lightTheme)
+  }, [prefersDarkMode])
 
   useEffect(() => {
     onLoad()
-  }, [])
+    handleThemeChange()
+  }, [handleThemeChange])
 
   async function onLoad() {
     try {
@@ -35,7 +46,6 @@ function App() {
         onError(error)
       }
     }
-
     setIsAuthenticating(false)
   }
 
@@ -46,36 +56,31 @@ function App() {
   }
 
   return (
-    !isAuthenticating && (
-      <div className="App container py-3">
-        <Navbar collapseOnSelect bg="light" expand="md" className="mb-3 px-3">
-          <LinkContainer to="/">
-            <Navbar.Brand className="fw-bold text-muted"> PlanPals </Navbar.Brand>
-          </LinkContainer>
-          <Navbar.Toggle />
-          <Navbar.Collapse className="justify-content-end">
-            <Nav activeKey={window.location.pathname}>
-              {isAuthenticated ?
-                <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
-              : <>
-                  <LinkContainer to="/signup">
-                    <Nav.Link>Signup</Nav.Link>
-                  </LinkContainer>
-                  <LinkContainer to="/login">
-                    <Nav.Link>Login</Nav.Link>
-                  </LinkContainer>
-                </>
-              }
-            </Nav>
-          </Navbar.Collapse>
-        </Navbar>
-        <AppContext.Provider
-          value={{ isAuthenticated, cognitoUser, ppUser, userHasAuthenticated, setCognitoUser, setPPUser }}
-        >
-          <Routes />
-        </AppContext.Provider>
-      </div>
-    )
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {!isAuthenticating && (
+        <Container className="App" maxWidth="xl">
+          <ResponsiveAppBar
+            theme={theme}
+            title={'PlanPals'}
+            handleLogout={handleLogout}
+            backToHomeHandler={() => nav('/planners')}
+            handleLogin={() => nav('/login')}
+            handleSignup={() => nav('/signup')}
+            handleAbout={() => nav('/about')}
+            handlePlanners={() => nav('/planners')}
+            isAuthenticated={isAuthenticated}
+          ></ResponsiveAppBar>
+          <ThemeContext.Provider value={{ theme, setTheme }}>
+            <AppContext.Provider
+              value={{ isAuthenticated, cognitoUser, ppUser, userHasAuthenticated, setCognitoUser, setPPUser }}
+            >
+              <Routes />
+            </AppContext.Provider>
+          </ThemeContext.Provider>
+        </Container>
+      )}
+    </ThemeProvider>
   )
 }
 

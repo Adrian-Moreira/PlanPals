@@ -6,7 +6,7 @@ const apiURI = config.api.URL
 const queueState = {
   queue: [],
   running: new Set(),
-  concurrency: 3,
+  concurrency: 10,
 }
 
 const processQueue = async () => {
@@ -57,7 +57,9 @@ const apiLib = {
     axios.patch(apiURI + endpoint, { ...data, params }),
   ),
 
-  delete: createRequest((endpoint, { params = {} } = {}) => axios.delete(apiURI + endpoint, { params })),
+  delete: createRequest((endpoint, { params = {}, data = {} } = {}) =>
+    axios.delete(apiURI + endpoint, { data, params }),
+  ),
 
   setQueueConcurrency: (concurrency) => {
     queueState.concurrency = concurrency
