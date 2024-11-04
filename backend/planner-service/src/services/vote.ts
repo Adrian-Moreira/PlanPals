@@ -174,10 +174,11 @@ const getVoteCountByObjectId = async (req: Request, res: Response, next: NextFun
     });
   }
 
-  const upVoteCount = existingVotes.upVotes.length;
-  const downVoteCount = existingVotes.downVotes.length;
 
-  req.body.result = { upVoteCount, downVoteCount };
+  req.body.result = {
+    upVoteCount: existingVotes.upVotes.length,
+    downVoteCount: existingVotes.downVotes.length,
+  };
   req.body.status = StatusCodes.OK;
   next();
 };
