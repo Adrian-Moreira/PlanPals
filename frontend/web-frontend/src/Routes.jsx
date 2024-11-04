@@ -11,14 +11,15 @@ import About from './containers/About.jsx'
 export default function Links() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/beta" element={<Home />} />
+      <Route path="/" element={<Planners />} />
       <Route path="/about" element={<About />} />
-      <Route path="/login" element={<Login />} />;
+      <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/planner/:id" element={<PlannerDetail />} />
       <Route path="/planners" element={<Planners />} />
       <Route path="/planner/:access/:plannerId" element={<Planner />} />
-      <Route path="*" element={<NotFound />} />;
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
