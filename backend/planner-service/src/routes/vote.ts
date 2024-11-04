@@ -40,3 +40,10 @@ voteRouter.delete(
   UserService.verifyUserExists,
   VoteService.removeVote,
 )
+
+voteRouter.get(
+  '/count',
+  VoteValidator.getVotesByObjectId,
+  RequestUtils.verifyObjectExistInCollection,
+  VoteService.getVoteCountByObjectId,
+);

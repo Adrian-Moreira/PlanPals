@@ -150,6 +150,41 @@ const getVotesByObjectId = async (req: Request, res: Response, next: NextFunctio
 }
 
 /**
+ * Retrieves the number of upvotes and downvotes for an object in the planner with the given objectId and type.
+ *
+ * If the vote document does not exist, this endpoint will create a new vote document
+ * with an empty array of upvotes and downvotes, and return a count of 0 for each.
+ *
+ * @param req - The incoming request from the client.
+ * @param res - The response to the client.
+ * @param next - The next function in the middleware chain.
+ */
+const getVoteCountByObjectId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { objectId: oid, type } = req.body.out;
+  let existingVotes = await VoteModel.findOne({
+    objectId: { id: oid, collection: type },
+  });
+
+  if (!existingVotes) {
+    // Create a new document if none exists
+    existingVotes = await VoteModel.create({
+      objectId: { id: oid, collection: type },
+      upVotes: [],
+      downVotes: [],
+    });
+  }
+
+
+  req.body.result = {
+    upVoteCount: existingVotes.upVotes.length,
+    downVoteCount: existingVotes.downVotes.length,
+  };
+  req.body.status = StatusCodes.OK;
+  next();
+};
+
+
+/**
  * Checks if a user has voted on an object in the planner with the given objectId and type.
  *
  * If the vote document does not exist, this endpoint will return a 404 error.
@@ -189,5 +224,7 @@ const VoteService = {
   removeVote,
   getVotesByObjectId,
   isUserVoted,
+  getVoteCountByObjectId
 }
 export default VoteService
+

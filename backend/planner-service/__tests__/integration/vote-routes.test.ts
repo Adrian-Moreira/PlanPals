@@ -316,4 +316,66 @@ describe('Integration Test: Vote API', () => {
       expect(response.body.success).toBe(false)
     })
   })
+
+  describe('perform GET from /vote/count - Get Vote Counts', () => {
+    it('should return OK and the correct count of upvotes and downvotes for an existing object', async () => {
+      // Explicitly add an upvote to ensure it's counted
+      await request(app.app)
+        .post(`/vote/up`)
+        .send({
+          objectId: testDestination1._id.toString(),
+          type: 'Destination',
+          createdBy: testUser1._id.toString(),
+        })
+        .expect(StatusCodes.OK);
+  
+      const response = await request(app.app)
+        .get(`/vote/count`)
+        .query({
+          type: 'Destination',
+          objectId: testDestination1._id.toString(),
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.OK);
+  
+      console.log("Response body:", response.body);
+  
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.upVoteCount).toBe(1); // Expecting 1 upvote
+      expect(response.body.data.downVoteCount).toBe(1); // Expecting 1 downvote from setup
+    });
+  });
+  
+  it('should correctly count multiple upvotes and downvotes', async () => {
+    await request(app.app)
+      .post(`/vote/up`)
+      .send({
+        objectId: testDestination1._id.toString(),
+        type: 'Destination',
+        createdBy: testUser3._id.toString(),
+      })
+      .expect(StatusCodes.OK);
+  
+    await request(app.app)
+      .post(`/vote/down`)
+      .send({
+        objectId: testDestination1._id.toString(),
+        type: 'Destination',
+        createdBy: testUser4._id.toString(),
+      })
+      .expect(StatusCodes.OK);
+  
+    const response = await request(app.app)
+      .get(`/vote/count`)
+      .query({
+        type: 'Destination',
+        objectId: testDestination1._id.toString(),
+      })
+      .expect('Content-Type', /json/)
+      .expect(StatusCodes.OK);
+  
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.upVoteCount).toBe(2); // Expecting 2 upvotes (testUser1 and testUser3)
+    expect(response.body.data.downVoteCount).toBe(2); // Expecting 2 downvotes (testUser2 and testUser4)
+  });
 })
