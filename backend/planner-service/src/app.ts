@@ -18,12 +18,12 @@ const port: number = config.server.port ? parseInt(config.server.port) : 8080
 export let MongooseConnection: Mongoose
 export let PPAPP: PlanPals
 
-const rateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 100,
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-})
+// const rateLimiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   limit: 100,
+//   standardHeaders: 'draft-7',
+//   legacyHeaders: false,
+// })
 
 const healthChecker = (req: Request, res: Response) => {
   res.status(StatusCodes.OK).send('OK')
@@ -44,7 +44,7 @@ export function initExpress(app: Express): Express {
   app.use(cors())
   app.use(express.urlencoded({ extended: false }))
   app.use(express.static('public'))
-  app.use(rateLimiter)
+  // app.use(rateLimiter)
   app.get('/', landingPage)
   app.get('/health', healthChecker)
   app.use(router)

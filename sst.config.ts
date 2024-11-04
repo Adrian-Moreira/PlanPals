@@ -14,10 +14,16 @@ export default $config({
     }
   },
   async run() {
+    const region = aws.getRegionOutput().name
     const vpc = new sst.aws.Vpc('PlanPalsAWSVPC', { bastion: true })
     const cluster = new sst.aws.Cluster('PlanPalsAWSCluster', { vpc })
-    const bucket = new sst.aws.Bucket('PlanPalsBucket', {
-      access: 'public',
+    const bucket = new sst.aws.Bucket('PlanPalsBucket', { access: 'public' })
+    const userPool = new sst.aws.CognitoUserPool('PlanPalsCognitoUserPool', {
+      usernames: ['email'],
+    })
+    const webClientPool = userPool.addClient('PlanPalsWebClientCognitoUserPool')
+    const identityPool = new sst.aws.CognitoIdentityPool('PlanPalsCognitoIdentityPool', {
+      userPools: [{ userPool: userPool.id, client: webClientPool.id }],
     })
 
     const atlasOwner = mongodbatlas.getAtlasUser({
@@ -91,8 +97,28 @@ export default $config({
       return connectionString(srv.replaceAll('mongodb+srv://', ''))
     })
 
+    const webFrontend = new sst.aws.StaticSite('PlanPalsWeb', {
+      path: './frontend/web-frontend',
+      domain: {
+        name: 'ppapp.xyz',
+        redirects: ['www.ppapp.xyz'],
+      },
+      build: {
+        output: 'dist',
+        command: 'npm run build',
+      },
+      environment: {
+        VITE_REGION: region,
+        VITE_API_URL: 'https://api.ppapp.xyz',
+        VITE_BUCKET: bucket.name,
+        VITE_USER_POOL_ID: userPool.id,
+        VITE_IDENTITY_POOL_ID: identityPool.id,
+        VITE_USER_POOL_CLIENT_ID: webClientPool.id,
+      },
+    })
+
     cluster.addService('PlanPalsService', {
-      link: [atlasCluster, bucket],
+      link: [atlasCluster, bucket, webFrontend],
       loadBalancer: {
         domain: {
           name: 'api.ppapp.xyz',
@@ -101,14 +127,6 @@ export default $config({
           { listen: '80/http', forward: '8080/http', container: 'planner-service' },
           { listen: '443/https', forward: '8080/http', container: 'planner-service' },
         ],
-        health: {
-          '8080/http': {
-            path: '/health',
-            interval: '10 seconds',
-            timeout: '10 seconds',
-            unhealthyThreshold: 3,
-          },
-        },
       },
       containers: [
         {

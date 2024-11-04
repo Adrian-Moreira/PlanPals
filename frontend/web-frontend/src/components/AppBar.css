@@ -1,0 +1,9 @@
+.PPAppBar {
+  padding: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border-radius: 0.5cm;
+  min-height: 4em;
+  max-height: 10vh;
+  max-width: 98vw;
+}
