@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom' // Import useParams to get plannerId from URL
+import { useNavigate, useParams } from 'react-router-dom' // Import useParams to get plannerId from URL
 import { BiSolidPlane } from 'react-icons/bi' // Icon for transport
 import { BiSolidBed } from 'react-icons/bi' // Icon for accommodations
 import { BiCalendarEvent } from 'react-icons/bi' // Icon for activities
@@ -8,8 +8,10 @@ import apiLib from '../lib/apiLib' // Import apiLib for API calls
 import { useAppContext } from '../lib/contextLib'
 import { getCurrentUser } from '../lib/authLib'
 import './Legacy.css'
-
+import CommentButton from '../components/Comments/CommentButton'
+import VoteButtons from '../components/Votes/VoteButtons'
 export const Planner = () => {
+  const nav = useNavigate()
   // Retrieve plannerId and userId from URL and context
   const { plannerId, access } = useParams()
   const isReadOnly = access === 'ro' //set planner to read only if user has ro access
@@ -18,11 +20,12 @@ export const Planner = () => {
   useEffect(() => {
     async function initializeUser() {
       if (!ppUser) {
-        try {
-          await getCurrentUser(setCognitoUser, setPPUser)
-        } catch (error) {
-          alert(error)
-        }
+        nav('/login')
+        // try {
+        //   await getCurrentUser(setCognitoUser, setPPUser)
+        // } catch (error) {
+        //   alert(error)
+        // }
       }
     }
     initializeUser()
@@ -830,6 +833,8 @@ export const Planner = () => {
                       <button className="Icon-button" onClick={() => handleDeleteDestination(dest._id)}>
                         <BsTrashFill />
                       </button>
+                      <VoteButtons id={dest._id} type="Destination" userId={ppUser._id} />
+                      <CommentButton id={dest._id} type="Destination" userId={ppUser._id} />
                     </div>
                   )}
                 </div>
@@ -932,6 +937,8 @@ export const Planner = () => {
                       <button className="Icon-button" onClick={() => handleDeleteTransportation(transport._id)}>
                         <BsTrashFill />
                       </button>
+                      <VoteButtons id={transport._id} type="Transport" userId={ppUser._id} />
+                      <CommentButton id={transport._id} type="Transport" userId={ppUser._id} />
                     </div>
                   )}
                 </div>
@@ -1053,6 +1060,8 @@ export const Planner = () => {
                       >
                         <BsTrashFill />
                       </button>
+                      <VoteButtons id={accommodation._id} type="Accommodation" userId={ppUser._id} />
+                      <CommentButton id={accommodation._id} type="Accommodation" userId={ppUser._id} />
                     </div>
                   )}
                 </div>
@@ -1172,6 +1181,8 @@ export const Planner = () => {
                       >
                         <BsTrashFill />
                       </button>
+                      <VoteButtons id={activity._id} type="Activity" userId={ppUser._id} />
+                      <CommentButton id={activity._id} type="Activity" userId={ppUser._id} />
                     </div>
                   )}
                 </div>

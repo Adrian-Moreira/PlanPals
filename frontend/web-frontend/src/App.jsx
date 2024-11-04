@@ -52,6 +52,7 @@ function App() {
   async function handleLogout() {
     await Auth.signOut()
     userHasAuthenticated(false)
+    setPPUser(null)
     nav('/login')
   }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BsFillPlusCircleFill, BsPencilFill, BsTrashFill } from 'react-icons/bs'
 import apiLib from '../lib/apiLib'
 import { useAppContext } from '../lib/contextLib'
@@ -7,6 +7,7 @@ import { getCurrentUser } from '../lib/authLib'
 import './Legacy.css'
 
 const Planners = () => {
+  const nav = useNavigate()
   const [plannerList, setPlannerList] = useState([])
   const [name, setName] = useState('') // State for planner name
   const [description, setDescription] = useState('') // State for planner description
@@ -31,11 +32,12 @@ const Planners = () => {
   useEffect(() => {
     async function initializeUser() {
       if (!ppUser) {
-        try {
-          await getCurrentUser(setCognitoUser, setPPUser)
-        } catch (error) {
-          alert(error)
-        }
+        nav('/login')
+        // try {
+        //   await getCurrentUser(setCognitoUser, setPPUser)
+        // } catch (error) {
+        //   alert(error)
+        // }
       }
     }
     initializeUser()
@@ -93,7 +95,7 @@ const Planners = () => {
     }
 
     try {
-      const response = await apiLib.patch(`/planner/${editingPlannerId}?ppUser._id=${ppUser._id}`, {
+      const response = await apiLib.patch(`/planner/${editingPlannerId}?userId=${ppUser._id}`, {
         data: {
           name: name,
           description: description,
