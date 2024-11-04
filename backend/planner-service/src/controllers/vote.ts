@@ -32,6 +32,13 @@ const VoteRouteSchema = {
       type: ValidCollectionSchema,
     }),
   }),
+
+  getVoteCountByObjectId: ReqAttrSchema.extend({
+    query: z.object({
+      objectId: ObjectIdStringSchema,
+      type: ValidCollectionSchema,
+    }),
+  }),
   isUserVoted: ReqAttrSchema.extend({
     query: z.object({
       objectId: ObjectIdStringSchema,
