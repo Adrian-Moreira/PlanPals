@@ -10,13 +10,12 @@ import * as MUIcons from '@mui/icons-material'
 
 import { onError } from '../lib/errorLib'
 import { useFormFields } from '../lib/hooksLib'
-import { useAppContext, useThemeContext } from '../lib/contextLib'
+import { useAppContext } from '../lib/contextLib'
 import apiLib from '../lib/apiLib'
 
 export default function Login() {
   const nav = useNavigate()
   const { userHasAuthenticated, setCognitoUser, setPPUser } = useAppContext()
-  const { theme } = useThemeContext()
   const [fields, handleFieldChange] = useFormFields({
     email: '',
     password: '',
@@ -36,15 +35,16 @@ export default function Login() {
   }
 
   function validateForm() {
-    return fields.email.length > 0 && fields.password.length > 0
+    return fields.email.length > 0
+    //&& fields.password.length > 0
   }
 
   async function handleSubmit(event) {
     event.preventDefault()
     setIsLoading(true)
     try {
-      const cognitoUser = await Auth.signIn(fields.email, fields.password)
-      setCognitoUser(cognitoUser)
+      // const cognitoUser = await Auth.signIn(fields.email, fields.password)
+      // setCognitoUser(cognitoUser)
       let response = await apiLib
         .get('/user/search', {
           params: { userName: fields.email },
@@ -81,7 +81,7 @@ export default function Login() {
             value={fields.email}
             onChange={handleFieldChange}
           />
-          <MUI.FormControl variant="outlined">
+          {/* <MUI.FormControl variant="outlined">
             <MUI.InputLabel>Password</MUI.InputLabel>
             <MUI.OutlinedInput
               error={authError}
@@ -106,8 +106,8 @@ export default function Login() {
               value={fields.password}
               onChange={handleFieldChange}
             />
-          </MUI.FormControl>
-          <LoaderButton isLoading={isLoading} onClick={handleSubmit} disabled={!validateForm()} theme={theme}>
+          </MUI.FormControl> */}
+          <LoaderButton isLoading={isLoading} onClick={handleSubmit} disabled={!validateForm()}>
             Login
           </LoaderButton>
         </MUI.Stack>

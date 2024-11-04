@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Auth } from 'aws-amplify'
-import * as MUI from '@mui/material/'
-import * as MUIcons from '@mui/icons-material'
 
 import './Signup.css'
 
@@ -11,17 +9,11 @@ import LoaderButton from '../components/LoaderButton'
 
 import { useNavigate } from 'react-router-dom'
 import { useFormFields } from '../lib/hooksLib'
-import { useAppContext, useThemeContext } from '../lib/contextLib'
+import { useAppContext } from '../lib/contextLib'
 import { onError } from '../lib/errorLib'
 import apiLib from '../lib/apiLib'
 
 export default function Signup() {
-  const { theme } = useThemeContext()
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [authError, setAuthError] = useState(false)
-  const [emailError, setEmailError] = useState(false)
-
   const [fields, handleFieldChange] = useFormFields({
     username: '',
     email: '',
@@ -29,61 +21,33 @@ export default function Signup() {
     confirmPassword: '',
     confirmationCode: '',
   })
-  const handleClickShowPassword = (fn) => () => fn((show) => !show)
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault()
-  }
-
-  const handleMouseUpPassword = (event) => {
-    event.preventDefault()
-  }
-
   const nav = useNavigate()
   const { userHasAuthenticated, setCognitoUser, setPPUser } = useAppContext()
   const [isLoading, setIsLoading] = useState(false)
   const [newUser, setNewUser] = useState(null)
-  const validateForm = useCallback(
-    function () {
-      return fields.email.length > 0 && fields.password.length > 0 && fields.password === fields.confirmPassword
-    },
-    [fields.confirmPassword, fields.email.length, fields.password],
-  )
+  function validateForm() {
+    return fields.email.length > 0 && fields.password.length > 0 && fields.password === fields.confirmPassword
+  }
 
   function validateConfirmationForm() {
     return fields.confirmationCode.length > 0
   }
 
-  const handleSubmit = useCallback(
-    async function (event) {
-      event.preventDefault()
-      setIsLoading(true)
-      try {
-        const newUser = await Auth.signUp({
-          username: fields.email,
-          password: fields.password,
-        })
-        setIsLoading(false)
-        setNewUser(newUser)
-      } catch (e) {
-        if (
-          e.message === 'Password did not conform with policy: Password not long enough' ||
-          e.message === 'Password did not conform with policy: Password must have numeric characters'
-        ) {
-          setAuthError(true)
-        } else {
-          setAuthError(false)
-        }
-        if (e.message === 'User already exists') {
-          setEmailError(true)
-        } else {
-          setEmailError(false)
-        }
-        onError(e)
-        setIsLoading(false)
-      }
-    },
-    [fields.email, fields.password, setAuthError, setEmailError],
-  )
+  async function handleSubmit(event) {
+    event.preventDefault()
+    setIsLoading(true)
+    try {
+      const newUser = await Auth.signUp({
+        username: fields.email,
+        password: fields.password,
+      })
+      setIsLoading(false)
+      setNewUser(newUser)
+    } catch (e) {
+      onError(e)
+      setIsLoading(false)
+    }
+  }
 
   async function handleConfirmationSubmit(event) {
     event.preventDefault()
@@ -129,113 +93,33 @@ export default function Signup() {
     )
   }
 
-  const renderForm = useCallback(() => {
+  function renderForm() {
     return (
       <Form onSubmit={handleSubmit}>
         <Stack gap={3}>
-          <MUI.TextField
-            autoCorrect="off"
-            required
-            id="username"
-            label="Preferred Name"
-            value={fields.username}
-            onChange={handleFieldChange}
-          />
-          <MUI.TextField
-            error={emailError}
-            autoFocus
-            helperText={emailError && 'Invalid email or email already in use.'}
-            required
-            id="email"
-            label="Email"
-            value={fields.email}
-            onChange={handleFieldChange}
-          />
-          <MUI.FormControl variant="outlined">
-            <MUI.InputLabel>Password</MUI.InputLabel>
-            <MUI.OutlinedInput
-              error={authError}
-              required
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              endAdornment={
-                <MUI.InputAdornment position="end">
-                  <MUI.IconButton
-                    aria-label={showPassword ? 'hide the password' : 'display the password'}
-                    onClick={handleClickShowPassword(setShowPassword)}
-                    onMouseDown={handleMouseDownPassword}
-                    onMouseUp={handleMouseUpPassword}
-                    edge="end"
-                  >
-                    {showPassword ?
-                      <MUIcons.VisibilityOff />
-                    : <MUIcons.Visibility />}
-                  </MUI.IconButton>
-                </MUI.InputAdornment>
-              }
-              label="password"
-              value={fields.password}
-              onChange={handleFieldChange}
-            />
-          </MUI.FormControl>
-          <MUI.FormControl variant="outlined">
-            <MUI.InputLabel>Confirm Password</MUI.InputLabel>
-            <MUI.OutlinedInput
-              error={authError}
-              id="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'}
-              endAdornment={
-                <MUI.InputAdornment position="end">
-                  <MUI.IconButton
-                    aria-label={showConfirmPassword ? 'hide the password' : 'display the password'}
-                    onClick={handleClickShowPassword(setShowConfirmPassword)}
-                    onMouseDown={handleMouseDownPassword}
-                    onMouseUp={handleMouseUpPassword}
-                    edge="end"
-                  >
-                    {showConfirmPassword ?
-                      <MUIcons.VisibilityOff />
-                    : <MUIcons.Visibility />}
-                  </MUI.IconButton>
-                </MUI.InputAdornment>
-              }
-              label="confirm password"
-              value={fields.confirmPassword}
-              onChange={handleFieldChange}
-            />
-          </MUI.FormControl>
-          <LoaderButton
-            size="lg"
-            type="submit"
-            variant="success"
-            theme={theme}
-            isLoading={isLoading}
-            disabled={!validateForm()}
-          >
+          <Form.Group controlId="username">
+            <Form.Label>Preferred Name</Form.Label>
+            <Form.Control size="lg" autoFocus type="text" value={fields.username} onChange={handleFieldChange} />
+          </Form.Group>
+          <Form.Group controlId="email">
+            <Form.Label>Email</Form.Label>
+            <Form.Control size="lg" type="email" value={fields.email} onChange={handleFieldChange} />
+          </Form.Group>
+          <Form.Group controlId="password">
+            <Form.Label>Password</Form.Label>
+            <Form.Control size="lg" type="password" value={fields.password} onChange={handleFieldChange} />
+          </Form.Group>
+          <Form.Group controlId="confirmPassword">
+            <Form.Label>Confirm Password</Form.Label>
+            <Form.Control size="lg" type="password" onChange={handleFieldChange} value={fields.confirmPassword} />
+          </Form.Group>
+          <LoaderButton size="lg" type="submit" variant="success" isLoading={isLoading} disabled={!validateForm()}>
             Signup
           </LoaderButton>
         </Stack>
       </Form>
     )
-  }, [
-    authError,
-    emailError,
-    fields.confirmPassword,
-    fields.email,
-    fields.password,
-    fields.username,
-    handleFieldChange,
-    handleSubmit,
-    isLoading,
-    showConfirmPassword,
-    showPassword,
-    theme,
-    validateForm,
-  ])
-
-  useEffect(() => {
-    renderForm()
-  }, [authError, renderForm])
+  }
 
   return <div className="Signup">{newUser === null ? renderForm() : renderConfirmationForm()}</div>
 }

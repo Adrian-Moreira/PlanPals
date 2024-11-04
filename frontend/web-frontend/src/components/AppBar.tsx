@@ -15,7 +15,10 @@ import MenuItem from '@mui/material/MenuItem'
 import { ThemeProvider } from '@mui/material/styles'
 import './AppBar.css'
 const pages = ['About', 'Planners']
-const welcome = ['Login', 'Signup']
+const welcome = [
+  'Login',
+  //, 'Signup'
+]
 const settings = [
   // 'Profile', 'Account',
   // 'Inbox',
