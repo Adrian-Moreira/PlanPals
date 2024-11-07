@@ -44,6 +44,25 @@ This runs a complete regression suite including all integration tests on push an
 
 ## Not testing
 
+### API Tier (Express + MongoDB)
+- **Fully Tested (80%+)**:
+  - Route handlers
+  - Service layer
+  - Model validations
+  - CRUD operations
+  - Error handling
+
+- **Mostly Tested (20-80%)**:
+  - Edge cases
+
+- **Somewhat Tested (0-20%)**:
+  - Concurrent operations
+  
+- **Not Tested**:
+  - Race conditions
+  - Long-running operations
+  - Network failures
+
 ```mermaid
 flowchart TB
     subgraph Infra["Infrastructure (Not Tested)"]
