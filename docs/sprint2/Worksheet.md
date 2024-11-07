@@ -42,6 +42,7 @@ This runs a complete regression suite including all integration tests on push an
 
 ## Not testing
 
+### Updated Diagram
 ```mermaid
 flowchart LR
     subgraph "Infrastructure"
@@ -53,11 +54,6 @@ flowchart LR
             S3["AWS S3 Serving Web Frontend (ppapp.xyz)"]
             ELB["AWS Elastic Load Balancer (api.ppapp.xyz)"]
             ECS["AWS Elastic Container Service"]
-            subgraph "MongoDB"
-                subgraph "Database"
-                    Planners[(Planner)]
-                end
-            end
             ELB --> ECS
         end
     end
@@ -81,7 +77,11 @@ flowchart LR
                 Services --> Models
             end
         end
-
+        subgraph "MongoDB"
+            subgraph "Database"
+                Planners[(Planner)]
+            end
+        end
     end
 
     Client --> ELB
