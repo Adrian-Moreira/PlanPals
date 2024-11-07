@@ -1,3 +1,5 @@
+[Updated Diagram](./Diagram.md)
+
 ## Regression Testing
 
 1. **How We Run Regression Tests:**
@@ -42,66 +44,67 @@ This runs a complete regression suite including all integration tests on push an
 
 ## Not testing
 
-### Updated Diagram
 ```mermaid
-flowchart LR
-    subgraph "Infrastructure"
-        SST["SST Framework"]
-        Docker["Docker Container"]
+flowchart TB
+    subgraph Infra["Infrastructure (Not Tested)"]
+        SST["SST Framework (Not tested)"]
+        Docker["Docker Container (Not tested)"]
         Docker --> SST
         SST --> Cloud
-        subgraph "Cloud"
-            S3["AWS S3 Serving Web Frontend (ppapp.xyz)"]
-            ELB["AWS Elastic Load Balancer (api.ppapp.xyz)"]
-            ECS["AWS Elastic Container Service"]
+        subgraph Cloud["Cloud (Not Tested)"]
+            S3["AWS S3 Serving Web Frontend (Not tested)"]
+            ELB["AWS Elastic Load Balancer (Not tested)"]
+            ECS["AWS Elastic Container Service (Not tested)"]
+            Atlas["MongoDB Atlas (Not tested)"]
             ELB --> ECS
         end
     end
+
     S3 --> Client
     ECS --> ExpressAPI
+
     subgraph "PlanPals"
-        subgraph "Frontend Tier"
-            Frontend["Flutter Frontend"]
-            Client["Web Frontend (ppapp.xyz)"]
+        subgraph FrontendTier["Frontend Tier (Not Tested)"]
+            Frontend["Flutter Frontend (Not tested)"]
+            Client["Web Frontend (Not tested)"]
         end
-        subgraph "Service Tier"
+
+        subgraph SSS["Service Tier (Fully Tested)"]
             subgraph "ExpressAPI"
-                Routes["Route Layer (Input Validation)"]
-                subgraph "Services"
-                    subgraph "Planner Services"
+                Routes["Route Layer (100% Coverage)"]
+                subgraph Services["Services (100% Coverage)"]
+                    subgraph PlannerServices["Planner Services"]
+                        PlannerOps["Planner Operations (100% Coverage)"]
                     end
                 end
-                Models["Model (Mongoose Schema)"]
-                
+                Models["Mongoose Schema (95.3% Coverage)"]
                 Routes --> Services
                 Services --> Models
             end
         end
-        subgraph "MongoDB"
-            subgraph "Database"
-                Planners[(Planner)]
-            end
+
+        subgraph Database["Database (Partially Tested)"]
+            Planners["Planner (Tested via Integration with in-memory DB)"]
         end
     end
 
-    Client --> ELB
-    Frontend --> ELB
+    Atlas --> Database
+    FrontendTier --> ELB
     Models --> Database
-    classDef frontendTier fill:#e1bee7,stroke:#9c27b0
-    classDef apiGateway fill:#bbdefb,stroke:#1976d2
-    classDef serviceTier fill:#c8e6c9,stroke:#4caf50
-    classDef dataTier fill:#ffe0b2,stroke:#ff9800
-    classDef infrastructure fill:#f5f5f5,stroke:#9e9e9e
+
+    classDef fullyCovered fill:#90EE90,stroke:#006400
+    classDef mostlyCovered fill:#FFD700,stroke:#B8860B
+    classDef notTested fill:#FFB6C1,stroke:#8B0000
+    classDef partiallyTested fill:#87CEEB,stroke:#4682B4
+    classDef pp fill:#bbccff,stroke:#1e1e1e
     classDef containers fill:#f5f5f5,stroke:#9e9e9e
     classDef cloud fill:#f5c5b5,stroke:#1e1e1e
-    classDef pp fill:#bbccff,stroke:#1e1e1e
 
-    class Client,Frontend frontendTier
-    class ALB,Gateway apiGateway
-    class Routes,Services,Models,PlannerService serviceTier
-    class MongoDB,Database,Planner dataTier
-    class SST,Docker,Cloud infrastructure
-    class AWS cloud
     class ExpressAPI containers
+    class Infra,Cloud cloud
+    class Client,Frontend,S3,ELB,ECS,SST,Docker,Atlas notTested
+    class Routes,Services,PlannerOps,PlannerServices,SSS fullyCovered
+    class Models mostlyCovered
+    class Planners,Database partiallyTested
     class PlanPals pp
 ```
