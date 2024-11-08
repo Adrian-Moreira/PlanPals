@@ -183,28 +183,28 @@ Contributed to the infrastructure setup using [SST](../../sst.config.ts) and AWS
     cluster.addService('PlanPalsService', {
         link: [atlasCluster, bucket, webFrontend, flutterFrontend],
         loadBalancer: {
-        domain: {
-            name: 'api.ppapp.xyz',
-        },
-        ports: [
-            { listen: '80/http', forward: '8080/http', container: 'planner-service' },
-            { listen: '443/https', forward: '8080/http', container: 'planner-service' },
-        ],
+            domain: {
+                name: 'api.ppapp.xyz',
+            },
+            ports: [
+                { listen: '80/http', forward: '8080/http', container: 'planner-service' },
+                { listen: '443/https', forward: '8080/http', container: 'planner-service' },
+            ],
         },
         containers: [
-        {
-            name: 'planner-service',
-            image: {
-            context: './backend/planner-service',
-            dockerfile: './backend/planner-service/Dockerfile',
+            {
+                name: 'planner-service',
+                image: {
+                    context: './backend/planner-service',
+                    dockerfile: './backend/planner-service/Dockerfile',
+                },
+                    environment: {
+                    DATABASE_CONNECTIONSTRING: stdSrv,
+                },
             },
-            environment: {
-            DATABASE_CONNECTIONSTRING: stdSrv,
-            },
-        },
         ],
         dev: {
-        command: 'npm i && npm run start',
+            command: 'npm i && npm run start',
         },
     })
     ```
@@ -215,3 +215,7 @@ Contributed to the infrastructure setup using [SST](../../sst.config.ts) and AWS
   - Load Balancer which redirects `http` and `https` requests
   - Secrets managed through SST Console or with environment variables for deploying manually.
 
+
+- **"Simplicity is the ultimate sophistication"**
+  - Self-documenting API contracts through reusable validation schemas, separation of concerns (Here: Validation) making the code maintainable
+  - Declarative infrastructure that's easy to understand, modify and deploy
