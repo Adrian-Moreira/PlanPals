@@ -215,7 +215,7 @@ Contributed to the infrastructure setup using [SST](../../sst.config.ts) and AWS
   - Load Balancer which redirects `http` and `https` requests
   - Secrets managed through SST Console or with environment variables for deploying manually.
 
+
 - **"Simplicity is the ultimate sophistication"**
   - Self-documenting API contracts through reusable validation schemas, separation of concerns (Here: Validation) making the code maintainable
   - Declarative infrastructure that's easy to understand, modify and deploy
-
