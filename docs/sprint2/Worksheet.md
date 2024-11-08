@@ -262,3 +262,10 @@ Adrian's most proud contribution was designing and simplifying react components 
   - Creating layers of containers, I was able simplify the code inside as much as possible
   - This creates maintainable, readable and easy to use code
   - Adding this one button and supplying an objectId and type is all you need to add comments to anything!
+
+#### Flutter Generic Card Component
+
+[Generic Card Code](https://github.com/Adrian-Moreira/PlanPals/blob/main/front-end-flutter/planpals/lib/shared/components/generic_card.dart)
+
+Ron’s proudest contribution was creating a flexible Card component that displays different types of data across the mobile app. This reusable design keeps the app consistent, reduced extra coding, and makes updates easier.
+
