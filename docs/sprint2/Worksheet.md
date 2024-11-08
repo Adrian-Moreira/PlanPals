@@ -269,3 +269,10 @@ Adrian's most proud contribution was designing and simplifying react components 
 
 Ron’s proudest contribution was creating a flexible Card component that displays different types of data across the mobile app. This reusable design keeps the app consistent, reduced extra coding, and makes updates easier.
 
+#### Web Frontend Planner UI
+
+![UI Image](Images/Planner%20UI.png)
+![Mobile UI Image](Images/Planner%20UI%20-%20Mobile.png)![UI Input Image](Images/Planner%20UI%20-%20Input.png)
+
+Josh's proudest contribution was working on the web frontend UI for planners. The planner UI was iterated on each sprint to create an interface that was functional, good looking, and had great usability. We put a lot of effort into designing a UI that was simple and effective. We also focused on using CSS to style the components of the interface so that they would look great on both mobile and desktop. The UI was designed to display all necessary information to a user in a way that is understandable and digestible. We also designed the interface and forms so that it was very simple for users to input data and make the most out of their planners. In this we opted to use mostly icons as buttons rather than large buttons with words as this reduced clutter on the screen and gave the whole page a simple and clean appearance. All in all, we are proud of how the web frontend’s planner UI turned out.  
+
