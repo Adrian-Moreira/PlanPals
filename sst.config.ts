@@ -117,8 +117,19 @@ export default $config({
       },
     })
 
+    const flutterFrontend = new sst.aws.StaticSite('PlanPalsFlutter', {
+      path: './front-end-flutter/planpals',
+      domain: {
+        name: 'm.ppapp.xyz',
+      },
+      build: {
+        output: 'build/web',
+        command: 'flutter pub get && flutter build web',
+      },
+    })
+
     cluster.addService('PlanPalsService', {
-      link: [atlasCluster, bucket, webFrontend],
+      link: [atlasCluster, bucket, webFrontend, flutterFrontend],
       loadBalancer: {
         domain: {
           name: 'api.ppapp.xyz',

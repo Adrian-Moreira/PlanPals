@@ -9,7 +9,6 @@ import Planners from './pages/planners'
 import Planner from './pages/planner'
 import Login from './pages/Login' // Import the Login page
 import ProtectedRoute from './ProtectedRoute' // Import the ProtectedRoute
-import { Resource } from 'sst'
 
 function App() {
   return (
