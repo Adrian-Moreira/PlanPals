@@ -219,3 +219,46 @@ Contributed to the infrastructure setup using [SST](../../sst.config.ts) and AWS
 - **"Simplicity is the ultimate sophistication"**
   - Self-documenting API contracts through reusable validation schemas, separation of concerns (Here: Validation) making the code maintainable
   - Declarative infrastructure that's easy to understand, modify and deploy
+
+
+#### Web Comment Integration
+
+Adrian's most proud contribution was designing and simplifying react components to allow comments on any object with a single, simple component
+
+   ```javascript
+   //Creates a button which when clicked shows or hides the comment box for a given object
+   //objectId must be supplied to show the correct comment box
+   
+   import React, { useState } from 'react';
+   import { BsChatFill } from "react-icons/bs";
+   import CommentBox from './commentBox';
+   
+   //id is the objectId, type is the object type
+   const CommentButton = ({id, type}) => {
+     const [isVisible, setIsVisible] = useState(false);
+   
+     const toggleVisibility = () => {
+       setIsVisible(prev => !prev);
+     };
+   
+     return (
+       <div id="comments" style={{display:"inline-block"}}>
+   
+           <button className="Icon-button" onClick={toggleVisibility}>
+               <BsChatFill/>
+           </button>
+   
+           <div id="commentVisibility" style={{display: isVisible ? "flex" : "none", float:"right"}}>
+               <CommentBox objectId={id} objectType={type}/>
+           </div>
+       </div>
+     );
+   };
+   
+   export default CommentButton;
+   ```
+
+- **As simple as possible**
+  - Creating layers of containers, I was able simplify the code inside as much as possible
+  - This creates maintainable, readable and easy to use code
+  - Adding this one button and supplying an objectId and type is all you need to add comments to anything!
