@@ -31,50 +31,13 @@ type PlanPals = {
   db: Mongoose
 }
 
-import { writeFileSync } from 'fs'
-import { performance, PerformanceObserver } from 'perf_hooks'
-import * as prof from 'v8-profiler-next'
-
-// Setup performance metrics observer
-const obs = new PerformanceObserver((list) => {
-  const entries = list.getEntries()
-  entries.forEach((entry) => {
-    console.log(`${entry.name}: ${entry.duration}ms`)
-  })
-})
-obs.observe({ entryTypes: ['measure'], buffered: true })
-
-// Middleware to measure route execution time
-const measureRouteTime = (req: Request, res: Response, next: NextFunction) => {
-  const routeName = `${req.method} ${req.path}`
-  performance.mark(`${routeName}-start`)
-
-  res.on('finish', () => {
-    performance.mark(`${routeName}-halt`)
-    performance.measure(routeName, `${routeName}-start`, `${routeName}-halt`)
-  })
-
-  next()
-}
-
 export function initExpress(app: Express): Express {
   app.use(express.json())
   app.use(cors())
   app.use(express.urlencoded({ extended: false }))
   app.use(express.static('public'))
-  // app.use(rateLimiter)
-  app.use(measureRouteTime)
   app.get('/', landingPage)
   app.get('/health', healthChecker)
-  app.get('/profile-pp-start', (req, res) => {
-    prof.startProfiling('CPU profile')
-    res.send('CPU profiling started')
-  })
-  app.get('/profile-pp-halt', (req, res) => {
-    const profile = prof.stopProfiling('CPU profile')
-    writeFileSync('./pp-profile.cpuprofile', JSON.stringify(profile))
-    res.send('CPU profile saved to pp-profile.cpuprofile')
-  })
   app.use(router)
   app.use(RequestUtils.mkErrorResponse)
   return app
