@@ -45,7 +45,7 @@ This runs a complete regression suite including all integration tests on push an
 ## Not testing
 
 ### API Tier (Express + MongoDB)
-[Coverage]()
+[Coverage](https://github.com/Adrian-Moreira/PlanPals/releases/download/Sprint2/coverage.tar.gz)
 - **Fully Tested (80%+)**:
   - Route handlers
   - Service layer
@@ -129,7 +129,7 @@ flowchart TB
     - **Is this fixable?**
       - Yes, we can optimize our database delete operation to use a more efficient way instead of finding then deleting associated objects one-by-one.
 
-- [Output]()
+- [Output](https://github.com/Adrian-Moreira/PlanPals/releases/download/Sprint2/planner-service-profile.tar.gz)
   - Frequent Database Operation
     - **Is this fixable?**
       - Yes, we can use cache for frequently accessed documents to avoid expensive database calls.
