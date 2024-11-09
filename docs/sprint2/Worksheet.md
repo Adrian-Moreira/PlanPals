@@ -276,3 +276,119 @@ Ron’s proudest contribution was creating a flexible Card component that displa
 
 Josh's proudest contribution was working on the web frontend UI for planners. The planner UI was iterated on each sprint to create an interface that was functional, good looking, and had great usability. We put a lot of effort into designing a UI that was simple and effective. We also focused on using CSS to style the components of the interface so that they would look great on both mobile and desktop. The UI was designed to display all necessary information to a user in a way that is understandable and digestible. We also designed the interface and forms so that it was very simple for users to input data and make the most out of their planners. In this we opted to use mostly icons as buttons rather than large buttons with words as this reduced clutter on the screen and gave the whole page a simple and clean appearance. All in all, we are proud of how the web frontend’s planner UI turned out.  
 
+#### Get Vote Count Feature
+
+Hridai’s proudest contribution was implementing the **Get Vote Count** feature, enabling users to retrieve vote counts for specific objects in the planner. This was essential for displaying voting information, including the number of upvotes and downvotes for destinations, activities, etc.
+
+- **Integration Test Implementation**  
+  To ensure reliability and coverage, Hridai added comprehensive integration tests for the new `GET /vote/count` route, ensuring it handles various edge cases and performs as expected. The integration tests were crucial in verifying the accuracy of vote counts for both existing and new objects.
+
+    ```typescript
+    // Test to get vote count
+    it('should return OK and the correct count of upvotes and downvotes for an existing object', async () => {
+      await request(app.app)
+        .post(`/vote/up`)  // Adding an upvote to ensure it's counted
+        .send({
+          objectId: testDestination1._id.toString(),
+          type: 'Destination',
+          createdBy: testUser1._id.toString(),
+        })
+        .expect(StatusCodes.OK);
+  
+      const response = await request(app.app)
+        .get(`/vote/count`)
+        .query({
+          type: 'Destination',
+          objectId: testDestination1._id.toString(),
+        })
+        .expect('Content-Type', /json/)
+        .expect(StatusCodes.OK);
+  
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.upVoteCount).toBe(1);  // Expected 1 upvote
+      expect(response.body.data.downVoteCount).toBe(1); // Expected 1 downvote from setup
+    });
+    ```
+
+- **Impact**  
+  - This feature improves the user experience by providing transparency on voting results.
+  - Integration tests were critical for ensuring consistent functionality throughout the application. The thorough validation of edge cases ensures this feature can be trusted in production.
+  - The solution is scalable and flexible, as the same route can be used across multiple object types (e.g., activities, destinations).
+
+#### User Login Flow Enhancement
+
+Hridai significantly improved the **User Login Flow**, ensuring that both new users and existing users can easily sign in and create accounts, allowing for seamless user management.
+
+- **Fixing User Creation & Login**  
+  The logic behind user login and registration was improved to handle both scenarios efficiently, making the experience more intuitive.
+
+    ```javascript
+    // Handles user login and account creation seamlessly
+    const handleLogin = async (e) => {
+      e.preventDefault();
+      const res = await axios.post('/auth/login', { username, password });
+      if (res.data.success) {
+        setUser(res.data.user);
+      } else {
+        alert('Login failed');
+      }
+    };
+    ```
+
+- **Impact**  
+  - Streamlined user management process.
+  - Increased application security by ensuring that user authentication is handled securely and robustly.
+
+#### Planner Display and Creation Interface
+
+Hridai contributed to the **Planner Display and Creation Interface** on the frontend, ensuring that the user interface for creating and viewing planners was both intuitive and functional.
+
+- **Improved User Experience**  
+  Hridai made sure that users could view all of their planners in one place and add new planners with just the necessary information.
+
+    ```javascript
+    // Planner creation flow now requires only essential fields
+    const handleCreatePlanner = async () => {
+      await axios.post('/planner', {
+        name: newPlannerName,
+        description: newPlannerDescription,
+      });
+    };
+    ```
+
+- **Impact**  
+  - Clean and minimalistic UI that emphasizes usability.
+  - The application now provides users with an easy way to manage their planners while minimizing confusion or clutter.
+
+#### Vote Count Integration
+
+Hridai worked on integrating the **Vote Count** feature into the app’s UI, allowing users to see the number of votes on various items directly within their planners.
+
+- **User-Centered Design**  
+  The integration displays vote counts for each destination, accommodation, and activity, providing users with clear feedback.
+
+    ```jsx
+    // Display vote counts for destinations
+    const VoteDisplay = ({ destinationId }) => {
+      const [votes, setVotes] = useState({ upVotes: 0, downVotes: 0 });
+
+      useEffect(() => {
+        axios.get(`/vote/count`, { params: { objectId: destinationId, type: 'Destination' } })
+          .then(res => setVotes(res.data.data))
+          .catch(err => console.error(err));
+      }, [destinationId]);
+
+      return (
+        <div>
+          <p>Upvotes: {votes.upVotes}</p>
+          <p>Downvotes: {votes.downVotes}</p>
+        </div>
+      );
+    };
+    ```
+
+- **Impact**  
+  - Users now get immediate feedback on how other users feel about different aspects of their planner.
+  - The feature encourages more user interaction and helps users make better decisions based on community input.
+
+---
