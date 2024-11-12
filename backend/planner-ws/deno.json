@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-read --allow-env --watch main.ts  --port 8000 --log-level 0"
+  },
+  "imports": {
+    "@fedify/amqp": "jsr:@fedify/amqp@^0.1.0",
+    "@fedify/fedify": "jsr:@fedify/fedify@^1.2.4",
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/cli": "jsr:@std/cli@^1.0.6",
+    "@types/amqplib": "npm:@types/amqplib@^0.10.5",
+    "amqplib": "npm:amqplib@^0.10.4"
+  }
+}

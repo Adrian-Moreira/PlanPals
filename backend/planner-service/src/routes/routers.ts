@@ -7,6 +7,7 @@ import { commentRouter } from './comment'
 import RequestUtils from '../utils/RequestUtils'
 
 const router = express.Router()
+
 router.use('/user', userRouter)
 router.use('/planner', plannerRouter)
 router.use('/vote', voteRouter)

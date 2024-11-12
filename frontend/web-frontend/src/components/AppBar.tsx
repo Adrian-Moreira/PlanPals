@@ -28,13 +28,13 @@ const settings = [
 function ResponsiveAppBar({
   title,
   theme,
-  isAuthenticated,
   handleLogout,
   handleLogin,
   handleSignup,
   handleAbout,
   handlePlanners,
   backToHomeHandler,
+  ppUser,
 }) {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
@@ -246,7 +246,7 @@ function ResponsiveAppBar({
             {mkTitle(title, { xs: 'flex', md: 'none' }, 1)}
             {mkNavMenu(pages, 1)}
 
-            {isAuthenticated ?
+            {ppUser ?
               <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

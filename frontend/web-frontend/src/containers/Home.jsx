@@ -7,19 +7,19 @@ import { useNavigate } from 'react-router-dom'
 
 import ppLogo from '../assets/PlanPals.jpg'
 
-import { useAppContext } from '../lib/contextLib'
 import { onError } from '../lib/errorLib'
 import apiLib from '../lib/apiLib'
-import { getCurrentUser } from '../lib/authLib'
+import { getCurrentUser, ppUser } from '../lib/authLib'
 import PlannerCard from '../components/PlannerCard'
 import PlannerCreateView from '../components/PlannerCreateView'
+import { useAtom } from 'jotai'
 
 export default function Home() {
   const nav = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
   const [plannerList, setPlannerList] = useState([])
   const [createNew, setCreateNew] = useState(false)
-  const { ppUser, isAuthenticated, setCognitoUser, setPPUser } = useAppContext()
+  const [pUser, setPPUser] = useAtom(ppUser)
 
   const fetchPlanners = useCallback(async (userId) => {
     if (!userId) return
@@ -53,10 +53,10 @@ export default function Home() {
 
   const onLoad = useCallback(async () => {
     try {
-      if (!ppUser) {
-        await getCurrentUser(setCognitoUser, setPPUser)
+      if (!pUser.loggedIn) {
+        await getCurrentUser(setPPUser)
       }
-      await fetchPlanners(ppUser._id)
+      await fetchPlanners(pUser.ppUser._id)
     } catch (error) {
       if (error !== 'No current user') {
         onError(error)
@@ -64,7 +64,7 @@ export default function Home() {
     } finally {
       setIsLoading(false)
     }
-  }, [setCognitoUser, setIsLoading, setPPUser, fetchPlanners, ppUser])
+  }, [setIsLoading, setPPUser, fetchPlanners, pUser])
 
   useEffect(() => {
     onLoad()
@@ -145,7 +145,7 @@ export default function Home() {
       <div className="lander">
         {isLoading ?
           <></>
-        : isAuthenticated ?
+        : pUser.loggedIn ?
           renderPlanners()
         : renderPlanPalsWelcome()}
       </div>

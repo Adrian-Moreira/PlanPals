@@ -1,12 +1,12 @@
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState, useCallback } from 'react'
-import { useAppContext } from '../lib/contextLib'
-import { getCurrentUser } from '../lib/authLib'
+import { getCurrentUser, ppUser } from '../lib/authLib'
 import apiLib from '../lib/apiLib'
 import { onError } from '../lib/errorLib'
 import * as MUI from '@mui/material'
 import PlannerDetailView from '../components/PlannerDetailView'
+import { useAtom } from 'jotai'
 function PlannerDetail() {
   const nav = useNavigate()
   const { id } = useParams()
@@ -14,7 +14,7 @@ function PlannerDetail() {
   const [transportList, setTransportList] = useState([])
   const [destinationList, setDestinationList] = useState([])
   const [plannerDetails, setPlannerDetails] = useState({})
-  const { ppUser, setCognitoUser, setPPUser } = useAppContext()
+  const [pUser, setPPUser] = useAtom(ppUser)
   const fetchPlannerDetails = useCallback(
     async (pUser) => {
       if (!pUser) return
@@ -51,15 +51,15 @@ function PlannerDetail() {
   )
   const onLoad = useCallback(async () => {
     try {
-      if (!ppUser) {
-        await getCurrentUser(setCognitoUser, setPPUser)
+      if (!pUser.loggedIn) {
+        await getCurrentUser(setPPUser)
       }
-      await fetchPlannerDetails(ppUser).then(() => setIsLoading(false))
+      await fetchPlannerDetails(pUser.ppUser).then(() => setIsLoading(false))
     } catch (error) {
       alert(error)
       nav('/login')
     }
-  }, [setCognitoUser, setIsLoading, setPPUser, fetchPlannerDetails, ppUser, nav])
+  }, [setIsLoading, setPPUser, fetchPlannerDetails, pUser, nav])
   useEffect(() => {
     onLoad()
   }, [onLoad])
@@ -70,7 +70,7 @@ function PlannerDetail() {
     : <PlannerDetailView
         key={plannerDetails._id}
         planner={plannerDetails}
-        ppUser={ppUser}
+        ppUser={pUser.ppUser}
         transportations={transportList}
         destinations={destinationList}
       ></PlannerDetailView>

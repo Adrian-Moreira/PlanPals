@@ -4,6 +4,7 @@ import { MalformedRequestException } from '../exceptions/MalformedRequestExcepti
 import { StatusCodes } from 'http-status-codes'
 import mongoose from 'mongoose'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
+import { inspect } from 'node:util'
 
 /**
  * Verifies that an object with the given objectId exists in the given collection.
@@ -50,9 +51,9 @@ function mkRequestParser<T>(
       .catch((error: any) => {
         req.body.err = new MalformedRequestException({
           requestBody: ''
-            .concat(` Body: ${req.body}`)
-            .concat(` Params: ${req.params}`)
-            .concat(` Query: ${req.query}`)
+            .concat(` Body: ${inspect(req.body)}`)
+            .concat(` Params: ${inspect(req.params)}`)
+            .concat(` Query: ${inspect(req.query)}`)
             .concat(' Error: ' + error),
           requestType: 'parseRequest',
         })

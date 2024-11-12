@@ -1,12 +1,7 @@
-import { Auth } from 'aws-amplify'
 import { createContext, useContext } from 'react'
 
 export const AppContext = createContext({
-  isAuthenticated: false,
-  cognitoUser: Auth.currentAuthenticatedUser().then((user) => user),
   ppUser: undefined,
-  userHasAuthenticated: useAppContext,
-  setCognitoUser: useAppContext,
   setPPUser: useAppContext,
 })
 

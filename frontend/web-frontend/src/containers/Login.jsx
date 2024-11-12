@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Auth } from 'aws-amplify'
 
 import './Login.css'
 
@@ -15,7 +14,7 @@ import apiLib from '../lib/apiLib'
 
 export default function Login() {
   const nav = useNavigate()
-  const { userHasAuthenticated, setCognitoUser, setPPUser } = useAppContext()
+  const { ppUser, setPPUser } = useAppContext()
   const [fields, handleFieldChange] = useFormFields({
     email: '',
     password: '',
@@ -55,8 +54,10 @@ export default function Login() {
           }
         })
         .finally((res) => res)
-      setPPUser(response.data.data)
-      userHasAuthenticated(true)
+      setPPUser({
+        loggedIn: true,
+        ppUser: response.data.data,
+      })
       nav('/')
     } catch (error) {
       if (error?.message === 'Incorrect username or password.' || error?.message === 'User does not exist.') {

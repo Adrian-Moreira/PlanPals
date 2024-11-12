@@ -5,6 +5,9 @@ export default {
   database: {
     connectionString: process.env.DATABASE_CONNECTIONSTRING,
   },
+  messageQ: {
+    connectionString: process.env.RABBITMQ_CONNECTIONSTRING,
+  },
   logger: {
     level: process.env.LOG_LEVEL,
   },

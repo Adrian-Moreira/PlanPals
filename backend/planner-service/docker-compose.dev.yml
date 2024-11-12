@@ -7,6 +7,7 @@ services:
     environment:
       - SERVER_PORT=8080
       - DATABASE_CONNECTIONSTRING=mongodb://mongo:27017/planner
+      - RABBITMQ_CONNECTIONSTRING=amqp://user:password@rabbitmq:5672
     depends_on:
       - mongo
 
@@ -17,6 +18,15 @@ services:
     volumes:
       - mongodb:/data/db
       - mongodb_config:/data/configdb
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
 
 volumes:
   mongodb:
