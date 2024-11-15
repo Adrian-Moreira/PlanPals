@@ -3,7 +3,7 @@ import request from 'supertest'
 import config from '../../src/config'
 import PlanPals, { initServer, startServer, stopServer } from '../../src/app'
 import { StatusCodes } from 'http-status-codes'
-import { BasicUserSchema, UserModel, UserSchema } from '../../src/models/User'
+import { UserModel, UserSchema } from '../../src/models/User'
 
 let app: PlanPals
 let testUser: any = {
@@ -24,7 +24,6 @@ describe('Integration Test: User API', () => {
     await UserModel.deleteMany({})
 
     testUser = await UserModel.create(testUser)
-    testUser = await UserSchema.parseAsync(testUser)
   })
 
   afterAll(async () => await stopServer(app))

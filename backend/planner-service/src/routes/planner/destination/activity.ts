@@ -4,6 +4,7 @@ import PlannerService from '../../../services/planner'
 import DestinationService from '../../../services/destination'
 import ActivityService from '../../../services/activity'
 import UserService from '../../../services/user'
+import { publishDeleteEvent, publishUpdateEvent } from '../../../services/rabbit'
 export const activityRouter = express.Router({ mergeParams: true })
 
 activityRouter.get(
@@ -23,6 +24,7 @@ activityRouter.post(
   PlannerService.verifyUserCanEditPlanner,
   DestinationService.verifyDestinationExists,
   ActivityService.createActivityDocument,
+  publishUpdateEvent,
 )
 activityRouter.get(
   '/:activityId([0-9a-fA-F]{24})',
@@ -43,6 +45,7 @@ activityRouter.patch(
   DestinationService.verifyDestinationExists,
   ActivityService.verifyActivityExists,
   ActivityService.updateActivityDocument,
+  publishUpdateEvent,
 )
 activityRouter.delete(
   '/:activityId([0-9a-fA-F]{24})',
@@ -53,4 +56,5 @@ activityRouter.delete(
   DestinationService.verifyDestinationExists,
   ActivityService.verifyActivityExists,
   ActivityService.deleteActivityDocument,
+  publishDeleteEvent,
 )

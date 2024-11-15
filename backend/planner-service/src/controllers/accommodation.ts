@@ -9,7 +9,7 @@ const AccommodationRouteSchema = {
       destinationId: ObjectIdStringSchema,
     }),
     body: z.object({
-      name: z.string(),
+      name: z.string().min(1),
       location: z.string().optional(),
       startDate: z.string().datetime().or(z.date()),
       endDate: z.string().datetime().or(z.date()),
@@ -42,7 +42,7 @@ const AccommodationRouteSchema = {
       accommodationId: ObjectIdStringSchema,
     }),
     body: z.object({
-      name: z.string().optional(),
+      name: z.string().min(1).optional(),
       location: z.string().optional(),
       startDate: z.string().datetime().or(z.date()).optional(),
       endDate: z.string().datetime().or(z.date()).optional(),

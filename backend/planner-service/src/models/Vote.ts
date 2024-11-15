@@ -31,5 +31,6 @@ export const VoteSchema = z.object({
   downVotes: z.array(ObjectIdSchema),
 })
 
-export const VoteModel = mongoose.model<Vote>('Vote', VoteMongoSchema)
+export const VoteCollection = 'Vote'
+export const VoteModel = mongoose.model<Vote>(VoteCollection, VoteMongoSchema)
 export type Vote = z.infer<typeof VoteSchema>

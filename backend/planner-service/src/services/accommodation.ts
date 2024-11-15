@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { Types } from 'mongoose'
-import { AccommodationModel } from '../models/Accommodation'
+import { AccommodationCollection, AccommodationModel } from '../models/Accommodation'
 import { DestinationModel } from '../models/Destination'
 
 /**
@@ -50,6 +50,7 @@ const createAccommodationDocument = async (req: Request, res: Response, next: Ne
   const createdAccommodation = await AccommodationModel.create({
     createdBy: targetUser._id,
     destinationId: targetDestination._id,
+    plannerId: targetDestination.plannerId,
     name,
     location,
     startDate,
@@ -66,6 +67,7 @@ const createAccommodationDocument = async (req: Request, res: Response, next: Ne
   })
 
   req.body.result = createdAccommodation
+  req.body.dataType = AccommodationCollection
   req.body.status = StatusCodes.CREATED
 
   next()
@@ -95,6 +97,7 @@ const updateAccommodationDocument = async (req: Request, res: Response, next: Ne
   )
 
   req.body.result = updatedAccommodation
+  req.body.dataType = AccommodationCollection
   req.body.status = StatusCodes.OK
 
   next()
@@ -126,6 +129,7 @@ const deleteAccommodationDocument = async (req: Request, res: Response, next: Ne
   }
 
   req.body.result = deletedAccommodation
+  req.body.dataType = AccommodationCollection
   req.body.status = StatusCodes.OK
 
   next()

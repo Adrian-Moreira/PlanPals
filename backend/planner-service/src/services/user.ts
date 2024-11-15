@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { BasicUser, UserModel } from '../models/User'
+import { BasicUser, UserCollection, UserModel } from '../models/User'
 
 const verifyUserExists = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   let { userId, createdBy }: { userId: any; createdBy: any } = req.body.out
@@ -41,6 +41,7 @@ const createUserDocument = async (req: Request, res: Response, next: NextFunctio
     next(req.body.err)
   })
   req.body.result = userCreated
+  req.body.dataType = UserCollection
   req.body.status = StatusCodes.CREATED
   next()
 }
@@ -79,6 +80,7 @@ const updateUserDocument = async (req: Request, res: Response, next: NextFunctio
   }
 
   req.body.result = userUpdated
+  req.body.dataType = UserCollection
   req.body.status = StatusCodes.OK
 
   next()
@@ -98,6 +100,7 @@ const deleteUserDocument = async (req: Request, res: Response, next: NextFunctio
   const userDeleted = await UserModel.findOneAndDelete({ _id: targetUser._id })
 
   req.body.result = userDeleted
+  req.body.dataType = UserCollection
   req.body.status = StatusCodes.OK
 
   next()
@@ -144,6 +147,20 @@ const getUserDocumentByName = async (req: Request, res: Response, next: NextFunc
   next()
 }
 
+const getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  const users = await UserModel.find().lean()
+  if (!users || users.length === 0) {
+    req.body.err = new RecordNotFoundException({
+      recordType: 'User',
+    })
+    next(req.body.err)
+  } else {
+    req.body.result = users
+    req.body.status = StatusCodes.OK
+  }
+  next()
+}
+
 const UserService = {
   verifyUserExists,
   createUserDocument,
@@ -151,5 +168,6 @@ const UserService = {
   deleteUserDocument,
   getUserDocumentById,
   getUserDocumentByName,
+  getAllUsers,
 }
 export default UserService

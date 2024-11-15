@@ -8,7 +8,7 @@
     "build": "tsc",
     "debug": "nodemon --inspect=0.0.0.0:9229",
     "start": "nodemon",
-    "test": "jest --maxWorkers=1",
+    "test": "jest --maxWorkers=1 --forceExit",
     "sso": "aws sso login --sso-session=pp"
   },
   "dependencies": {

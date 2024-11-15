@@ -1,22 +1,42 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { z } from 'zod'
-import { TransportModel } from './Transport'
-import { VoteModel } from './Vote'
-import { CommentsModel } from './Comment'
-import { DestinationModel } from './Destination'
+import { TransportCollection, TransportModel } from './Transport'
+import { VoteCollection, VoteModel } from './Vote'
+import { CommentCollection, CommentsModel } from './Comment'
+import { DestinationCollection, DestinationModel } from './Destination'
+import { ActivityCollection } from './Activity'
+import { AccommodationCollection } from './Accommodation'
+import { UserCollection } from './User'
+
+export const PlannerCollection = 'Planner'
 
 export const ValidCollections = [
-  'Accommodation',
-  'Activity',
-  'Comment',
-  'Destination',
-  'Planner',
-  'Transport',
-  'User',
-  'Vote',
+  AccommodationCollection,
+  ActivityCollection,
+  CommentCollection,
+  DestinationCollection,
+  PlannerCollection,
+  TransportCollection,
+  UserCollection,
+  VoteCollection,
+]
+export const VotableCollections = [
+  AccommodationCollection,
+  ActivityCollection,
+  CommentCollection,
+  DestinationCollection,
+  TransportCollection,
+]
+export const CommentableCollections = [
+  AccommodationCollection,
+  ActivityCollection,
+  DestinationCollection,
+  TransportCollection,
 ]
 
 export const ValidCollectionSchema = z.string().refine((val) => ValidCollections.includes(val))
+export const VotableCollectionSchema = z.string().refine((val) => VotableCollections.includes(val))
+export const CommentableCollectionSchema = z.string().refine((val) => CommentableCollections.includes(val))
 // .transform((val: string) => mongoose.models[val!])
 
 export const ObjectIdSchema = z.instanceof(Types.ObjectId).refine((val) => Types.ObjectId.isValid(val), {
@@ -74,6 +94,7 @@ const PlannerMongoSchema = new Schema<Planner>(
 
 export const PlannerSchema = z.object({
   _id: ObjectIdSchema,
+  plannerId: ObjectIdSchema,
   createdAt: z.string().datetime().or(z.date()),
   updatedAt: z.string().datetime().or(z.date()),
   createdBy: ObjectIdSchema,
@@ -114,7 +135,5 @@ PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
   }
   next()
 })
-
-export const PlannerModel = mongoose.model('Planner', PlannerMongoSchema)
-
+export const PlannerModel = mongoose.model(PlannerCollection, PlannerMongoSchema)
 export type Planner = z.infer<typeof PlannerSchema>

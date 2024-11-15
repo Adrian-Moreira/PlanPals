@@ -41,6 +41,11 @@ const ActivityMongoSchema = new Schema<Activity>(
       ref: 'Destination',
       required: true,
     },
+    plannerId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Planner',
+    },
   },
   { _id: true, timestamps: true },
 )
@@ -60,6 +65,7 @@ export const ActivitySchema = z.object({
   done: z.boolean(),
 
   destinationId: ObjectIdSchema,
+  plannerId: ObjectIdSchema,
 })
 
 ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
@@ -88,7 +94,7 @@ ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
 
   next()
 })
-
-export const ActivityModel = mongoose.model<Activity>('Activity', ActivityMongoSchema)
+export const ActivityCollection = 'Activity'
+export const ActivityModel = mongoose.model<Activity>(ActivityCollection, ActivityMongoSchema)
 
 export type Activity = z.infer<typeof ActivitySchema>

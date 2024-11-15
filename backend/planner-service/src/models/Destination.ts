@@ -92,7 +92,7 @@ DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
 
   next()
 })
-
-export const DestinationModel = mongoose.model<Destination>('Destination', DestinationMongoSchema)
+export const DestinationCollection = 'Destination'
+export const DestinationModel = mongoose.model<Destination>(DestinationCollection, DestinationMongoSchema)
 
 export type Destination = z.infer<typeof DestinationSchema>

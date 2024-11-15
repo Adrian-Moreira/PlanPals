@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useCallback } from 'react'
-import { useAtom } from 'jotai'
+import { atom, createStore, Provider, useAtom } from 'jotai'
 
 import './App.css'
 import { lightTheme, darkTheme } from './theme'
@@ -11,8 +11,7 @@ import Container from '@mui/material/Container'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import Routes from './Routes.jsx'
-import { AppContext, ThemeContext } from './lib/contextLib'
-import { ppUser } from './lib/authLib.js'
+import { ppUserAtom } from './lib/authLib.ts'
 
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
@@ -22,7 +21,8 @@ import '@fontsource/roboto/700.css'
 function App() {
   const nav = useNavigate()
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const [pUser, setPPUser] = useAtom(ppUser)
+  const [pUser, setPPUser] = useAtom(ppUserAtom)
+
   const [theme, setTheme] = useState(lightTheme)
 
   const handleThemeChange = useCallback(async () => {
@@ -30,21 +30,21 @@ function App() {
   }, [prefersDarkMode])
 
   useEffect(() => {
-    onLoad()
     handleThemeChange()
   }, [handleThemeChange])
 
-  async function onLoad() {}
-
   async function handleLogout() {
-    setPPUser(null)
+    setPPUser({
+      loggedIn: false,
+      ppUser: null,
+    })
     nav('/login')
   }
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {ppUser && (
+      {ppUserAtom && (
         <Container className="App" maxWidth="xl">
           <ResponsiveAppBar
             theme={theme}
@@ -57,11 +57,7 @@ function App() {
             handlePlanners={() => nav('/planners')}
             ppUser={pUser}
           ></ResponsiveAppBar>
-          <ThemeContext.Provider value={{ theme, setTheme }}>
-            <AppContext.Provider value={{ pUser, setPPUser }}>
-              <Routes />
-            </AppContext.Provider>
-          </ThemeContext.Provider>
+          <Routes />
         </Container>
       )}
     </ThemeProvider>

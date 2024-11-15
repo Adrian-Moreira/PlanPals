@@ -7,7 +7,7 @@ import * as MUI from '@mui/material'
 import CommentBox from './CommentBox'
 
 //id is the objectId, type is the object type
-const CommentButton = ({ id, type, userId }) => {
+const CommentButton = ({ id, type, userId, plannerId }) => {
   const [isVisible, setIsVisible] = useState(false)
 
   const toggleVisibility = useCallback(() => {
@@ -21,7 +21,7 @@ const CommentButton = ({ id, type, userId }) => {
       </MUI.IconButton>
 
       <div id="commentVisibility" style={{ display: isVisible ? 'flex' : 'none', float: 'right' }}>
-        <CommentBox objectId={id} objectType={type} userId={userId} />
+        <CommentBox objectId={id} objectType={type} userId={userId} plannerId={plannerId} />
       </div>
     </div>
   )

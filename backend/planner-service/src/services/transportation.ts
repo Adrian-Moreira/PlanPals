@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { Transport, TransportModel } from '../models/Transport'
+import { Transport, TransportCollection, TransportModel } from '../models/Transport'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { PlannerModel } from '../models/Planner'
 
@@ -61,6 +61,7 @@ const createTransportationDocument = async (req: Request, res: Response, next: N
   )
 
   req.body.result = createdTransportation
+  req.body.dataType = TransportCollection
   req.body.status = StatusCodes.CREATED
   next()
 }
@@ -90,6 +91,7 @@ const updateTransportationDocument = async (req: Request, res: Response, next: N
   )
 
   req.body.result = updatedTransportation
+  req.body.dataType = TransportCollection
   req.body.status = StatusCodes.OK
 
   next()
@@ -113,6 +115,7 @@ const deleteTransportationDocument = async (req: Request, res: Response, next: N
   })
 
   req.body.result = deletedTransportation
+  req.body.dataType = TransportCollection
   req.body.status = StatusCodes.OK
 
   next()

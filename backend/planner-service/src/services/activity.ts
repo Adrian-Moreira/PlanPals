@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
-import { Activity, ActivityModel } from '../models/Activity'
+import { Activity, ActivityCollection, ActivityModel } from '../models/Activity'
 import { DestinationModel } from '../models/Destination'
 
 /**
@@ -45,6 +45,7 @@ const createActivityDocument = async (req: Request, res: Response, next: NextFun
   const createdActivity = await ActivityModel.create({
     createdBy: targetUser._id,
     destinationId: targetDestination._id,
+    plannerId: targetDestination.plannerId,
     name,
     startDate,
     duration,
@@ -62,6 +63,7 @@ const createActivityDocument = async (req: Request, res: Response, next: NextFun
   })
 
   req.body.result = createdActivity
+  req.body.dataType = ActivityCollection
   req.body.status = StatusCodes.CREATED
 
   next()
@@ -90,6 +92,7 @@ const updateActivityDocument = async (req: Request, res: Response, next: NextFun
   })
 
   req.body.result = updatedActivity
+  req.body.dataType = ActivityCollection
   req.body.status = StatusCodes.OK
 
   next()
@@ -121,6 +124,7 @@ const deleteActivityDocument = async (req: Request, res: Response, next: NextFun
   }
 
   req.body.result = deletedActivity
+  req.body.dataType = ActivityCollection
   req.body.status = StatusCodes.OK
 
   next()

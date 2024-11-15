@@ -5,6 +5,7 @@ import DestinationValidator from '../../../controllers/destination'
 import PlannerService from '../../../services/planner'
 import DestinationService from '../../../services/destination'
 import UserService from '../../../services/user'
+import { publishDeleteEvent, publishUpdateEvent } from '../../../services/rabbit'
 
 export const destinationRouter = express.Router({ mergeParams: true })
 
@@ -23,6 +24,7 @@ destinationRouter.post(
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.createDestinationDocument,
+  publishUpdateEvent,
 )
 
 destinationRouter.get(
@@ -42,6 +44,7 @@ destinationRouter.patch(
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
   DestinationService.updateDestinationDocument,
+  publishUpdateEvent,
 )
 destinationRouter.delete(
   '/:destinationId([0-9a-fA-F]{24})',
@@ -51,6 +54,7 @@ destinationRouter.delete(
   PlannerService.verifyUserCanViewPlanner,
   DestinationService.verifyDestinationExists,
   DestinationService.deleteDestinationDocument,
+  publishDeleteEvent,
 )
 
 destinationRouter.use('/:destinationId([0-9a-fA-F]{24})/accommodation', accommodationRouter)

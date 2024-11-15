@@ -5,33 +5,36 @@ import './Login.css'
 
 import LoaderButton from '../components/LoaderButton.tsx'
 import * as MUI from '@mui/material/'
-import * as MUIcons from '@mui/icons-material'
+// import * as MUIcons from '@mui/icons-material'
 
 import { onError } from '../lib/errorLib'
 import { useFormFields } from '../lib/hooksLib'
-import { useAppContext } from '../lib/contextLib'
 import apiLib from '../lib/apiLib'
+import { useAtom } from 'jotai'
+import { ppUserAtom } from '../lib/authLib.ts'
+import { userMapAtom } from '../lib/appLib.ts'
 
 export default function Login() {
   const nav = useNavigate()
-  const { ppUser, setPPUser } = useAppContext()
+  const [pUser, setPPUser] = useAtom(ppUserAtom)
+  const [userMap, setUserMap] = useAtom(userMapAtom)
   const [fields, handleFieldChange] = useFormFields({
     email: '',
     password: '',
   })
 
   const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  // const [showPassword, setShowPassword] = useState(false)
   const [authError, setAuthError] = useState(false)
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show)
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault()
-  }
+  // const handleClickShowPassword = () => setShowPassword((show) => !show)
+  // const handleMouseDownPassword = (event) => {
+  //   event.preventDefault()
+  // }
 
-  const handleMouseUpPassword = (event) => {
-    event.preventDefault()
-  }
+  // const handleMouseUpPassword = (event) => {
+  //   event.preventDefault()
+  // }
 
   function validateForm() {
     return fields.email.length > 0
@@ -54,10 +57,12 @@ export default function Login() {
           }
         })
         .finally((res) => res)
-      setPPUser({
+      const newUser = {
         loggedIn: true,
         ppUser: response.data.data,
-      })
+      }
+      setPPUser(newUser)
+      setUserMap(userMap.set(response.data.data._id, response.data.data))
       nav('/')
     } catch (error) {
       if (error?.message === 'Incorrect username or password.' || error?.message === 'User does not exist.') {

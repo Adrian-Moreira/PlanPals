@@ -77,7 +77,7 @@ TransportMongoSchema.pre('findOneAndDelete', async function (next) {
 
   next()
 })
-
-export const TransportModel = mongoose.model<Transport>('Transport', TransportMongoSchema)
+export const TransportCollection = 'Transport'
+export const TransportModel = mongoose.model<Transport>(TransportCollection, TransportMongoSchema)
 
 export type Transport = z.infer<typeof TransportSchema>

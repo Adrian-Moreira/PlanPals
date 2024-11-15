@@ -4,6 +4,7 @@ import AccommodationService from '../../../services/accommodation'
 import PlannerService from '../../../services/planner'
 import DestinationService from '../../../services/destination'
 import UserService from '../../../services/user'
+import { publishDeleteEvent, publishUpdateEvent } from '../../../services/rabbit'
 
 export const accommodationRouter = express.Router({ mergeParams: true })
 
@@ -24,6 +25,7 @@ accommodationRouter.post(
   PlannerService.verifyUserCanEditPlanner,
   DestinationService.verifyDestinationExists,
   AccommodationService.createAccommodationDocument,
+  publishUpdateEvent,
 )
 accommodationRouter.get(
   '/:accommodationId([0-9a-fA-F]{24})',
@@ -44,6 +46,7 @@ accommodationRouter.patch(
   DestinationService.verifyDestinationExists,
   AccommodationService.verifyAccommodationExists,
   AccommodationService.updateAccommodationDocument,
+  publishUpdateEvent,
 )
 accommodationRouter.delete(
   '/:accommodationId([0-9a-fA-F]{24})',
@@ -54,4 +57,5 @@ accommodationRouter.delete(
   DestinationService.verifyDestinationExists,
   AccommodationService.verifyAccommodationExists,
   AccommodationService.deleteAccommodationDocument,
+  publishDeleteEvent,
 )

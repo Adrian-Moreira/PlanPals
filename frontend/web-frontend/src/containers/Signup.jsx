@@ -9,9 +9,7 @@ import LoaderButton from '../components/LoaderButton'
 
 import { useNavigate } from 'react-router-dom'
 import { useFormFields } from '../lib/hooksLib'
-import { useAppContext } from '../lib/contextLib'
 import { onError } from '../lib/errorLib'
-import apiLib from '../lib/apiLib'
 
 export default function Signup() {
   const [fields, handleFieldChange] = useFormFields({
@@ -22,7 +20,6 @@ export default function Signup() {
     confirmationCode: '',
   })
   const nav = useNavigate()
-  const { userHasAuthenticated, setCognitoUser, setPPUser } = useAppContext()
   const [isLoading, setIsLoading] = useState(false)
   const [newUser, setNewUser] = useState(null)
   function validateForm() {
@@ -54,15 +51,6 @@ export default function Signup() {
     setIsLoading(true)
     try {
       await Auth.confirmSignUp(fields.email, fields.confirmationCode)
-      const cognitoUser = await Auth.signIn(fields.email, fields.password)
-      setCognitoUser(cognitoUser)
-      const response = await apiLib.post('/user', {
-        params: {},
-        data: { userName: fields.email, preferredName: fields.username },
-      })
-      setPPUser(response.data)
-      userHasAuthenticated(true)
-
       nav('/')
     } catch (e) {
       onError(e)
