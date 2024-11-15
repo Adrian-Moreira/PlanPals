@@ -1,5 +1,6 @@
 # Ignore artifacts:
-packages/cdk/cdk.out
-packages/ui/.next
-packages/ui/out
+dist
+out
+build
+backend/planner-ws
 node_modules
