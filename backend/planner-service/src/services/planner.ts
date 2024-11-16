@@ -1,13 +1,7 @@
-import { PlannerModel } from '../models/Planner'
+import { PlannerCollection, PlannerModel } from '../models/Planner'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { DestinationModel } from '../models/Destination'
-import { TransportModel } from '../models/Transport'
-import { ActivityModel } from '../models/Activity'
-import { AccommodationModel } from '../models/Accommodation'
-import { VoteModel } from '../models/Vote'
-import { CommentModel } from '../models/Comment'
 
 /**
  * Creates a new planner document in the database.
@@ -46,6 +40,9 @@ export const createPlannerDocument = async (req: Request, res: Response, next: N
   })
 
   req.body.result = planner
+  req.body.dataType = PlannerCollection
+  req.body.plannerId = planner._id
+  req.body.userIds = [planner.createdBy, ...planner.roUsers, ...planner.rwUsers]
   req.body.status = StatusCodes.CREATED
   next()
 }
@@ -60,16 +57,19 @@ export const createPlannerDocument = async (req: Request, res: Response, next: N
  * @throws {RecordNotFoundException} If the planner does not exist.
  */
 export const updatePlannerDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { targetPlanner, name, description, startDate, endDate } = req.body.out
+  const { targetPlanner, name, description, startDate, endDate, roUsers, rwUsers } = req.body.out
 
   targetPlanner.name = name || targetPlanner.name
   targetPlanner.description = description || targetPlanner.description
   targetPlanner.startDate = startDate || targetPlanner.startDate
   targetPlanner.endDate = endDate || targetPlanner.endDate
+  targetPlanner.roUsers = roUsers || targetPlanner.roUsers
+  targetPlanner.rwUsers = roUsers || targetPlanner.rwUsers
 
   const savedPlanner = await PlannerModel.findOneAndUpdate({ _id: targetPlanner._id }, targetPlanner, { new: true })
 
   req.body.result = savedPlanner
+  req.body.dataType = PlannerCollection
   req.body.status = StatusCodes.OK
   next()
 }
@@ -91,6 +91,7 @@ export const deletePlannerDocument = async (req: Request, res: Response, next: N
   })
 
   req.body.result = planner
+  req.body.dataType = PlannerCollection
   req.body.status = StatusCodes.OK
   next()
 }
@@ -110,7 +111,7 @@ export const getPlannerDocumentsByUserId = async (req: Request, res: Response, n
 
   switch (access) {
     case 'rw':
-      resultPlanners = await PlannerModel.find({ rwUsers: targetUser._id })
+      resultPlanners = await PlannerModel.find({ $or: [{ createdBy: targetUser._id }, { rwUsers: targetUser._id }] })
       break
     case 'ro':
       resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })
@@ -169,6 +170,12 @@ async function verifyPlannerExists(req: Request, res: Response, next: NextFuncti
     next(req.body.err)
   } else {
     req.body.out = { ...req.body.out, targetPlanner }
+    req.body.plannerId = targetPlanner._id
+    req.body.userIds = [
+      req.body.out.targetPlanner.createdBy,
+      ...req.body.out.targetPlanner.roUsers,
+      ...req.body.out.targetPlanner.rwUsers,
+    ]
   }
   next()
 }

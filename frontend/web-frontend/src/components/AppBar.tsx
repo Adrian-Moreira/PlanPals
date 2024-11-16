@@ -14,6 +14,7 @@ import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
 import { ThemeProvider } from '@mui/material/styles'
 import './AppBar.css'
+import { PopoverVirtualElement } from '@mui/material'
 const pages = ['About', 'Planners']
 const welcome = [
   'Login',
@@ -28,13 +29,13 @@ const settings = [
 function ResponsiveAppBar({
   title,
   theme,
-  isAuthenticated,
   handleLogout,
   handleLogin,
   handleSignup,
   handleAbout,
   handlePlanners,
   backToHomeHandler,
+  ppUser,
 }) {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
@@ -95,8 +96,8 @@ function ResponsiveAppBar({
     navItems: string[],
     label: string,
     flexGrow: number,
-    elementId,
-    anchorElement,
+    elementId: string | undefined,
+    anchorElement: Element | PopoverVirtualElement | (() => Element) | (() => PopoverVirtualElement) | null | undefined,
     onClick: (event: React.MouseEvent<HTMLElement>) => any,
     onClose: () => any,
   ) => (
@@ -176,8 +177,8 @@ function ResponsiveAppBar({
     navItems: string[],
     label: string,
     flexGrow: number,
-    elementId,
-    anchorElement,
+    elementId: string | undefined,
+    anchorElement: Element | (() => Element) | PopoverVirtualElement | (() => PopoverVirtualElement) | null | undefined,
     onClick: (event: React.MouseEvent<HTMLElement>) => any,
     onClose: () => any,
   ) => (
@@ -246,7 +247,7 @@ function ResponsiveAppBar({
             {mkTitle(title, { xs: 'flex', md: 'none' }, 1)}
             {mkNavMenu(pages, 1)}
 
-            {isAuthenticated ?
+            {ppUser.loggedIn ?
               <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

@@ -99,6 +99,7 @@ describe('Integration Test: Accommodation API', () => {
       createdBy: testUser1._id,
       location: 'Barcelona',
       destinationId: testDestination1._id,
+      plannerId: testPlanner._id,
       startDate: new Date().toISOString(),
       endDate: new Date().toISOString(),
     })
@@ -108,6 +109,7 @@ describe('Integration Test: Accommodation API', () => {
       createdBy: testUser4._id,
       location: 'Tallinn',
       destinationId: testDestination2._id,
+      plannerId: testPlanner2._id,
       startDate: new Date().toISOString(),
       endDate: new Date().toISOString(),
     })

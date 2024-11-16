@@ -4,6 +4,7 @@ import { MalformedRequestException } from '../exceptions/MalformedRequestExcepti
 import { StatusCodes } from 'http-status-codes'
 import mongoose from 'mongoose'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
+import { inspect } from 'node:util'
 
 /**
  * Verifies that an object with the given objectId exists in the given collection.
@@ -23,6 +24,8 @@ export async function verifyObjectExistInCollection(req: Request, res: Response,
       recordId: objectId,
     })
     next(req.body.err)
+  } else {
+    req.body.out = { ...req.body.out, plannerId: object.plannerId }
   }
   next()
 }
@@ -49,11 +52,12 @@ function mkRequestParser<T>(
       })
       .catch((error: any) => {
         req.body.err = new MalformedRequestException({
-          requestBody: ''
-            .concat(` Body: ${req.body}`)
-            .concat(` Params: ${req.params}`)
-            .concat(` Query: ${req.query}`)
-            .concat(' Error: ' + error),
+          requestBody: JSON.stringify({
+            Body: req.body,
+            Params: req.params,
+            Query: req.query,
+            Cause: error,
+          }),
           requestType: 'parseRequest',
         })
         next(req.body.err)

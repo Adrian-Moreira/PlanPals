@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { VoteModel } from '../models/Vote'
+import { VoteCollection, VoteModel } from '../models/Vote'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { StatusCodes } from 'http-status-codes'
 
@@ -37,6 +37,7 @@ const upVote = async (req: Request, res: Response, next: NextFunction): Promise<
   existingVotes = await VoteModel.findOneAndUpdate({ _id: existingVotes._id }, existingVotes, { new: true })
 
   req.body.result = existingVotes
+  req.body.dataType = VoteCollection
   req.body.status = StatusCodes.OK
   next()
 }
@@ -75,6 +76,7 @@ const downVote = async (req: Request, res: Response, next: NextFunction): Promis
   existingVotes = await VoteModel.findOneAndUpdate({ _id: existingVotes._id }, existingVotes, { new: true })
 
   req.body.result = existingVotes
+  req.body.dataType = VoteCollection
   req.body.status = StatusCodes.OK
   next()
 }
@@ -114,6 +116,7 @@ const removeVote = async (req: Request, res: Response, next: NextFunction): Prom
     existingVotes = await VoteModel.findOneAndUpdate({ _id: existingVotes._id }, existingVotes, { new: true })
     req.body.result = existingVotes
     req.body.status = StatusCodes.OK
+    req.body.dataType = VoteCollection
   }
   next()
 }
@@ -160,10 +163,10 @@ const getVotesByObjectId = async (req: Request, res: Response, next: NextFunctio
  * @param next - The next function in the middleware chain.
  */
 const getVoteCountByObjectId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { objectId: oid, type } = req.body.out;
+  const { objectId: oid, type } = req.body.out
   let existingVotes = await VoteModel.findOne({
     objectId: { id: oid, collection: type },
-  });
+  })
 
   if (!existingVotes) {
     // Create a new document if none exists
@@ -171,18 +174,16 @@ const getVoteCountByObjectId = async (req: Request, res: Response, next: NextFun
       objectId: { id: oid, collection: type },
       upVotes: [],
       downVotes: [],
-    });
+    })
   }
-
 
   req.body.result = {
     upVoteCount: existingVotes.upVotes.length,
     downVoteCount: existingVotes.downVotes.length,
-  };
-  req.body.status = StatusCodes.OK;
-  next();
-};
-
+  }
+  req.body.status = StatusCodes.OK
+  next()
+}
 
 /**
  * Checks if a user has voted on an object in the planner with the given objectId and type.
@@ -224,7 +225,6 @@ const VoteService = {
   removeVote,
   getVotesByObjectId,
   isUserVoted,
-  getVoteCountByObjectId
+  getVoteCountByObjectId,
 }
 export default VoteService
-

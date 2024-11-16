@@ -23,7 +23,7 @@ const PlannerRouteSchema = {
   createPlanner: ReqAttrSchema.extend({
     body: z.object({
       createdBy: ObjectIdStringSchema,
-      name: z.string(),
+      name: z.string().min(1),
       description: z.string().optional(),
       startDate: z.string().datetime().or(z.date()),
       endDate: z.string().datetime().or(z.date()),
@@ -36,10 +36,12 @@ const PlannerRouteSchema = {
   }),
   updatePlanner: ReqAttrSchema.extend({
     body: z.object({
-      name: z.string().optional(),
+      name: z.string().min(1).optional(),
       description: z.string().optional(),
       startDate: z.string().datetime().or(z.date()).optional(),
       endDate: z.string().datetime().or(z.date()).optional(),
+      roUsers: z.array(ObjectIdStringSchema).optional(),
+      rwUsers: z.array(ObjectIdStringSchema).optional(),
     }),
     query: z.object({
       userId: ObjectIdStringSchema,

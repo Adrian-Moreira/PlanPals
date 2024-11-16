@@ -1,4 +1,5 @@
 .DS_Store
+.zed
 out
 coverage
 node_modules
@@ -13,3 +14,5 @@ front-end-flutter/planpals/ios/Runner/GoogleService-Info.plist
 front-end-flutter/planpals/macos/Runner/GoogleService-Info.plist
 front-end-flutter/planpals/lib/firebase_options.dart
 planner-service/src/services/firebase/auth_key.json
+*.bak
+dist

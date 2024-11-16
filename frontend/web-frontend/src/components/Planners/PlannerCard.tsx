@@ -1,8 +1,7 @@
 import * as MUI from '@mui/material'
-import './PlannerCard.css'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { convertDatePairs, convertToLongDate } from '../lib/dateLib'
+import { convertDatePairs, convertToLongDate } from '../../lib/dateLib'
 
 PlannerCard.propTypes = {
   planner: PropTypes.shape({
@@ -19,7 +18,12 @@ PlannerCard.propTypes = {
 export default function PlannerCard({ className, planner, onClick, ...props }) {
   const { startDate, endDate } = convertDatePairs(planner.startDate, planner.endDate)
   return (
-    <MUI.Card onClick={onClick} sx={{ minWidth: 300 }} className={`PlannerCard ${className}`} {...props}>
+    <MUI.Card
+      onClick={onClick}
+      sx={{ minWidth: { xs: '90vw', sm: '44vw', md: '30vw', lg: '22vw', xl: '20vw' } }}
+      className={`PlannerCard ${className}`}
+      {...props}
+    >
       <MUI.CardActionArea>
         <MUI.CardContent>
           <MUI.Typography variant="h6">{planner.name}</MUI.Typography>

@@ -99,6 +99,7 @@ describe('Integration Test: Activity API', () => {
       createdBy: testUser1._id,
       location: 'Sagrada Família',
       destinationId: testDestination1._id,
+      plannerId: testPlanner._id,
       startDate: new Date().toISOString(),
       duration: 10800, // 3 hours
       done: false,
@@ -109,6 +110,7 @@ describe('Integration Test: Activity API', () => {
       createdBy: testUser4._id,
       location: 'Hermann Castle',
       destinationId: testDestination2._id,
+      plannerId: testPlanner2._id,
       startDate: new Date().toISOString(),
       duration: 7200, // 2 hours
       done: false,

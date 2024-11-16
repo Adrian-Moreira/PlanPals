@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { RecordConflictException } from '../exceptions/RecordConflictException'
-import { DestinationModel } from '../models/Destination'
+import { DestinationCollection, DestinationModel } from '../models/Destination'
 import { Types } from 'mongoose'
 import { PlannerModel } from '../models/Planner'
 
@@ -66,6 +66,7 @@ const createDestinationDocument = async (req: Request, res: Response, next: Next
   )
 
   req.body.result = newDestination
+  req.body.dataType = DestinationCollection
   req.body.status = StatusCodes.CREATED
 
   next()
@@ -92,6 +93,7 @@ const updateDestinationDocument = async (req: Request, res: Response, next: Next
   })
 
   req.body.result = savedDestination
+  req.body.dataType = DestinationCollection
   req.body.status = StatusCodes.OK
 
   next()
@@ -115,6 +117,7 @@ const deleteDestinationDocument = async (req: Request, res: Response, next: Next
   })
 
   req.body.result = deletedDestination
+  req.body.dataType = DestinationCollection
   req.body.status = StatusCodes.OK
 
   next()

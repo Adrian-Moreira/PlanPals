@@ -4,6 +4,7 @@ import { transportationRouter } from './transportation/transportation'
 import PlannerValidator from '../../controllers/planner'
 import PlannerService from '../../services/planner'
 import UserService from '../../services/user'
+import { publishDeleteEvent, publishUpdateEvent } from '../../services/rabbit'
 
 const plannerRouter = express.Router({ mergeParams: true })
 
@@ -18,6 +19,7 @@ plannerRouter.post(
   PlannerValidator.createPlanner,
   UserService.verifyUserExists,
   PlannerService.createPlannerDocument,
+  publishUpdateEvent
 )
 plannerRouter.get(
   '/:plannerId([0-9a-fA-F]{24})',
@@ -34,6 +36,7 @@ plannerRouter.patch(
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,
   PlannerService.updatePlannerDocument,
+  publishUpdateEvent
 )
 plannerRouter.delete(
   '/:plannerId([0-9a-fA-F]{24})',
@@ -42,6 +45,7 @@ plannerRouter.delete(
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,
   PlannerService.deletePlannerDocument,
+  publishDeleteEvent
 )
 plannerRouter.post(
   '/:plannerId([0-9a-fA-F]{24})/invite',

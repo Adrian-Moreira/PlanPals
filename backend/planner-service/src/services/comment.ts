@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { CommentModel, CommentsModel } from '../models/Comment'
+import { CommentCollection, CommentModel, CommentsModel } from '../models/Comment'
 import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { StatusCodes } from 'http-status-codes'
 
@@ -53,6 +53,8 @@ const createCommentDocument = async (req: Request, res: Response, next: NextFunc
   await CommentsModel.findOneAndUpdate({ _id: commentsDocument._id }, commentsDocument, { new: true })
 
   req.body.result = commentDocument
+  req.body.addon = [commentsDocument]
+  req.body.dataType = CommentCollection
   req.body.status = StatusCodes.CREATED
   next()
 }
@@ -88,11 +90,9 @@ const removeCommentDocument = async (req: Request, res: Response, next: NextFunc
     next(req.body.err)
   }
 
-  req.body.result = await CommentModel.findOneAndDelete({
-    _id: commentId,
-  })
-
+  req.body.result = await CommentModel.findOneAndDelete({ _id: commentId })
   req.body.status = StatusCodes.OK
+  req.body.dataType = CommentCollection
   next()
 }
 

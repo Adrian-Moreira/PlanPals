@@ -61,6 +61,14 @@ const apiLib = {
     axios.delete(apiURI + endpoint, { data, params }),
   ),
 
+  getUserById: async (id) => {
+    const userResponse = await apiLib.get(`/user/${id}`)
+    if (userResponse.data.success) {
+      return { user: userResponse.data.data, ok: true }
+    }
+    return { user: null, ok: false }
+  },
+
   setQueueConcurrency: (concurrency) => {
     queueState.concurrency = concurrency
     processQueue()

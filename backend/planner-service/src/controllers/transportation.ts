@@ -9,7 +9,7 @@ const TransportationRouteSchema = {
     }),
     body: z.object({
       createdBy: ObjectIdStringSchema,
-      type: z.string(),
+      type: z.string().min(1),
       details: z.string().optional(),
       departureTime: z.string().datetime().or(z.date()),
       arrivalTime: z.string().datetime().or(z.date()),
@@ -39,7 +39,7 @@ const TransportationRouteSchema = {
       transportationId: ObjectIdStringSchema,
     }),
     body: z.object({
-      type: z.string().optional(),
+      type: z.string().min(1).optional(),
       details: z.string().optional(),
       departureTime: z.string().datetime().or(z.date()).optional(),
       arrivalTime: z.string().datetime().or(z.date()).optional(),
@@ -60,7 +60,5 @@ const TransportationRouteSchema = {
   }),
 }
 
-const TransportationValidator = RequestUtils.mkParsers(
-  TransportationRouteSchema,
-)
+const TransportationValidator = RequestUtils.mkParsers(TransportationRouteSchema)
 export default TransportationValidator

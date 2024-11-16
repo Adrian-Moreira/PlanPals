@@ -10,14 +10,53 @@ import React, { useEffect, useState } from 'react'
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
 import apiLib from '../../lib/apiLib'
+import { useWebSocket } from '../../lib/wsLib'
 
 //id is the objectId, type is the object type
-function VoteButtons({ id, type, userId }) {
+function VoteButtons({ id, type, userId, plannerId }) {
+  const { messages } = useWebSocket()
+
   const [upVotes, setUpVotes] = useState(0)
   const [downVotes, setDownVotes] = useState(0)
 
+  const [upVoteUsers, setUpVoteUsers] = useState([])
+  const [downVoteUsers, setDownVoteUsers] = useState([])
+
   const [hasVotedUp, setHasVotedUp] = useState(false)
   const [hasVotedDown, setHasVotedDown] = useState(false)
+  useEffect(() => {
+    const relevantEntries = Object.entries(messages).filter(([, msg]) => {
+      return (
+        msg.topic.type === 'planner' &&
+        msg.topic.id === plannerId &&
+        msg.message.type === 'Vote' &&
+        msg.message.data.objectId.id === id &&
+        msg.message.data.objectId.collection === type
+      )
+    })
+    relevantEntries.forEach(([msgId, msg]) => {
+      switch (msg.action) {
+        case 'update':
+        case 'delete':
+          setUpVotes(msg.message.data.upVotes.length)
+          setUpVoteUsers(msg.message.data.upVotes)
+          setDownVotes(msg.message.data.downVotes.length)
+          setDownVoteUsers(msg.message.data.downVotes)
+          if (msg.message.data.upVotes.some((uid: string) => uid === userId)) {
+            setHasVotedUp(true)
+            setHasVotedDown(false)
+          } else if (msg.message.data.downVotes.some((uid: string) => uid === userId)) {
+            setHasVotedUp(false)
+            setHasVotedDown(true)
+          } else {
+            setHasVotedUp(false)
+            setHasVotedDown(false)
+          }
+          delete messages[msgId]
+          break
+      }
+    })
+  }, [messages, plannerId, id, userId])
 
   //Called when the user presses the upVote button
   const upVote = async () => {
@@ -136,7 +175,9 @@ function VoteButtons({ id, type, userId }) {
         if (response.data.success) {
           //Set both vote counters to reflect the amount of votes made on the object
           setUpVotes(response.data.data.upVotes.length)
+          setUpVoteUsers(response.data.data.upVotes)
           setDownVotes(response.data.data.downVotes.length)
+          setDownVoteUsers(response.data.data.downVotes)
         } else {
           console.error('Failed to fetch votes:', response.data.message) // Log error message
         }

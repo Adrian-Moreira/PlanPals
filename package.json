@@ -3,6 +3,9 @@
   "scripts": {
     "sso": "aws sso login --sso-session=pp"
   },
+  "dependencies": {
+    "amqplib": "^0.10.4"
+  },
   "devDependencies": {
     "prettier": "3.3.3",
     "sst": "^3.2.73"

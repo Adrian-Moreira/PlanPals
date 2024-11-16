@@ -104,6 +104,7 @@ describe('Integration Test: Vote API', () => {
       createdBy: testUser1._id,
       location: 'Sagrada Família',
       destinationId: testDestination1._id,
+      plannerId: testPlanner._id,
       startDate: new Date().toISOString(),
       duration: 10800, // 3 hours
       done: false,
@@ -114,6 +115,7 @@ describe('Integration Test: Vote API', () => {
       createdBy: testUser4._id,
       location: 'Hermann Castle',
       destinationId: testDestination2._id,
+      plannerId: testPlanner2._id,
       startDate: new Date().toISOString(),
       duration: 7200, // 2 hours
       done: false,
@@ -327,8 +329,8 @@ describe('Integration Test: Vote API', () => {
           type: 'Destination',
           createdBy: testUser1._id.toString(),
         })
-        .expect(StatusCodes.OK);
-  
+        .expect(StatusCodes.OK)
+
       const response = await request(app.app)
         .get(`/vote/count`)
         .query({
@@ -336,16 +338,16 @@ describe('Integration Test: Vote API', () => {
           objectId: testDestination1._id.toString(),
         })
         .expect('Content-Type', /json/)
-        .expect(StatusCodes.OK);
-  
-      console.log("Response body:", response.body);
-  
-      expect(response.body.success).toBe(true);
-      expect(response.body.data.upVoteCount).toBe(1); // Expecting 1 upvote
-      expect(response.body.data.downVoteCount).toBe(1); // Expecting 1 downvote from setup
-    });
-  });
-  
+        .expect(StatusCodes.OK)
+
+      console.log('Response body:', response.body)
+
+      expect(response.body.success).toBe(true)
+      expect(response.body.data.upVoteCount).toBe(1) // Expecting 1 upvote
+      expect(response.body.data.downVoteCount).toBe(1) // Expecting 1 downvote from setup
+    })
+  })
+
   it('should correctly count multiple upvotes and downvotes', async () => {
     await request(app.app)
       .post(`/vote/up`)
@@ -354,8 +356,8 @@ describe('Integration Test: Vote API', () => {
         type: 'Destination',
         createdBy: testUser3._id.toString(),
       })
-      .expect(StatusCodes.OK);
-  
+      .expect(StatusCodes.OK)
+
     await request(app.app)
       .post(`/vote/down`)
       .send({
@@ -363,8 +365,8 @@ describe('Integration Test: Vote API', () => {
         type: 'Destination',
         createdBy: testUser4._id.toString(),
       })
-      .expect(StatusCodes.OK);
-  
+      .expect(StatusCodes.OK)
+
     const response = await request(app.app)
       .get(`/vote/count`)
       .query({
@@ -372,10 +374,10 @@ describe('Integration Test: Vote API', () => {
         objectId: testDestination1._id.toString(),
       })
       .expect('Content-Type', /json/)
-      .expect(StatusCodes.OK);
-  
-    expect(response.body.success).toBe(true);
-    expect(response.body.data.upVoteCount).toBe(2); // Expecting 2 upvotes (testUser1 and testUser3)
-    expect(response.body.data.downVoteCount).toBe(2); // Expecting 2 downvotes (testUser2 and testUser4)
-  });
+      .expect(StatusCodes.OK)
+
+    expect(response.body.success).toBe(true)
+    expect(response.body.data.upVoteCount).toBe(2) // Expecting 2 upvotes (testUser1 and testUser3)
+    expect(response.body.data.downVoteCount).toBe(2) // Expecting 2 downvotes (testUser2 and testUser4)
+  })
 })

@@ -12,6 +12,11 @@ const AccommodationMongoSchema = new Schema<Accommodation>(
       required: true,
       ref: 'Destination',
     },
+    plannerId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Planner',
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -43,6 +48,7 @@ export const AccommodationSchema = z.object({
   _id: ObjectIdSchema,
 
   destinationId: ObjectIdSchema,
+  plannerId: ObjectIdSchema,
 
   createdAt: z.string().datetime(),
   createdBy: ObjectIdSchema,
@@ -81,7 +87,7 @@ AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
 
   next()
 })
-
-export const AccommodationModel = mongoose.model<Accommodation>('Accommodation', AccommodationMongoSchema)
+export const AccommodationCollection = 'Accommodation'
+export const AccommodationModel = mongoose.model<Accommodation>(AccommodationCollection, AccommodationMongoSchema)
 
 export type Accommodation = z.infer<typeof AccommodationSchema>

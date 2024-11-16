@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useCallback } from 'react'
-import { Auth } from 'aws-amplify'
+import { atom, createStore, Provider, useAtom } from 'jotai'
 
 import './App.css'
 import { lightTheme, darkTheme } from './theme'
@@ -11,55 +11,47 @@ import Container from '@mui/material/Container'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import Routes from './Routes.jsx'
-import { AppContext, ThemeContext } from './lib/contextLib'
-import { onError } from './lib/errorLib'
+import { ppUserAtom } from './lib/authLib.ts'
 
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
+import { subscriptionAtom, wsAtom } from './lib/appLib.ts'
 
 function App() {
   const nav = useNavigate()
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const [isAuthenticated, userHasAuthenticated] = useState(false)
-  const [isAuthenticating, setIsAuthenticating] = useState(true)
-  const [cognitoUser, setCognitoUser] = useState(undefined)
-  const [ppUser, setPPUser] = useState(undefined)
+  const [pUser, setPPUser] = useAtom(ppUserAtom)
+
   const [theme, setTheme] = useState(lightTheme)
+
+  const [currSubs] = useAtom(subscriptionAtom)
+
+  const [webSocket] = useAtom(wsAtom)
 
   const handleThemeChange = useCallback(async () => {
     setTheme(prefersDarkMode ? darkTheme : lightTheme)
   }, [prefersDarkMode])
 
   useEffect(() => {
-    onLoad()
     handleThemeChange()
   }, [handleThemeChange])
 
-  async function onLoad() {
-    try {
-      await Auth.currentSession()
-      userHasAuthenticated(true)
-    } catch (error) {
-      if (error !== 'No current user') {
-        onError(error)
-      }
-    }
-    setIsAuthenticating(false)
-  }
-
   async function handleLogout() {
-    await Auth.signOut()
-    userHasAuthenticated(false)
-    setPPUser(null)
-    nav('/login')
+    setPPUser({
+      loggedIn: false,
+      ppUser: null,
+    })
+    currSubs.clear()
+    webSocket.close()
+    nav('/')
   }
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {!isAuthenticating && (
+      {ppUserAtom && (
         <Container className="App" maxWidth="xl">
           <ResponsiveAppBar
             theme={theme}
@@ -70,15 +62,9 @@ function App() {
             handleSignup={() => nav('/signup')}
             handleAbout={() => nav('/about')}
             handlePlanners={() => nav('/planners')}
-            isAuthenticated={isAuthenticated}
+            ppUser={pUser}
           ></ResponsiveAppBar>
-          <ThemeContext.Provider value={{ theme, setTheme }}>
-            <AppContext.Provider
-              value={{ isAuthenticated, cognitoUser, ppUser, userHasAuthenticated, setCognitoUser, setPPUser }}
-            >
-              <Routes />
-            </AppContext.Provider>
-          </ThemeContext.Provider>
+          <Routes />
         </Container>
       )}
     </ThemeProvider>

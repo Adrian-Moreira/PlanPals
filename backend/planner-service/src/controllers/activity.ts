@@ -10,7 +10,7 @@ const ActivityRouteSchema = {
     }),
     body: z.object({
       createdBy: ObjectIdStringSchema,
-      name: z.string(),
+      name: z.string().min(1),
       location: z.string().optional(),
       startDate: z.string().datetime().or(z.date()),
       duration: z.number(),
@@ -42,7 +42,7 @@ const ActivityRouteSchema = {
       activityId: ObjectIdStringSchema,
     }),
     body: z.object({
-      name: z.string().optional(),
+      name: z.string().min(1).optional(),
       startDate: z.string().datetime().or(z.date()).optional(),
       duration: z.number().optional(),
       location: z.string().optional(),

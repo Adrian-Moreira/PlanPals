@@ -3,6 +3,7 @@ import TransportationValidator from '../../../controllers/transportation'
 import PlannerService from '../../../services/planner'
 import TransportationService from '../../../services/transportation'
 import UserService from '../../../services/user'
+import { publishDeleteEvent, publishUpdateEvent } from '../../../services/rabbit'
 
 export const transportationRouter = express.Router({ mergeParams: true })
 
@@ -22,6 +23,7 @@ transportationRouter.post(
   PlannerService.verifyPlannerExists,
   PlannerService.verifyUserCanEditPlanner,
   TransportationService.createTransportationDocument,
+  publishUpdateEvent
 )
 
 transportationRouter.get(
@@ -42,6 +44,7 @@ transportationRouter.patch(
   PlannerService.verifyUserCanEditPlanner,
   TransportationService.verifyTransportationExists,
   TransportationService.updateTransportationDocument,
+  publishUpdateEvent
 )
 
 transportationRouter.delete(
@@ -52,4 +55,5 @@ transportationRouter.delete(
   PlannerService.verifyUserCanEditPlanner,
   TransportationService.verifyTransportationExists,
   TransportationService.deleteTransportationDocument,
+  publishDeleteEvent
 )
