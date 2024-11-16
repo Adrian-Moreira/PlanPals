@@ -14,8 +14,12 @@ Before starting, ensure you have Deno 2.0 installed on your system. If not, you 
    ```bash
    deno run dev
    ```
+   #### Alternatively
+   ```bash
+   deno run --allow-net --allow-read --allow-env --watch src/main.ts --port ${PORT_NUMBER} --log-level ${LOG_LEVEL}
+  ```
 
-   ### Step 3: Build for Production
+   ### Step 3: Build Executable
    To build the app for production, run:
    ```bash
    deno run build
