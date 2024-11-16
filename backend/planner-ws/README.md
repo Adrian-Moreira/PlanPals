@@ -10,10 +10,10 @@ Before starting, ensure you have Deno 2.0 installed on your system. If not, you 
    This will install all the required dependencies for the project.
 
    ### Step 2: Start the Development Server
+   #### You'll need rabbitmq running either at `"amqp://user:password@localhost:5672"` or specify connection string by envvar `RABBITMQ_CONNECTIONSTRING`
    ```bash
    deno run dev
    ```
-   This runs the app in development mode. Open [http://localhost:5173](http://localhost:5173) to view it in your browser.
 
    ### Step 3: Build for Production
    To build the app for production, run:
