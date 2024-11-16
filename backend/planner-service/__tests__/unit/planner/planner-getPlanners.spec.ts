@@ -1,12 +1,5 @@
 import sinon from 'sinon'
-import {
-  describe,
-  expect,
-  it,
-  jest,
-  beforeEach,
-  afterEach,
-} from '@jest/globals'
+import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals'
 import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { PlannerModel } from '../../../src/models/Planner'
@@ -60,16 +53,9 @@ describe('Planner->getPlannersById', () => {
   it('should get existing planners for user', async () => {
     req.body.out.targetUser = targetUser1
 
-    plannerMock
-      .expects('find')
-      .withArgs({ createdBy: targetUser1._id })
-      .resolves([existingPlanner])
+    plannerMock.expects('find').withArgs({ createdBy: targetUser1._id }).resolves([existingPlanner])
 
-    await PlannerService.getPlannerDocumentsByUserId(
-      req as Request,
-      res as Response,
-      next as NextFunction,
-    )
+    await PlannerService.getPlannerDocumentsByUserId(req as Request, res as Response, next as NextFunction)
 
     plannerMock.verify()
     expect(req.body.status).toEqual(StatusCodes.OK)
@@ -83,16 +69,9 @@ describe('Planner->getPlannersById', () => {
     req.body.out.targetUser = targetUser2
     req.body.out.access = 'ro'
 
-    plannerMock
-      .expects('find')
-      .withArgs({ roUsers: targetUser2._id })
-      .resolves([existingPlanner])
+    plannerMock.expects('find').withArgs({ roUsers: targetUser2._id }).resolves([existingPlanner])
 
-    await PlannerService.getPlannerDocumentsByUserId(
-      req as Request,
-      res as Response,
-      next as NextFunction,
-    )
+    await PlannerService.getPlannerDocumentsByUserId(req as Request, res as Response, next as NextFunction)
 
     plannerMock.verify()
     expect(req.body.status).toEqual(StatusCodes.OK)
@@ -108,14 +87,10 @@ describe('Planner->getPlannersById', () => {
 
     plannerMock
       .expects('find')
-      .withArgs({ rwUsers: targetUser2._id })
+      .withArgs({ $or: [{ createdBy: targetUser2._id }, { rwUsers: targetUser2._id }] })
       .resolves(null)
 
-    await PlannerService.getPlannerDocumentsByUserId(
-      req as Request,
-      res as Response,
-      next as NextFunction,
-    )
+    await PlannerService.getPlannerDocumentsByUserId(req as Request, res as Response, next as NextFunction)
 
     plannerMock.verify()
     expect(req.body.err).toBeDefined()
@@ -126,11 +101,7 @@ describe('Planner->getPlannersById', () => {
 
     plannerMock.expects('find').resolves(null)
 
-    await PlannerService.getPlannerDocumentsByUserId(
-      req as Request,
-      res as Response,
-      next as NextFunction,
-    )
+    await PlannerService.getPlannerDocumentsByUserId(req as Request, res as Response, next as NextFunction)
 
     plannerMock.verify()
     expect(req.body.err).toBeDefined()
