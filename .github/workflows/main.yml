@@ -12,7 +12,7 @@ jobs:
 
     services:
       rabbitmq:
-        image: rabbitmq:3-management
+        image: rabbitmq:management
         ports:
           - 5672:5672
           - 15672:15672
@@ -36,6 +36,9 @@ jobs:
           npm install
           npm run test -- --ci --reporters=jest-junit
           popd
+        env:
+          RABBITMQ_CONNECTIONSTRING: amqp://localhost:5672
+
       - uses: actions/upload-artifact@v4
         with:
           name: Planner Express Test Results
