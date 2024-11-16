@@ -17,6 +17,7 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
+import { subscriptionAtom, wsAtom } from './lib/appLib.ts'
 
 function App() {
   const nav = useNavigate()
@@ -24,6 +25,10 @@ function App() {
   const [pUser, setPPUser] = useAtom(ppUserAtom)
 
   const [theme, setTheme] = useState(lightTheme)
+
+  const [currSubs] = useAtom(subscriptionAtom)
+
+  const [webSocket] = useAtom(wsAtom)
 
   const handleThemeChange = useCallback(async () => {
     setTheme(prefersDarkMode ? darkTheme : lightTheme)
@@ -38,7 +43,9 @@ function App() {
       loggedIn: false,
       ppUser: null,
     })
-    nav('/login')
+    currSubs.clear()
+    webSocket.close()
+    nav('/')
   }
 
   return (

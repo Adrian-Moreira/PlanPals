@@ -12,6 +12,7 @@ import {
   clientSubsByTopic,
 } from "./data/clients.ts";
 import { queues } from "./data/queue.ts";
+import { mkTopic } from "./data/topic.ts";
 
 interface ServinsArgs {
   updateInt: number;
@@ -100,6 +101,37 @@ if (import.meta.main) {
     },
   }));
   processLoglevel({ logLevel });
-  const serverAttrs = await StartServing(port);
-  setUpSignalListeners(port, serverAttrs);
+
+  const start = async () => {
+    const serverAttrs = await StartServing(port);
+    setUpSignalListeners(port, serverAttrs);
+  };
+
+  const createRetryTicker = () => {
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    const ticker = setInterval(async () => {
+      if (attempts >= maxAttempts) {
+        console.error("Max retry attempts reached. Exiting...");
+        clearInterval(ticker);
+        Deno.exit(1);
+      }
+      attempts++;
+      await startWithRetry(ticker)();
+    }, 5000);
+
+    return ticker;
+  };
+
+  const startWithRetry = (ticker: number) => async () => {
+    try {
+      await start();
+      clearInterval(ticker);
+    } catch (e) {
+      console.error("Failed to start server:", e);
+    }
+  };
+
+  await startWithRetry(createRetryTicker())();
 }

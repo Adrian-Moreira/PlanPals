@@ -10,10 +10,12 @@ import React, { useEffect, useState } from 'react'
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
 import apiLib from '../../lib/apiLib'
-import { WebSockerConnector, wsAtom } from '../../lib/wsLib'
+import { useWebSocket } from '../../lib/wsLib'
 
 //id is the objectId, type is the object type
 function VoteButtons({ id, type, userId, plannerId }) {
+  const { messages } = useWebSocket()
+
   const [upVotes, setUpVotes] = useState(0)
   const [downVotes, setDownVotes] = useState(0)
 
@@ -22,9 +24,8 @@ function VoteButtons({ id, type, userId, plannerId }) {
 
   const [hasVotedUp, setHasVotedUp] = useState(false)
   const [hasVotedDown, setHasVotedDown] = useState(false)
-  const ws = WebSockerConnector(wsAtom)
   useEffect(() => {
-    const relevantEntries = Object.entries(ws.messages).filter(([, msg]) => {
+    const relevantEntries = Object.entries(messages).filter(([, msg]) => {
       return (
         msg.topic.type === 'planner' &&
         msg.topic.id === plannerId &&
@@ -51,11 +52,11 @@ function VoteButtons({ id, type, userId, plannerId }) {
             setHasVotedUp(false)
             setHasVotedDown(false)
           }
-          delete ws.messages[msgId]
+          delete messages[msgId]
           break
       }
     })
-  }, [ws.messages, plannerId, id, userId])
+  }, [messages, plannerId, id, userId])
 
   //Called when the user presses the upVote button
   const upVote = async () => {

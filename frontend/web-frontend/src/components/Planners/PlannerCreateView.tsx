@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useInsertionEffect, useState } from 'react'
 import * as MUI from '@mui/material/'
 import * as MUIcons from '@mui/icons-material'
 import dayjs from 'dayjs'
@@ -10,8 +10,9 @@ import apiLib from '../../lib/apiLib'
 import { onError } from '../../lib/errorLib'
 import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
-import { ppUserAtom } from '../../lib/authLib'
+import { PPUser, ppUserAtom } from '../../lib/authLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
+import { userMapAtom } from '../../lib/appLib'
 
 export interface PlannerCreateViewProps {
   handelCancel: () => void
@@ -34,8 +35,38 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
   const [endDate, setEndDate] = React.useState(dayjs(today))
   const [startTime, setStartTime] = React.useState(dayjs(today))
   const [endTime, setEndTime] = React.useState(dayjs(today))
+  const [palList, setPalList] = React.useState<PPUser[]>([])
+  const [selectedPals, setSelectedPals] = React.useState<PPUser[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
+  const [userMap] = useAtom(userMapAtom)
   const [pUser] = useAtom(ppUserAtom)
+  const [pError, setPError] = useState(false)
+  const [timeError, setTimeError] = useState(false)
+
+  const fetchPalList = useCallback(async () => {
+    try {
+      const res = await apiLib.get('/user/ls', {})
+      const pals: PPUser[] = res.data.data
+      pals.map((p) => userMap.set(p._id, p))
+      setPalList(pals)
+      return res.data.success ? pals : []
+    } catch {
+      console.error('No Users Fetched')
+      return []
+    }
+  }, [])
+
+  const validatePlannerForm = useCallback(() => {
+    const isNameValid = fields.plannerName.length > 0
+    setPError(!isNameValid)
+    const isTimeValid = startDate.isBefore(endDate) && combineDateAndTime(endDate, endTime).isBefore(new Date())
+    setTimeError(!isTimeValid)
+    return isNameValid && isTimeValid
+  }, [fields.plannerName, startDate, endDate, startTime, endTime])
+
+  useEffect(() => {
+    fetchPalList()
+  }, [])
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
@@ -48,6 +79,7 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
           description: fields.plannerDescription,
           startDate: combineDateAndTime(startDate, startTime).toISOString(),
           endDate: combineDateAndTime(endDate, endTime).toISOString(),
+          rwUsers: selectedPals.map((p) => p._id),
         },
       })
       if (res.data.success && fields?.destinationName !== '') {
@@ -113,6 +145,34 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
                 value={fields.destinationName}
                 onChange={handleFieldChange}
               />
+              <MUI.Typography variant="h6">Add Pals to plan together!</MUI.Typography>
+              <MUI.Autocomplete
+                multiple
+                id="pals-selection"
+                options={palList.filter((user) => user._id !== pUser.ppUser?._id)}
+                value={selectedPals}
+                onChange={(_, newValue) => setSelectedPals(newValue)}
+                getOptionLabel={(option) => option.preferredName || option.userName}
+                renderInput={(params) => (
+                  <MUI.TextField {...params} variant="outlined" label="Select Pals" placeholder="Search pals..." />
+                )}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => {
+                    const { key, ...otherProps } = getTagProps({ index })
+                    return (
+                      <MUI.Chip
+                        key={option._id} // Use explicit key
+                        label={option.preferredName || option.userName}
+                        {...otherProps}
+                        onDelete={() => {
+                          const newSelected = selectedPals.filter((pal) => pal._id !== option._id)
+                          setSelectedPals(newSelected)
+                        }}
+                      />
+                    )
+                  })
+                }
+              />
             </MUI.Stack>
           </MUI.Box>
         </MUI.Box>
@@ -130,6 +190,8 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
     props.hasPlanner,
     props.open,
     props.setOnReload,
+    palList,
+    selectedPals,
   ])
 
   return (
@@ -138,7 +200,7 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
       setOpen={props.setOpen}
       label={'CreateNewPlanner'}
       title={'Creating a New Planner'}
-      childrens={renderCreatePlanner()}
+      children={renderCreatePlanner()}
       cancelEnable={props.hasPlanner}
       confirmEnable={true}
       confirmButtonLabel="Save and Continue"

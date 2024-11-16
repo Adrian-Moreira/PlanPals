@@ -1,5 +1,5 @@
 ## Prerequisites
-Before starting, ensure you have Deno installed on your system. If not, you can download it [here](https://deno.com/).
+Before starting, ensure you have Deno 2.0 installed on your system. If not, you can download it [here](https://deno.com/).
 
 ## To Start:
 1. In the `planner-ws` directory, run the following commands:
@@ -8,7 +8,7 @@ Before starting, ensure you have Deno installed on your system. If not, you can 
    deno install
    ```
    This will install all the required dependencies for the project.
-   
+
    ### Step 2: Start the Development Server
    ```bash
    deno run dev
@@ -32,7 +32,7 @@ Parameters:
   "topics": [{
     "type": 'planners' | 'planner' | 'inbox',
     "id": string // userId | plannerId | userId
-  }]
+  }, ...]
 }
 ```
 

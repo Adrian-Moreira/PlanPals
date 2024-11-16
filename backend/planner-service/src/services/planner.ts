@@ -111,7 +111,7 @@ export const getPlannerDocumentsByUserId = async (req: Request, res: Response, n
 
   switch (access) {
     case 'rw':
-      resultPlanners = await PlannerModel.find({ rwUsers: targetUser._id })
+      resultPlanners = await PlannerModel.find({ $or: [{ createdBy: targetUser._id }, { rwUsers: targetUser._id }] })
       break
     case 'ro':
       resultPlanners = await PlannerModel.find({ roUsers: targetUser._id })

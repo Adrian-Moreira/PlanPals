@@ -7,7 +7,7 @@ import { onError } from '../lib/errorLib'
 import * as MUI from '@mui/material'
 import { useAtom } from 'jotai'
 import { userMapAtom } from '../lib/appLib.ts'
-import { WebSockerConnector, wsAtom } from '../lib/wsLib'
+import { useWebSocket } from '../lib/wsLib'
 import Planner from '../components/Planners/Planner.tsx'
 
 function PlannerDetail() {
@@ -20,20 +20,17 @@ function PlannerDetail() {
   const [onReload, setReload] = useState(true)
   const [pUser, setPPUser] = useAtom(ppUserAtom)
   const [userMap, setUserMap] = useAtom(userMapAtom)
-
-  const [wsAtm] = useAtom(wsAtom)
-  const ws = WebSockerConnector(wsAtom)
-
+  const { messages, subscribe, webSocket } = useWebSocket()
   useEffect(() => {
     if (!plannerDetails._id || !onReload) return
     setTimeout(() => {
-      ws.subscribeAtom([{ type: 'planner', id: plannerDetails._id }])
+      if (webSocket.readyState === 1) subscribe([{ type: 'planner', id: plannerDetails._id }])
       setReload(false)
     }, 500)
-  }, [plannerDetails, wsAtm, onReload])
+  }, [plannerDetails, webSocket.readyState, onReload])
 
   useEffect(() => {
-    const relevantEntries = Object.entries(ws.messages).filter(
+    const relevantEntries = Object.entries(messages).filter(
       ([, msg]) =>
         msg.topic.type === 'planner' &&
         msg.topic.id === plannerDetails._id &&
@@ -50,7 +47,7 @@ function PlannerDetail() {
             const tmpList = destinationList.filter((t) => t._id !== msg.message.data._id)
             setDestinationList([...tmpList, msg.message.data])
           }
-          delete ws.messages[msgId]
+          delete messages[msgId]
           break
         case 'delete':
           if (msg.message.type === 'Transport') {
@@ -61,11 +58,11 @@ function PlannerDetail() {
             const tmpList = destinationList.filter((t) => t._id !== msg.message.data._id)
             setDestinationList([...tmpList])
           }
-          delete ws.messages[msgId]
+          delete messages[msgId]
           break
       }
     })
-  }, [ws.messages, plannerDetails, transportList, destinationList])
+  }, [messages, plannerDetails, transportList, destinationList])
 
   const fetchPlannerDetails = useCallback(
     async (pUser) => {
@@ -88,16 +85,16 @@ function PlannerDetail() {
         setPlannerDetails({ ...planner.data.data, createdBy: creator })
 
         const transportRes = planner.data.data.transportations
-        const destinationRes = planner.data.data.destinations
-        const destinations = await Promise.all(
-          destinationRes.map(async (did) => {
-            const res = await apiLib.get(`/planner/${id}/destination/${did}`, {
-              params: { userId: pUser._id },
-            })
-            return res.data.success ? res.data.data : {}
-          }),
-        )
-        setDestinationList(destinations)
+        // const destinationRes = planner.data.data.destinations
+        // const destinations = await Promise.all(
+        //   destinationRes.map(async (did) => {
+        //     const res = await apiLib.get(`/planner/${id}/destination/${did}`, {
+        //       params: { userId: pUser._id },
+        //     })
+        //     return res.data.success ? res.data.data : {}
+        //   }),
+        // )
+        // setDestinationList(destinations)
         const transports = await Promise.all(
           transportRes.map(async (tid) => {
             const res = await apiLib.get(`/planner/${id}/transportation/${tid}`, {
@@ -133,7 +130,7 @@ function PlannerDetail() {
         id={plannerDetails._id}
         planner={plannerDetails}
         transportList={transportList}
-        destnationList={destinationList}
+        destinationList={destinationList}
       ></Planner>
   // : <PlannerDetailView
   //     key={plannerDetails._id}

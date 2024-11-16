@@ -9,8 +9,27 @@ jobs:
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
+
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmqctl node_health_check"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Wait for RabbitMQ
+        run: |
+          timeout 30s bash -c 'until nc -z localhost 5672; do sleep 1; done'
+          sleep 10
+
       - name: Run PP-Server Tests
         run: |
           pushd backend/planner-service

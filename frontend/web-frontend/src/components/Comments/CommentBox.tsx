@@ -12,13 +12,13 @@ import { IComment } from './Comment'
 import CommentList from './CommentList'
 import CommentForm from './CommentForm'
 import apiLib from '../../lib/apiLib'
-import { WebSockerConnector, wsAtom } from '../../lib/wsLib'
+import { useWebSocket } from '../../lib/wsLib'
 
 const CommentBox = ({ objectId, objectType, userId, plannerId }) => {
   const [commentData, setComments] = useState<IComment[]>([])
-  const ws = WebSockerConnector(wsAtom)
+  const { messages } = useWebSocket()
   useEffect(() => {
-    const relevantEntries = Object.entries(ws.messages).filter(([, msg]) => {
+    const relevantEntries = Object.entries(messages).filter(([, msg]) => {
       return (
         msg.topic.type === 'planner' &&
         msg.topic.id === plannerId &&
@@ -31,15 +31,15 @@ const CommentBox = ({ objectId, objectType, userId, plannerId }) => {
       switch (msg.action) {
         case 'update':
           setComments([...commentData.filter((c) => c._id !== msg.message.data._id), msg.message.data])
-          delete ws.messages[msgId]
+          delete messages[msgId]
           break
         case 'delete':
           setComments(commentData.filter((c) => c._id !== msg.message.data._id))
-          delete ws.messages[msgId]
+          delete messages[msgId]
           break
       }
     })
-  }, [ws.messages, plannerId, objectId, userId])
+  }, [messages, plannerId, objectId, userId])
 
   //Handles submitting a new comment, sending it to the server and updating the comment display
   const handleCommentSubmit = async (newComment) => {
