@@ -11,9 +11,17 @@ Before starting, ensure you have Deno 2.0 installed on your system. If not, you 
 
    ### Step 2: Start the Development Server
    #### You'll need rabbitmq running either at `"amqp://user:password@localhost:5672"` or specify connection string by envvar `RABBITMQ_CONNECTIONSTRING`
+   The server will retry up to 5 times before giving up.
    ```bash
    deno run dev
    ```
+<<<<<<< Updated upstream
+=======
+   #### Alternatively
+   ```bash
+   deno run --allow-net --allow-read --allow-env --watch src/main.ts --port ${PORT_NUMBER} --log-level ${LOG_LEVEL}
+   ```
+>>>>>>> Stashed changes
 
    ### Step 3: Build for Production
    To build the app for production, run:
@@ -22,7 +30,12 @@ Before starting, ensure you have Deno 2.0 installed on your system. If not, you 
    ```
    This creates an executable `planner-ws` in the current directory.
 
-## (Un)Subscribe
+   ### Optional: IPC
+   If you're using Linux or macOS, you can send SIGUSR1 for outputting information to stderr
+   , and SIGHUP to hangup then restart the server.
+
+
+## (Un)Subscribe (You send this request)
 Parameters:
 - action: Either `"subscribe"` or `"unsubscribe"`
 - topics: An array of topic objects containing `type` and `id` shown below.
@@ -32,11 +45,11 @@ Parameters:
   "topics": [{
     "type": 'planners' | 'planner' | 'inbox',
     "id": string // userId | plannerId | userId
-  }, ...]
+  }, ...] // an array of topics
 }
 ```
 
-## Broadcast Message
+## Broadcast Message (You receive this after subscribing)
 Attributes:
 - topic: A topic string in the form of `${type}:${id}`.
 - action: Either `update` or `delete`
@@ -48,7 +61,7 @@ Attributes:
   "message": {
     "data": any, // the object being updated
     "type": string, // the object's collection name
-    "userIds"?: [string], // userIds relevant to the object
+    "userIds"?: string[], // userIds relevant to the object
     "plannerId": string // plannerId associated with the object
   }
 }
