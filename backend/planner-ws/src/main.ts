@@ -1,10 +1,8 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
-import { difference } from "@std/datetime";
 import * as amqp from "npm:amqplib";
 import { connectToRabbitMQ, initRabbitChannel } from "./network/rabbit.ts";
 import { processFlags, processLoglevel } from "./utils/args.ts";
 import { startListening } from "./network/websocket.ts";
-import { PrintInfo } from "./utils/info.ts";
 import { broadcastPendingMessages } from "./network/broadcast.ts";
 import {
     cleanUpClients,
@@ -18,7 +16,6 @@ export interface ServinsArgs {
     updateInt: number;
     cleanUpInt: number;
 }
-
 export async function StartServing(
     port: number = 8000,
     args: ServinsArgs = { updateInt: 1000, cleanUpInt: 120000 },
@@ -40,13 +37,11 @@ export async function StartServing(
     );
     return { ac, rabbitChannel, wsServer, startDate: new Date() };
 }
-
 export interface ServerAttrArgs {
     rabbitChannel: amqp.Channel;
     wsServer: Deno.HttpServer;
     startDate: Date;
 }
-
 export async function StopServing(args: ServerAttrArgs) {
     await args.rabbitChannel.close();
     await args.wsServer.shutdown();
