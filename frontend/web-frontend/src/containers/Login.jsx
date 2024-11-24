@@ -72,10 +72,15 @@ export default function Login() {
       setIsLoading(false)
     }
   }
-
+  // Handle key press for Enter key
+  function handleKeyPress(event) {
+    if (event.key === 'Enter' && validateForm()) {
+      handleSubmit(event)
+    }
+  }
   return (
     <div className="Login">
-      <MUI.Box component="form" noValidate autoComplete="off">
+      <MUI.Box component="form" noValidate autoComplete="off" onKeyDown={handleKeyPress}>
         <MUI.Stack gap={3}>
           <MUI.TextField
             error={authError}
