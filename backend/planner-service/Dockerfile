@@ -15,4 +15,6 @@ RUN npm install -g ts-node
 
 COPY . .
 
+EXPOSE 8080
+
 CMD [ "ts-node", "src/app.ts" ]

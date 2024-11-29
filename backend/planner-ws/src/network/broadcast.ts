@@ -8,9 +8,6 @@ interface PublishUpdateArgs {
     topic: Topic;
     action: MessageActionType | string;
     message: PPObject;
-    topic: Topic;
-    action: MessageActionType | string;
-    message: PPObject;
 }
 
 /**
