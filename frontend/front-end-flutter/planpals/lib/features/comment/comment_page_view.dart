@@ -30,8 +30,9 @@ class _CommentPageViewState extends State<CommentPageView> {
   bool _isLoading = true;
 
   final TextEditingController _commentController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  bool _showSendButton = false;
+  // final FocusNode _focusNode = FocusNode();
+  // bool _showSendButton = false;
+  bool _isButtonDisabled = true;
 
   @override
   void initState() {
@@ -45,15 +46,22 @@ class _CommentPageViewState extends State<CommentPageView> {
       setState(() {
         _isLoading = _commentViewModel.isloading;
         _comments = _commentViewModel.comments;
+        _isButtonDisabled = true;
+      });
+    });
+
+    _commentController.addListener(() {
+      setState(() {
+        _isButtonDisabled = _commentController.text.isEmpty;
       });
     });
 
     // Add listener to toggle send button visibility
-    _focusNode.addListener(() {
-      setState(() {
-        _showSendButton = _focusNode.hasFocus;
-      });
-    });
+    // _focusNode.addListener(() {
+    //   setState(() {
+    //     _showSendButton = _focusNode.hasFocus;
+    //   });
+    // });
   }
 
   @override
@@ -172,7 +180,7 @@ class _CommentPageViewState extends State<CommentPageView> {
           Expanded(
             child: TextField(
               controller: _commentController,
-              focusNode: _focusNode,
+              // focusNode: _focusNode,
               decoration: InputDecoration(
                 hintText: 'Add a comment...',
                 border: OutlineInputBorder(
@@ -183,16 +191,16 @@ class _CommentPageViewState extends State<CommentPageView> {
           ),
 
           // Conditionally displayed Send button
-          if (_showSendButton)
-            IconButton(
-              icon: const Icon(
-                Icons.send,
-                size: 35,
-              ),
-              color: Colors.blueAccent,
-              tooltip: 'Send',
-              onPressed: _handleSendComment,
-            )
+          // if (_showSendButton)
+          IconButton(
+            icon: const Icon(
+              Icons.send,
+              size: 35,
+            ),
+            color: Colors.blueAccent,
+            tooltip: 'Send',
+            onPressed: _isButtonDisabled ? null : _handleSendComment,
+          )
         ],
       ),
     );
@@ -244,7 +252,7 @@ class _CommentPageViewState extends State<CommentPageView> {
   @override
   void dispose() {
     _commentController.dispose();
-    _focusNode.dispose();
+    // _focusNode.dispose();
     _commentViewModel.dispose();
     super.dispose();
   }
