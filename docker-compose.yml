@@ -41,6 +41,16 @@ services:
       - rabbitmq
       - planner-ws
 
+  # planner-frontend:
+  #   build:
+  #     context: ./frontend/web-frontend
+  #   ports:
+  #     - '5173:5173'
+  #   environment:
+  #     - VITE_API_URL=http://planner-service:8080
+  #   depends_on:
+  #     - planner-service
+
 volumes:
   mongodb:
   mongodb_config:
