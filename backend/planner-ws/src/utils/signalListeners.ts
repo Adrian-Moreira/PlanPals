@@ -25,46 +25,46 @@ const retryFunc = (
         wsServer: Deno.HttpServer<Deno.Addr>;
     }>,
 ) =>
-async () => {
-    const newAttr = await StartServing(port);
-    args.rabbitChannel = newAttr.rabbitChannel;
-    args.wsServer = newAttr.wsServer;
-    PrintInfo();
-};
+    async () => {
+        const newAttr = await StartServing(port);
+        args.rabbitChannel = newAttr.rabbitChannel;
+        args.wsServer = newAttr.wsServer;
+        PrintInfo();
+    };
 
 export const setUpSignalListeners = (
     { StartServing, StopServing, queues, clientSockets, clientSubsByTopic }:
         ListenerProps,
 ) =>
-(port: number, args: ServerAttrArgs) => {
-    Deno.addSignalListener("SIGINT", async () => {
-        console.error("\nReceived SIGINT, stopping...");
-        await StopServing(args);
-        Deno.exit();
-    });
-    if (Deno.build.os === "linux" || Deno.build.os === "darwin") {
-        Deno.addSignalListener("SIGTERM", async () => {
-            console.error("\nReceived SIGTERM, stopping...");
+    (port: number, args: ServerAttrArgs) => {
+        Deno.addSignalListener("SIGINT", async () => {
+            console.error("\nReceived SIGINT, stopping...");
             await StopServing(args);
             Deno.exit();
         });
+        if (Deno.build.os === "linux" || Deno.build.os === "darwin") {
+            Deno.addSignalListener("SIGTERM", async () => {
+                console.error("\nReceived SIGTERM, stopping...");
+                await StopServing(args);
+                Deno.exit();
+            });
 
-        Deno.addSignalListener("SIGHUP", async () => {
-            console.error("\nReceived SIGHUP, restarting...");
-            await StopServing(args);
-            queues.forEach((q) => q.pending.length = 0);
-            clientSockets.clear();
-            clientSubsByTopic.clear();
-            setTimeout(retryFunc(args, port, StartServing), 1000);
-        });
+            Deno.addSignalListener("SIGHUP", async () => {
+                console.error("\nReceived SIGHUP, restarting...");
+                await StopServing(args);
+                queues.forEach((q) => q.pending.length = 0);
+                clientSockets.clear();
+                clientSubsByTopic.clear();
+                setTimeout(retryFunc(args, port, StartServing), 1000);
+            });
 
-        Deno.addSignalListener("SIGUSR1", () => {
-            const upTime = difference(args.startDate, new Date());
-            console.error(
-                `Started at: ${args.startDate}`,
-                `Uptime: ${upTime.seconds} secs`,
-            );
-            PrintInfo();
-        });
-    }
-};
+            Deno.addSignalListener("SIGUSR1", () => {
+                const upTime = difference(args.startDate, new Date());
+                console.error(
+                    `Started at: ${args.startDate}`,
+                    `Uptime: ${upTime.seconds} secs`,
+                );
+                PrintInfo();
+            });
+        }
+    };

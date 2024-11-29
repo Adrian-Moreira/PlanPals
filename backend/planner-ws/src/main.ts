@@ -11,6 +11,7 @@ import {
 } from "./data/clients.ts";
 import { queues } from "./data/queue.ts";
 
+
 import { setUpSignalListeners } from "./utils/signalListeners.ts";
 export interface ServinsArgs {
     updateInt: number;
@@ -23,7 +24,7 @@ export async function StartServing(
     const ac = new AbortController();
     const rabbitChannel = await connectToRabbitMQ(
         Deno.env.get("RABBITMQ_CONNECTIONSTRING") ??
-            "amqp://user:password@localhost:5672",
+        "amqp://user:password@localhost:5672",
     );
     await initRabbitChannel(rabbitChannel);
     const wsServer = startListening({ port, ac });
@@ -47,6 +48,7 @@ export async function StopServing(args: ServerAttrArgs) {
     await args.wsServer.shutdown();
     console.error("Server closed.");
 }
+
 
 if (import.meta.main) {
     const { logLevel, port } = processFlags(parseArgs(Deno.args, {

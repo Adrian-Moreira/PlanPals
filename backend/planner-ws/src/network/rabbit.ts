@@ -13,14 +13,14 @@ let rabbitChannel: amqp.Channel;
  * a consumer for the RabbitMQ channel.
  */
 const mkQueueConsumer =
-    (ch: amqp.Channel) => (queue: IQueue) => (msg: amqp.ConsumeMessage) => {
-        console.debug("Received Message!");
-        if (!msg) return;
-        const ppObject = JSON.parse(msg.content.toString()) as PPObject;
-        console.log(`From Queue: ${queue.name} => `, ppObject);
-        queue.pending.push({ object: ppObject });
-        ch.ack(msg);
-    };
+	(ch: amqp.Channel) => (queue: IQueue) => (msg: amqp.ConsumeMessage) => {
+		console.debug("Received Message!");
+		if (!msg) return;
+		const ppObject = JSON.parse(msg.content.toString()) as PPObject;
+		console.log(`From Queue: ${queue.name} => `, ppObject);
+		queue.pending.push({ object: ppObject });
+		ch.ack(msg);
+	};
 
 /**
  * Initializes a queue on the given RabbitMQ channel with the given consumer.
@@ -31,13 +31,13 @@ const mkQueueConsumer =
  * The function to call when a message is received on the queue.
  */
 const initQueue = async (
-    q: IQueue,
-    ch: amqp.Channel,
-    consumer: (msg: amqp.ConsumeMessage) => void,
+	q: IQueue,
+	ch: amqp.Channel,
+	consumer: (msg: amqp.ConsumeMessage) => void,
 ) => {
-    console.debug("Initializing queue", q);
-    await ch.assertQueue(q.name, { durable: false });
-    ch.consume(q.name, consumer);
+	console.debug("Initializing queue", q);
+	await ch.assertQueue(q.name, { durable: false });
+	ch.consume(q.name, consumer);
 };
 
 /**
@@ -50,8 +50,8 @@ const initQueue = async (
  * been successfully initialized.
  */
 const initQueues = async (qs: IQueue[], ch: amqp.Channel): Promise<void> => {
-    const mkConsumer = mkQueueConsumer(ch);
-    await Promise.all(qs.map((q) => initQueue(q, ch, mkConsumer(q))));
+	const mkConsumer = mkQueueConsumer(ch);
+	await Promise.all(qs.map((q) => initQueue(q, ch, mkConsumer(q))));
 };
 
 /**
@@ -64,9 +64,9 @@ const initQueues = async (qs: IQueue[], ch: amqp.Channel): Promise<void> => {
  * @returns {Promise<amqp.Channel>} A promise that resolves with a connected channel.
  */
 export const connectToRabbitMQ = async (str: string): amqp.Channel => {
-    const connection = await amqp.connect(str);
-    rabbitChannel = await connection.createChannel();
-    return rabbitChannel;
+	const connection = await amqp.connect(str);
+	rabbitChannel = await connection.createChannel();
+	return rabbitChannel;
 };
 
 /**
@@ -81,12 +81,12 @@ export const connectToRabbitMQ = async (str: string): amqp.Channel => {
  * channel.
  */
 export const initRabbitChannel = async (
-    ch: amqp.Channel,
+	ch: amqp.Channel,
 ): Promise<amqp.Channel> => {
-    if (ch) rabbitChannel = ch;
-    await initQueues(queues, rabbitChannel).catch(() => {
-        console.error("Failed while initilizing queues");
-        Deno.exit(1);
-    });
-    return rabbitChannel;
+	if (ch) rabbitChannel = ch;
+	await initQueues(queues, rabbitChannel).catch(() => {
+		console.error("Failed while initilizing queues");
+		Deno.exit(1);
+	});
+	return rabbitChannel;
 };
