@@ -21,14 +21,13 @@ export interface PPPlanner {
   startDate: string
   endDate: string
   destinations: string[]
+  transportations: string[]
 }
 
 export interface PlannerProps {
   key: string
   id: string
   planner: PPPlanner
-  transportList: any[]
-  destinationList: any[]
 }
 
 const tabs = ['Destination', 'Transportation']
@@ -92,12 +91,7 @@ export default function Planner(props: PlannerProps) {
               planner={props.planner}
               setCurrentDestination={setCurrentDestination}
             ></DestinationCreate>
-            <DestinationItems
-              planner={props.planner}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-              setCurrentDestination={setCurrentDestination}
-            />
+            <DestinationItems planner={props.planner} setCurrentDestination={setCurrentDestination} />
           </>,
         )
         break
@@ -109,11 +103,7 @@ export default function Planner(props: PlannerProps) {
               setOpen={setCreationDialogOpen}
               planner={props.planner}
             ></TransportCreate>
-            <TransportItems
-              transportList={props.transportList}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            ></TransportItems>
+            <TransportItems planner={props.planner}></TransportItems>
           </>,
         )
         break
@@ -123,7 +113,7 @@ export default function Planner(props: PlannerProps) {
     }
 
     return <> {...elements}</>
-  }, [isLoading, selectedTab, creationDialogOpen, props.planner._id, props.destinationList])
+  }, [isLoading, selectedTab, creationDialogOpen, props.planner._id])
 
   const { startDate, endDate } = convertDatePairs(props.planner.startDate, props.planner.endDate)
   return isLoading ?

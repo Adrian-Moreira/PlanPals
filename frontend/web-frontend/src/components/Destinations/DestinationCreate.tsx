@@ -1,4 +1,3 @@
-import CreateCard from '../Common/CreateCard'
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -103,7 +102,7 @@ export default function DestinationCreate(props: DestinationCreateProps) {
     }
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q="${query}"&limit=5&appid=${config.api.OWM_DEFAULT_KEY}`
+        `https://api.openweathermap.org/geo/1.0/direct?q="${query}"&limit=5&appid=${config.api.OWM_DEFAULT_KEY}`,
       )
       const data = await response.json()
       const formattedLocations: PPLocation[] = data.map((item: any) => ({
@@ -111,7 +110,7 @@ export default function DestinationCreate(props: DestinationCreateProps) {
         lat: item.lat,
         lon: item.lon,
         country: item.country,
-        state: item.state
+        state: item.state,
       }))
       setLocations(formattedLocations)
     } catch (error) {
@@ -122,7 +121,7 @@ export default function DestinationCreate(props: DestinationCreateProps) {
 
   const debouncedFetchLocations = useCallback(
     MUI.debounce((query: string) => fetchLocations(query), 300),
-    []
+    [],
   )
 
   const renderCreateDestination = useCallback(() => {
@@ -131,10 +130,14 @@ export default function DestinationCreate(props: DestinationCreateProps) {
         <MUI.Box sx={{ gap: 4 }}>
           <MUI.Box sx={{ flexDirection: 'column' }}>
             <MUI.Stack spacing={2}>
-            <MUI.Autocomplete
+              <MUI.Autocomplete
                 id="destination-search"
                 options={locations}
-                getOptionLabel={(option) => option.state ? `${option.name}, ${option.state} (${option.country})` : `${option.name} (${option.country})`}
+                getOptionLabel={(option) =>
+                  option.state ?
+                    `${option.name}, ${option.state} (${option.country})`
+                  : `${option.name} (${option.country})`
+                }
                 value={selectedLocation}
                 onChange={(event, newValue) => {
                   setSelectedLocation(newValue)
@@ -175,7 +178,17 @@ export default function DestinationCreate(props: DestinationCreateProps) {
         </MUI.Box>
       </MUI.Box>
     )
-  }, [fields.destinationName, destError, timeError, startDate, endDate, startTime, endTime, locations, selectedLocation])
+  }, [
+    fields.destinationName,
+    destError,
+    timeError,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    locations,
+    selectedLocation,
+  ])
 
   return (
     <AdaptiveDialog

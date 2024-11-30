@@ -5,6 +5,12 @@ This project was bootstrapped with [Vite](https://vite.dev/).
 ## Prerequisites
 Before starting, ensure you have Node.js and npm installed on your system. If not, you can download them [here](https://nodejs.org/).
 
+Make sure you have a `.env.local` file in this directory.
+```bash
+VITE_API_URL=http://localhost:8080
+VITE_OWM_DEFAULT_KEY=YOUR_KEY_HERE
+```
+
 ## To Start:
 1. In the `web-frontend` directory, run the following commands:
    ### Step 1: Install Dependencies
@@ -12,7 +18,7 @@ Before starting, ensure you have Node.js and npm installed on your system. If no
    npm install
    ```
    This will install all the required dependencies for the project.
-   
+
    ### Step 2: Start the Development Server
    ```bash
    npm run dev
@@ -25,7 +31,7 @@ Before starting, ensure you have Node.js and npm installed on your system. If no
    npm run build
    ```
    This bundles the app to a static site in the `dist` directory.
-   
+
 ## Handling CORS Issues
 The app may encounter Cross-Origin Resource Sharing (CORS). To resolve this, follow these steps:
 

@@ -14,13 +14,12 @@ function PlannerDetail() {
   const nav = useNavigate()
   const { id } = useParams()
   const [isLoading, setIsLoading] = useState(true)
-  const [transportList, setTransportList] = useState([])
-  const [destinationList, setDestinationList] = useState([])
+
   const [plannerDetails, setPlannerDetails] = useState({})
   const [onReload, setReload] = useState(true)
   const [pUser, setPPUser] = useAtom(ppUserAtom)
   const [userMap, setUserMap] = useAtom(userMapAtom)
-  const { messages, subscribe, webSocket } = useWebSocket()
+  const { subscribe, webSocket } = useWebSocket()
   useEffect(() => {
     if (!plannerDetails._id || !onReload) return
     setTimeout(() => {
@@ -28,41 +27,6 @@ function PlannerDetail() {
       setReload(false)
     }, 500)
   }, [plannerDetails, webSocket.readyState, onReload])
-
-  useEffect(() => {
-    const relevantEntries = Object.entries(messages).filter(
-      ([, msg]) =>
-        msg.topic.type === 'planner' &&
-        msg.topic.id === plannerDetails._id &&
-        (msg.message.type === 'Transport' || msg.message.type === 'Destination'),
-    )
-    relevantEntries.forEach(([msgId, msg]) => {
-      switch (msg.action) {
-        case 'update':
-          if (msg.message.type === 'Transport') {
-            const tmpList = transportList.filter((t) => t._id !== msg.message.data._id)
-            setTransportList([...tmpList, msg.message.data])
-          }
-          if (msg.message.type === 'Destination') {
-            const tmpList = destinationList.filter((t) => t._id !== msg.message.data._id)
-            setDestinationList([...tmpList, msg.message.data])
-          }
-          delete messages[msgId]
-          break
-        case 'delete':
-          if (msg.message.type === 'Transport') {
-            const tmpList = transportList.filter((t) => t._id !== msg.message.data._id)
-            setTransportList([...tmpList])
-          }
-          if (msg.message.type === 'Destination') {
-            const tmpList = destinationList.filter((t) => t._id !== msg.message.data._id)
-            setDestinationList([...tmpList])
-          }
-          delete messages[msgId]
-          break
-      }
-    })
-  }, [messages, plannerDetails, transportList, destinationList])
 
   const fetchPlannerDetails = useCallback(
     async (pUser) => {
@@ -83,27 +47,6 @@ function PlannerDetail() {
           }
         }
         setPlannerDetails({ ...planner.data.data, createdBy: creator })
-
-        const transportRes = planner.data.data.transportations
-        // const destinationRes = planner.data.data.destinations
-        // const destinations = await Promise.all(
-        //   destinationRes.map(async (did) => {
-        //     const res = await apiLib.get(`/planner/${id}/destination/${did}`, {
-        //       params: { userId: pUser._id },
-        //     })
-        //     return res.data.success ? res.data.data : {}
-        //   }),
-        // )
-        // setDestinationList(destinations)
-        const transports = await Promise.all(
-          transportRes.map(async (tid) => {
-            const res = await apiLib.get(`/planner/${id}/transportation/${tid}`, {
-              params: { userId: pUser._id },
-            })
-            return res.data.success ? res.data.data : {}
-          }),
-        )
-        setTransportList(transports)
       } catch (error) {
         onError(error)
       }
@@ -125,19 +68,6 @@ function PlannerDetail() {
       <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
         <MUI.CircularProgress />
       </MUI.Box>
-    : <Planner
-        key={plannerDetails._id}
-        id={plannerDetails._id}
-        planner={plannerDetails}
-        transportList={transportList}
-        destinationList={destinationList}
-      ></Planner>
-  // : <PlannerDetailView
-  //     key={plannerDetails._id}
-  //     planner={plannerDetails}
-  //     ppUser={pUser.ppUser}
-  //     transportations={transportList}
-  //     destinations={destinationList}
-  //   ></PlannerDetailView>
+    : <Planner key={plannerDetails._id} id={plannerDetails._id} planner={plannerDetails}></Planner>
 }
 export default PlannerDetail
