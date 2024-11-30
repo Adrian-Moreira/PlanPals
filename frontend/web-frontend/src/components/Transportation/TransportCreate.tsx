@@ -90,7 +90,7 @@ export default function TransportCreate(props: TransportCreateProps) {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <DraggableMarker centre={[fromPosition[0], fromPosition[1]]}></DraggableMarker>
+                <DraggableMarker centre={[fromPosition[0], fromPosition[1]]} setCentre={(p) => setFromPosition(p)}></DraggableMarker>
               </MapContainer>
               <MUI.Typography variant="body1">
                 To
@@ -100,7 +100,7 @@ export default function TransportCreate(props: TransportCreateProps) {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <DraggableMarker centre={[toPosition[0], toPosition[1]]}></DraggableMarker>
+                <DraggableMarker centre={[toPosition[0], toPosition[1]]} setCentre={(p) => setToPosition(p)}></DraggableMarker>
               </MapContainer>
               {timeError && (
                 <MUI.Typography color="error" variant="subtitle1">
@@ -116,7 +116,7 @@ export default function TransportCreate(props: TransportCreateProps) {
         </MUI.Box>
       </MUI.Box>
     )
-  }, [transportType, timeError, fields.transportDetails, fields.vehicleId, startDate, endDate, startTime, endTime])
+  }, [transportType, timeError, fields.transportDetails, fields.vehicleId, startDate, endDate, startTime, endTime, fromPosition, toPosition])
 
   const handleSubmitTransportation = useCallback(
     async (event: any) => {
@@ -131,6 +131,9 @@ export default function TransportCreate(props: TransportCreateProps) {
             type: transportType,
             vehicleId: fields.vehicleId,
             details: fields.transportDetails,
+
+            from: fromPosition,
+            to: toPosition
           },
         })
         if (res.data.success) {
@@ -148,21 +151,21 @@ export default function TransportCreate(props: TransportCreateProps) {
         onError('Erorr Creating Transportation. Please retry later!')
       }
     },
-    [fields.transportDetails, fields.vehicleId, startDate, startTime, endDate, endTime, pUser.ppUser],
+    [fields.transportDetails, fields.vehicleId, startDate, startTime, endDate, endTime, pUser.ppUser, fromPosition, toPosition],
   )
 
   const validateCreateTransportForm = useCallback(() => {
     const isTimeValid =
-      startDate.isBefore(endDate) &&
+    combineDateAndTime(startDate, startTime).isBefore(combineDateAndTime(endDate, endTime)) &&
       combineDateAndTime(startDate, startTime).isAfter(plannerStartDate) &&
       combineDateAndTime(endDate, endTime).isBefore(plannerEndDate)
     setTimeError(!isTimeValid)
     return isTimeValid
-  }, [startDate, endDate, startTime, endTime])
+  }, [startDate, endDate, startTime, endTime, plannerStartDate, plannerEndDate])
 
   useEffect(() => {
     validateCreateTransportForm()
-  }, [startDate, endDate, startTime, endTime])
+  }, [startDate, endDate, startTime, endTime, plannerStartDate, plannerEndDate, validateCreateTransportForm])
 
   return (
     <AdaptiveDialog

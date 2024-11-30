@@ -9,8 +9,6 @@ import { PPPlanner } from '../Planners/Planner'
 
 export interface DestinationItemsProps {
   planner: PPPlanner
-  isLoading: boolean
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   setCurrentDestination: React.Dispatch<React.SetStateAction<any>>
 }
 
@@ -18,9 +16,10 @@ export default function DestinationItems(props: DestinationItemsProps) {
   const [destinationList, setListOfDestination] = useState<DestinationProps[]>([])
   const [destItems, setDestItems] = useState([<></>])
   const [pUser, setPPUser] = useAtom(ppUserAtom)
+  const [isLoading, setIsLoading] = useState(true)
 
   const fetchDestinationList = useCallback(async () => {
-    props.setIsLoading(true)
+    setIsLoading(true)
     const dList = await Promise.all(
       props.planner.destinations.map(async (did) => {
         const res = await apiLib.get(`/planner/${props.planner._id}/destination/${did}`, {
@@ -29,7 +28,7 @@ export default function DestinationItems(props: DestinationItemsProps) {
         return res.data.success ? res.data.data : {}
       }),
     )
-    props.setIsLoading(false)
+    setIsLoading(false)
     setListOfDestination(dList)
   }, [pUser, props.planner._id])
 
@@ -39,7 +38,7 @@ export default function DestinationItems(props: DestinationItemsProps) {
 
   useEffect(() => {
     setDestItems(
-      destinationList.map((d) => (
+      destinationList.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startxDate).getTime()).map((d) => (
         <DestinationItem
           key={d._id}
           _id={d._id}
@@ -58,9 +57,9 @@ export default function DestinationItems(props: DestinationItemsProps) {
   useEffect(() => {
     renderItems()
   }, [destItems])
-  return props.isLoading ?
-      <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
-        <MUI.CircularProgress />
-      </MUI.Box>
+  return isLoading ?
+    <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
+      <MUI.CircularProgress />
+    </MUI.Box>
     : <> {renderItems()}</>
 }

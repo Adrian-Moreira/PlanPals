@@ -5,6 +5,7 @@ import leaflet from "leaflet"
 
 export interface DraggableMarkerProps {
     centre: [number, number]
+    setCentre: React.Dispatch<React.SetStateAction<number[]>>
 }
 
 export function DraggableMarker(props: DraggableMarkerProps) {
@@ -17,14 +18,15 @@ export function DraggableMarker(props: DraggableMarkerProps) {
           const marker = markerRef.current as unknown as leaflet.Marker
           if (marker != null) {
             setPosition([marker.getLatLng().lat, marker.getLatLng().lng])
+            props.setCentre([marker.getLatLng().lat, marker.getLatLng().lng])
           }
         },
       }),
       [],
     )
-    const toggleDraggable = useCallback(() => {
-      setDraggable((d) => !d)
-    }, [])
+    // const toggleDraggable = useCallback(() => {
+    //   setDraggable((d) => !d)
+    // }, [])
   
     return (
       <Marker

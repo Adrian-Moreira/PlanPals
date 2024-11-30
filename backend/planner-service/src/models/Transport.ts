@@ -35,10 +35,10 @@ const TransportMongoSchema = new Schema<Transport>(
       required: true,
     },
     from: {
-      type: [number, number],
+      type: [Number, Number],
     },
     to: {
-      type: [number, number],
+      type: [Number, Number],
     },
   },
   {

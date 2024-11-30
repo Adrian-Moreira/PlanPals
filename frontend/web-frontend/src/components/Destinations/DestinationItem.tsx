@@ -10,7 +10,6 @@ import { ppUserAtom } from '../../lib/authLib'
 import dayjs from 'dayjs'
 import { MapContainer, Marker, Popup } from 'react-leaflet'
 import { TileLayer } from 'react-leaflet/TileLayer'
-import { useMap } from 'react-leaflet/hooks'
 
 interface WeatherInfo {
   temp: number
@@ -35,6 +34,7 @@ export default function DestinationItem(props: DestinationProps) {
   const { startDate, endDate } = convertDatePairs(props.startDate, props.endDate)
   const [weather, setWeather] = useState<WeatherInfo | null>(null)
   const [pUser] = useAtom(ppUserAtom)
+  const regionName = new Intl.DisplayNames(['en'], {type: 'region'});
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -88,7 +88,7 @@ export default function DestinationItem(props: DestinationProps) {
         <MUI.CardHeader
           avatar={<MUIcons.LocationOn />}
           title={props.name}
-          subheader={props.state ? `${props.state}, ${props.country}` : props.country}
+          subheader={props.country ? props.state ? `${props.state}, ${regionName.of(props.country)}` : regionName.of(props.country) : ''}
         />
         <MUI.CardContent>
           <MUI.Box sx={{ display: 'flex', flexDirection: 'row' }}>
