@@ -266,6 +266,10 @@ Introduction: to be generated
   | `startDate` | string or Date | Yes      | Start date of the destination. |
   | `endDate`   | string or Date | Yes      | End date of the destination.   |
   | `name`      | string         | Yes      | Name of the destination.   |
+  | `lat`      | Number         | No      | Lat   |
+  | `lon`      | Number         | No      | Lng   |
+  | `country`      | string         | No      | Country code  |
+  | `state`      | string         | No      | State   |
 
 - **Response:**
 
@@ -318,6 +322,10 @@ Introduction: to be generated
   | `name`      | string         | No       | Name of the destination.   |
   | `startDate` | string or Date | No       | Start date of the destination. |
   | `endDate`   | string or Date | No       | End date of the destination.   |
+  | `lat`      | Number         | No      | Lat |
+  | `lon`      | Number         | No      | Lng   |
+  | `country`      | string         | No      | Country Code   |
+  | `state`      | string         | No      | State  |
 
 - **Response:**
 
@@ -663,6 +671,8 @@ Introduction: to be generated
   | `departureTime`| string or Date | Yes      | Departure time.               |
   | `arrivalTime`  | string or Date | Yes      | Arrival time.                 |
   | `vehicleId`    | string         | No       | ID of the vehicle used.       |
+  | `from`      | [Number, Number]         | No      |  From LatLng  |
+  | `to`      | [Number, Number]         | No      | To LatLng   |
 
 - **Response:**
 
@@ -717,7 +727,8 @@ Introduction: to be generated
   | `departureTime`| string or Date | No       | Departure time.               |
   | `arrivalTime`  | string or Date | No       | Arrival time.                 |
   | `vehicleId`    | string         | No       | ID of the vehicle used.       |
-
+  | `from`      | [Number, Number]         | No      |  From LatLng  |
+  | `to`      | [Number, Number]         | No      | To LatLng   |
 - **Response:**
 
   Returns the updated transportation object.
