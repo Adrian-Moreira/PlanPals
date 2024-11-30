@@ -15,6 +15,8 @@ import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import SelectItems from '../Common/SelectItems'
 import { getVehicleIcon } from './TransportItem'
+import { DraggableMarker } from '../DraggableMarker'
+import { MapContainer, TileLayer } from 'react-leaflet'
 
 const transportTypes = ['Bus', 'Train', 'Car', 'Airplane', 'Metro', 'Tram', 'Bicycle', 'Ferry']
 
@@ -33,6 +35,11 @@ export default function TransportCreate(props: TransportCreateProps) {
   const [endTime, setEndTime] = useState(plannerEndDate)
   const [isLoading, setIsLoading] = useState(false)
   const [pUser] = useAtom(ppUserAtom)
+
+  const [fromPosition, setFromPosition] = useState([51.505, -0.09]);
+  const [toPosition, setToPosition] = useState([51.515, -0.1]);
+  const [fromDraggable, setFromDraggable] = useState(false);
+  const [toDraggable, setToDraggable] = useState(false);
 
   const [transportType, setTransportType] = useState(transportTypes[0])
   const [fields, handleFieldChange] = useFormFields({
@@ -75,6 +82,26 @@ export default function TransportCreate(props: TransportCreateProps) {
                 value={fields.vehicleId}
                 onChange={handleFieldChange}
               />
+              <MUI.Typography variant="body1">
+                From
+              </MUI.Typography>
+              <MapContainer style={{ height: '300px', width: '100%' }} center={[fromPosition[0], fromPosition[1]]} zoom={13} scrollWheelZoom={true}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <DraggableMarker centre={[fromPosition[0], fromPosition[1]]}></DraggableMarker>
+              </MapContainer>
+              <MUI.Typography variant="body1">
+                To
+              </MUI.Typography>
+              <MapContainer style={{ height: '300px', width: '100%' }} center={[fromPosition[0], fromPosition[1]]} zoom={13} scrollWheelZoom={true}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <DraggableMarker centre={[toPosition[0], toPosition[1]]}></DraggableMarker>
+              </MapContainer>
               {timeError && (
                 <MUI.Typography color="error" variant="subtitle1">
                   Dates need to be within the planner's date.

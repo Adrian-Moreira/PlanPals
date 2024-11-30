@@ -41,7 +41,7 @@ async function verifyTransportationExists(req: Request, res: Response, next: Nex
  * @throws {RecordConflictException} If a transportation with the same details already exists.
  */
 const createTransportationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { plannerId, targetUser, type, details, departureTime, arrivalTime, vehicleId, targetPlanner } = req.body.out
+  const { plannerId, targetUser, type, details, departureTime, arrivalTime, vehicleId, from, to, targetPlanner } = req.body.out
 
   const createdTransportation = await TransportModel.create({
     plannerId,
@@ -51,6 +51,8 @@ const createTransportationDocument = async (req: Request, res: Response, next: N
     departureTime,
     arrivalTime,
     vehicleId,
+    from,
+    to,
   })
   targetPlanner.transportations.push(createdTransportation._id)
 
@@ -76,13 +78,16 @@ const createTransportationDocument = async (req: Request, res: Response, next: N
  * @throws {RecordNotFoundException} If the transportation does not exist.
  */
 const updateTransportationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  let { type, details, departureTime, arrivalTime, vehicleId, targetTransportation } = req.body.out
+  let { type, details, departureTime, arrivalTime, vehicleId, from, to, targetTransportation } = req.body.out
 
   targetTransportation.type = type || targetTransportation.type
   targetTransportation.details = details || targetTransportation.details
   targetTransportation.departureTime = departureTime || targetTransportation.departureTime
   targetTransportation.arrivalTime = arrivalTime || targetTransportation.arrivalTime
   targetTransportation.vehicleId = vehicleId || targetTransportation.vehicleId
+
+  targetTransportation.from = from || targetTransportation.from
+  targetTransportation.to = to || targetTransportation.to
 
   const updatedTransportation = await TransportModel.findOneAndUpdate(
     { _id: targetTransportation._id },

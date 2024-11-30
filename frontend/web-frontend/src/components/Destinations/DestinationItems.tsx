@@ -46,8 +46,7 @@ export default function DestinationItems(props: DestinationItemsProps) {
           name={d.name}
           startDate={d.startDate}
           endDate={d.endDate}
-          onClickHandler={() => props.setCurrentDestination(d)}
-        />
+          onClickHandler={() => props.setCurrentDestination(d)} plannerId={props.planner._id} lat={d.lat} lon={d.lon} country={d.country} state={d.state} />
       )),
     )
   }, [destinationList])

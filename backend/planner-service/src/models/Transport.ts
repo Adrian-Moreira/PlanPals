@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { number, z } from 'zod'
 import mongoose, { Schema } from 'mongoose'
 import { ObjectIdSchema, PlannerModel } from './Planner'
 import { CommentsModel } from './Comment'
@@ -34,6 +34,12 @@ const TransportMongoSchema = new Schema<Transport>(
       type: String,
       required: true,
     },
+    from: {
+      type: [number, number],
+    },
+    to: {
+      type: [number, number],
+    },
   },
   {
     _id: true,
@@ -57,6 +63,9 @@ export const TransportSchema = z.object({
 
   type: z.string(),
   vehicleId: z.string().optional(),
+
+  from: z.array(z.number()).length(2).optional(),
+  to: z.array(z.number()).length(2).optional(),
 })
 
 TransportMongoSchema.pre('findOneAndDelete', async function (next) {

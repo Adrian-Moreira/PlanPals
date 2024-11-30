@@ -1,6 +1,6 @@
 import RequestUtils, { ReqAttrSchema } from '../utils/RequestUtils'
 import { ObjectIdStringSchema } from '../models/Planner'
-import z from 'zod'
+import z, { number } from 'zod'
 
 const TransportationRouteSchema = {
   createTransportation: ReqAttrSchema.extend({
@@ -14,6 +14,9 @@ const TransportationRouteSchema = {
       departureTime: z.string().datetime().or(z.date()),
       arrivalTime: z.string().datetime().or(z.date()),
       vehicleId: z.string().optional(),
+
+      from: z.array(z.number()).length(2).optional(),
+      to: z.array(z.number()).length(2).optional(),
     }),
   }),
   getTransportationById: ReqAttrSchema.extend({
@@ -44,6 +47,9 @@ const TransportationRouteSchema = {
       departureTime: z.string().datetime().or(z.date()).optional(),
       arrivalTime: z.string().datetime().or(z.date()).optional(),
       vehicleId: z.string().optional(),
+
+      from: z.array(z.number()).length(2).optional(),
+      to: z.array(z.number()).length(2).optional(),
     }),
     query: z.object({
       userId: ObjectIdStringSchema,
