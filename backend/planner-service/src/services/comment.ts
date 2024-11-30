@@ -92,6 +92,7 @@ const removeCommentDocument = async (req: Request, res: Response, next: NextFunc
 
   req.body.result = await CommentModel.findOneAndDelete({ _id: commentId })
   req.body.status = StatusCodes.OK
+  req.body.addon = [commentsDocument]
   req.body.dataType = CommentCollection
   next()
 }

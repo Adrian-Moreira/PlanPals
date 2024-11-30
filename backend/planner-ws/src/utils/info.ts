@@ -1,6 +1,18 @@
 import { clientSockets, clientSubsByTopic } from "../data/clients.ts";
 import { queues } from "../data/queue.ts";
 
+/**
+ * Prints out information about the state of the server, including:
+ * - The current time
+ * - The number of pending items in each queue
+ * - The data of each pending item in each queue
+ * - The client subscriptions by topic
+ * - The connected client sockets
+ *
+ * This function is intended to be used for debugging purposes.
+ *
+ * @returns void
+ */
 export const PrintInfo = () => {
 	console.error("\nInfo: ", new Date().toLocaleString());
 
@@ -9,13 +21,13 @@ export const PrintInfo = () => {
 		console.error(`\n${q.name} Queue:`);
 		if (q.pending.length === 0) {
 			console.error("  No pending items");
-		} else {
-			console.error(`  Pending Items (${q.pending.length}):`);
-			q.pending.forEach((item, index) => {
-				console.error(`    ${index + 1}.`);
-				console.error(`       Data: ${item.object}`);
-			});
+			return;
 		}
+		console.error(`  Pending Items (${q.pending.length}):`);
+		q.pending.forEach((item, index) => {
+			console.error(`    ${index + 1}.`);
+			console.error(`       Data: ${item.object}`);
+		});
 	});
 
 	console.error("\nClient Subscriptions by Topic:");
@@ -28,12 +40,9 @@ export const PrintInfo = () => {
 
 	console.error("\nConnected Client Sockets:");
 	clientSockets.forEach((socket, clientId) => {
-		console.error(
-			`  ${clientId}: ${
-				socket.readyState === WebSocket.OPEN
-					? "Connected"
-					: "Disconnected"
-			}`,
-		);
+		const isConnected = socket.readyState === WebSocket.OPEN
+			? "Connected"
+			: "Disconnected";
+		console.error(`  ${clientId}: ${isConnected}`);
 	});
 };

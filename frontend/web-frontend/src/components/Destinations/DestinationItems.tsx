@@ -25,11 +25,11 @@ export default function DestinationItems(props: DestinationItemsProps) {
       props.planner.destinations.map(async (did) => {
         const res = await apiLib.get(`/planner/${props.planner._id}/destination/${did}`, {
           params: { userId: pUser.ppUser!._id },
-        })
-        props.setIsLoading(false)
+        }).then((res) => res)
         return res.data.success ? res.data.data : {}
       }),
     )
+    props.setIsLoading(false)
     setListOfDestination(dList)
   }, [pUser, props.planner._id])
 

@@ -7,15 +7,11 @@ import 'package:planpals/features/profile/views/signup_page.dart';
 import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.dart';
 import 'package:planpals/features/travel_planner/views/planners_view.dart';
 import 'package:planpals/features/vote/vote_viewmodel.dart';
+import 'package:planpals/shared/network/ws_provider.dart';
 import 'package:provider/provider.dart';
 
-
 void main() {
-  runApp(
-
-     MyApp()
-
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,12 +21,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => WebSocketProvider()),
         ChangeNotifierProvider(create: (context) => PlannerViewModel()),
         ChangeNotifierProvider(create: (context) => UserViewModel()),
         ChangeNotifierProvider(create: (context) => VoteViewModel()),
         ChangeNotifierProvider(create: (context) => CommentViewModel()),
       ],
-
       child: SafeArea(
         child: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
