@@ -13,7 +13,7 @@ import { StatusCodes } from 'http-status-codes'
  * @throws {RecordNotFoundException} If the user does not exist.
  */
 export const createPlannerDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const {
+  let {
     targetUser,
     name,
     description,
@@ -25,6 +25,10 @@ export const createPlannerDocument = async (req: Request, res: Response, next: N
     transportations,
     invites,
   } = req.body.out
+
+  if (!rwUsers?.includes(targetUser._id)) {
+    rwUsers.push(targetUser._id)
+  }
 
   const planner = await PlannerModel.create({
     createdBy: targetUser._id,
