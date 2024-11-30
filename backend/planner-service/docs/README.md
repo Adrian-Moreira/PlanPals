@@ -12,6 +12,7 @@ Introduction: to be generated
 - [Transportation Endpoints](#transportation-endpoints)
 - [Vote Endpoints](#vote-endpoints)
 - [Comment Endpoints](#comment-endpoints)
+- [ShoppingList Endpoints](#shopping-list-endpoints)
 
 ---
 
@@ -928,6 +929,178 @@ Introduction: to be generated
   | ---------- | ------ | -------- | -------------------------------- |
   | `type`     | string | Yes      | The type of the object commented on. |
   | `objectId` | string | Yes      | The ID of the object.            |
+
+- **Response:**
+
+  Returns confirmation of deletion.
+
+---
+
+## Shopping List Endpoints
+
+**Base URL:** `/shoppingList`
+
+### Get Shopping Lists
+
+- **URL:** `/shoppingList`
+- **Method:** `GET`
+- **Description:** Retrieves shopping lists associated with a user.
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description                             |
+  | --------- | ------ | -------- | --------------------------------------- |
+  | `userId`  | string | Yes      | The user's ID.                          |
+
+- **Response:**
+
+  Returns a list of shopping lists.
+
+---
+
+### Create Shopping List
+
+- **URL:** `/shoppingList`
+- **Method:** `POST`
+- **Description:** Creates a new shopping list.
+- **Request Body:**
+
+  | Field          | Type             | Required | Description                                |
+  | -------------- | ---------------- | -------- | ------------------------------------------ |
+  | `name`         | string           | Yes      | Name of the shopping list.                |
+  | `description`  | string           | No       | Description of the shopping list.         |
+  | `createdBy`    | string           | Yes      | ID of the user creating the shopping list.|
+  | `items`        | array of objects | No       | Initial list of items in the shopping list. |
+   | `rwUsers`        | array of objects | No       | Read-write access users. |
+
+  - **Items Fields (optional):**
+    | Field      | Type   | Required | Description                     |
+    | ---------- | ------ | -------- | ------------------------------- |
+    | `name`     | string | Yes      | Name of the item.               |
+    | `location` | string | Yes      | Location where the item can be found. |
+    | `addedBy`  | string | Yes      | ID of the user adding the item. |
+
+- **Response:**
+
+  Returns the created shopping list object.
+
+---
+
+### Get Shopping Lists by User ID
+
+- **URL:** `/shoppingList`
+- **Method:** `GET`
+- **Description:** Retrieves all shopping lists associated with a specific user, either as the creator or with read-write access.
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description                             |
+  | --------- | ------ | -------- | --------------------------------------- |
+  | `userId`  | string | Yes      | The user's ID.                          |
+
+- **Response:**
+
+  Returns a list of shopping lists.
+
+---
+
+### Get Shopping List by ID
+
+- **URL:** `/shoppingList/:shoppingListId`
+- **Method:** `GET`
+- **Description:** Retrieves a shopping list by its ID.
+- **Path Parameters:**
+
+  | Parameter       | Type   | Required | Description                   |
+  | --------------- | ------ | -------- | ----------------------------- |
+  | `shoppingListId`| string | Yes      | The shopping list's ID.       |
+
+- **Response:**
+
+  Returns the shopping list object.
+
+---
+
+### Update Shopping List
+
+- **URL:** `/shoppingList/:shoppingListId`
+- **Method:** `PATCH`
+- **Description:** Updates a shopping list.
+- **Path Parameters:**
+
+  | Parameter       | Type   | Required | Description                   |
+  | --------------- | ------ | -------- | ----------------------------- |
+  | `shoppingListId`| string | Yes      | The shopping list's ID.       |
+
+- **Request Body:**
+
+  | Field          | Type   | Required | Description                  |
+  | -------------- | ------ | -------- | ---------------------------- |
+  | `name`         | string | No       | Updated name of the shopping list. |
+  | `description`  | string | No       | Updated description of the shopping list. |
+
+- **Response:**
+
+  Returns the updated shopping list object.
+
+---
+
+### Add Item to Shopping List
+
+- **URL:** `/shoppingList/:shoppingListId/item`
+- **Method:** `POST`
+- **Description:** Adds an item to a shopping list.
+- **Path Parameters:**
+
+  | Parameter       | Type   | Required | Description                   |
+  | --------------- | ------ | -------- | ----------------------------- |
+  | `shoppingListId`| string | Yes      | The shopping list's ID.       |
+
+- **Request Body:**
+
+  | Field      | Type   | Required | Description                     |
+  | ---------- | ------ | -------- | ------------------------------- |
+  | `name`     | string | Yes      | Name of the item.               |
+  | `location` | string | Yes      | Location where the item can be found. |
+  | `addedBy`  | string | Yes      | ID of the user adding the item. |
+
+- **Response:**
+
+  Returns the updated shopping list object with the new item added.
+
+---
+
+### Invite Users to Shopping List
+
+- **URL:** `/shoppingList/:shoppingListId/invite`
+- **Method:** `POST`
+- **Description:** Invites users to the shopping list with read-write access.
+- **Path Parameters:**
+
+  | Parameter       | Type   | Required | Description                   |
+  | --------------- | ------ | -------- | ----------------------------- |
+  | `shoppingListId`| string | Yes      | The shopping list's ID.       |
+
+- **Request Body:**
+
+  | Field      | Type             | Required | Description                     |
+  | ---------- | ---------------- | -------- | ------------------------------- |
+  | `userIds`  | array of strings | Yes      | List of user IDs to invite.     |
+
+- **Response:**
+
+  Returns the updated shopping list object with invited users.
+
+---
+
+### Delete Shopping List
+
+- **URL:** `/shoppingList/:shoppingListId`
+- **Method:** `DELETE`
+- **Description:** Deletes a shopping list.
+- **Path Parameters:**
+
+  | Parameter       | Type   | Required | Description                   |
+  | --------------- | ------ | -------- | ----------------------------- |
+  | `shoppingListId`| string | Yes      | The shopping list's ID.       |
 
 - **Response:**
 

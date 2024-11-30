@@ -1,6 +1,7 @@
 import express from 'express'
 
 import plannerRouter from './planner/planner'
+import shoppingListRouter from './shoppingList/shoppingList'
 import userRouter from './user'
 import { voteRouter } from './vote'
 import { commentRouter } from './comment'
@@ -12,6 +13,8 @@ router.use('/user', userRouter)
 router.use('/planner', plannerRouter)
 router.use('/vote', voteRouter)
 router.use('/comment', commentRouter)
+router.use('/shoppingList', shoppingListRouter)
+
 
 router.use(RequestUtils.mkSuccessResponse)
 
