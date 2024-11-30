@@ -10,6 +10,10 @@ import apiLib from '../../lib/apiLib.js'
 import AlertDialog from '../Common/AlertDialog.tsx'
 import { onError } from '../../lib/errorLib.js'
 import CardActionButtons from '../Common/CardActionButtons.tsx'
+import { MapContainer, Marker, Polyline, Popup } from 'react-leaflet'
+import { TileLayer } from 'react-leaflet/TileLayer'
+import GeodesicPath from '../Geodesic.tsx'
+
 export function getVehicleIcon(type: string) {
   switch (type) {
     case 'Bus':
@@ -43,6 +47,8 @@ export interface TransportProps {
   arrivalTime: string
   createdBy: string
   currentUserId: string
+  from?: number[]
+  to?: number[]
 }
 
 export default function TransportItem(props: TransportProps) {
@@ -70,10 +76,11 @@ export default function TransportItem(props: TransportProps) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const handleDeleteAction = useCallback(async () => {
-    const res = await apiLib.delete(`/planner/${props.plannerId}/transportation/${props._id}`, {
-      params: { userId: props.currentUserId },
-    })
-    if (!res.data.success) {
+    try {
+      const res = await apiLib.delete(`/planner/${props.plannerId}/transportation/${props._id}`, {
+        params: { userId: props.currentUserId },
+      })
+    } catch {
       onError("Error deleting: Transport mightn't be removed")
     }
   }, [])
@@ -142,6 +149,10 @@ export default function TransportItem(props: TransportProps) {
         <VoteButtons id={props._id} type={'Transport'} userId={props.currentUserId} plannerId={props.plannerId} />
         <CommentButton id={props._id} type={'Transport'} userId={props.currentUserId} plannerId={props.plannerId} />
       </MUI.CardActions>
+
+      {props.from && props.from[0] && props.from[1] && props.to && props.to[0] && props.to[1] ?
+        <GeodesicPath from={[props.from[0], props.from[1]]} to={[props.to[0], props.to[1]]} />
+      : <> </>}
     </MUI.Card>
   )
 }

@@ -2,7 +2,7 @@ import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
 import React, { useCallback, useEffect, useState } from 'react'
 import SelectItems from '../Common/SelectItems'
-import { PPUser } from '../../lib/authLib'
+import { ppUser, PPUser, ppUserAtom } from '../../lib/authLib'
 import CardActionButtons from '../Common/CardActionButtons'
 import DestinationItems from '../Destinations/DestinationItems'
 import DestinationCreate from '../Destinations/DestinationCreate'
@@ -10,6 +10,10 @@ import AddButton from '../Common/AddButton'
 import TransportItems from '../Transportation/TransportItems'
 import TransportCreate from '../Transportation/TransportCreate'
 import { convertDatePairs } from '../../lib/dateLib'
+import apiLib from '../../lib/apiLib'
+import { useAtom } from 'jotai'
+import { onError } from '../../lib/errorLib'
+import { useNavigate } from 'react-router-dom'
 
 export interface PPPlanner {
   _id: string
@@ -21,14 +25,13 @@ export interface PPPlanner {
   startDate: string
   endDate: string
   destinations: string[]
+  transportations: string[]
 }
 
 export interface PlannerProps {
   key: string
   id: string
   planner: PPPlanner
-  transportList: any[]
-  destinationList: any[]
 }
 
 const tabs = ['Destination', 'Transportation']
@@ -40,8 +43,19 @@ export default function Planner(props: PlannerProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [currentDestination, setCurrentDestination] = useState({})
   const [creationDialogOpen, setCreationDialogOpen] = useState(false)
+  const [pUser] = useAtom(ppUserAtom)
+  const nav = useNavigate()
 
-  const handleDeletePlanner = useCallback(async () => {}, [])
+  const handleDeletePlanner = useCallback(async () => {
+    try {
+      const res = await apiLib.delete(`/planner/${props.planner._id}`, {
+        params: { userId: pUser.ppUser?._id },
+      })
+      nav('/planners')
+    } catch {
+      onError("Error deleting: Planner mightn't be removed")
+    }
+  }, [])
   const handleEditPlanner = useCallback(async () => {}, [])
 
   const mkTabItems = useCallback(() => {
@@ -92,12 +106,7 @@ export default function Planner(props: PlannerProps) {
               planner={props.planner}
               setCurrentDestination={setCurrentDestination}
             ></DestinationCreate>
-            <DestinationItems
-              planner={props.planner}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-              setCurrentDestination={setCurrentDestination}
-            />
+            <DestinationItems planner={props.planner} setCurrentDestination={setCurrentDestination} />
           </>,
         )
         break
@@ -109,11 +118,7 @@ export default function Planner(props: PlannerProps) {
               setOpen={setCreationDialogOpen}
               planner={props.planner}
             ></TransportCreate>
-            <TransportItems
-              transportList={props.transportList}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            ></TransportItems>
+            <TransportItems planner={props.planner}></TransportItems>
           </>,
         )
         break
@@ -123,7 +128,7 @@ export default function Planner(props: PlannerProps) {
     }
 
     return <> {...elements}</>
-  }, [isLoading, selectedTab, creationDialogOpen, props.planner._id, props.destinationList])
+  }, [isLoading, selectedTab, creationDialogOpen, props.planner._id])
 
   const { startDate, endDate } = convertDatePairs(props.planner.startDate, props.planner.endDate)
   return isLoading ?

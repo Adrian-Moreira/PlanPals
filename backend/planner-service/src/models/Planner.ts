@@ -131,7 +131,7 @@ PlannerMongoSchema.pre('findOneAndDelete', async function (next) {
       planner!.transportations!.map((id: Types.ObjectId) => TransportModel.findOneAndDelete({ _id: id })),
     )
   } catch (err: any) {
-    next(err)
+    console.error(err)
   }
   next()
 })

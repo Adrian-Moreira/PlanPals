@@ -5,6 +5,7 @@ const config = {
   },
   api: {
     URL: import.meta.env.VITE_API_URL,
+    OWM_DEFAULT_KEY: import.meta.env.VITE_OWM_DEFAULT_KEY,
   },
   cognito: {
     REGION: import.meta.env.VITE_REGION,

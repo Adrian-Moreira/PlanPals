@@ -1,33 +1,4 @@
-version: '3.8'
-
 services:
-  planner-service:
-    build:
-      context: ./backend/planner-service
-    ports:
-      - '8080:8080'
-    environment:
-      - LOG_LEVEL=0
-      - SERVER_PORT=8080
-      - DATABASE_CONNECTIONSTRING=mongodb://mongo:27017/planner
-    depends_on:
-      - mongo
-
-  front-end-react:
-    build:
-      context: ./front-end-web
-    ports:
-      - '3000:3000'
-    depends_on:
-      - planner-service
-
-  # Flutter frontend - currently commented out
-  # front-end-flutter:
-  #   build:
-  #     context: ./front-end-flutter
-  #   depends_on:
-  #     - planner-service
-
   mongo:
     image: mongo:6
     ports:
@@ -35,6 +6,50 @@ services:
     volumes:
       - mongodb:/data/db
       - mongodb_config:/data/configdb
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+  planner-ws:
+    build:
+      context: ./backend/planner-ws
+    ports:
+      - '8000:8000'
+    environment:
+      - RABBITMQ_CONNECTIONSTRING=amqp://user:password@rabbitmq:5672
+    depends_on:
+      - rabbitmq
+
+  planner-service:
+    build:
+      context: ./backend/planner-service
+    ports:
+      - '8080:8080'
+    environment:
+      - SERVER_PORT=8080
+      - DATABASE_CONNECTIONSTRING=mongodb://mongo:27017/planner
+      - RABBITMQ_CONNECTIONSTRING=amqp://user:password@rabbitmq:5672
+      - WS_CONNECTIONSTRING=ws://planner-ws:8000
+    depends_on:
+      - mongo
+      - rabbitmq
+      - planner-ws
+
+  # planner-frontend:
+  #   build:
+  #     context: ./frontend/web-frontend
+  #   ports:
+  #     - '5173:5173'
+  #   environment:
+  #     - VITE_API_URL=http://planner-service:8080
+  #   depends_on:
+  #     - planner-service
 
 volumes:
   mongodb:

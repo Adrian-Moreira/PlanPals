@@ -89,7 +89,7 @@ ActivityMongoSchema.pre('findOneAndDelete', async function (next) {
     await CommentsModel.findOneAndDelete(activityObjectId)
     await VoteModel.findOneAndDelete(activityObjectId)
   } catch (err: any) {
-    next(err)
+    console.error(err)
   }
 
   next()

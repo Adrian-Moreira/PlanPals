@@ -58,7 +58,7 @@ export async function initServer(): Promise<PlanPals> {
   const server = createServer(app)
 
   const proxy = httpProxy.createProxyServer({
-    target: 'ws://localhost:8000',
+    target: config.ws.connectionString || 'ws://localhost:8000',
     ws: true,
   })
 
@@ -114,7 +114,7 @@ if (require.main === module) {
   process.on('SIGINT', async () => (await stopper)())
   process.on('SIGTERM', async () => (await stopper)())
   process.on('SIGHUP', async () => {
-    ;(await stopper)().then(() => {
+    ; (await stopper)().then(() => {
       setTimeout(() => {
         stopper = main()
       }, 1000)

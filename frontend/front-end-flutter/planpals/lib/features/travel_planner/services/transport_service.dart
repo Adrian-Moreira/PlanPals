@@ -24,19 +24,23 @@ class TransportService {
   }
 
   // Fetch all transports for a specific planner, optionally filtered by transport IDs
-  Future<List<Transport>> fetchAllTransports(String plannerId, {List<String>? transportIds}) async {
+  Future<List<Transport>> fetchAllTransports(String plannerId,
+      {List<String>? transportIds}) async {
     try {
-      final url = '${Urls.travelPlanner}/$plannerId/transportation${transportIds != null ? '?ids=${transportIds.join(',')}' : ''}';
+      final url =
+          '${Urls.travelPlanner}/$plannerId/transportation${transportIds != null ? '?ids=${transportIds.join(',')}' : ''}';
       final response = await _apiService.get(url);
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
         return jsonList.map((json) => Transport.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to fetch transports for planner ID=$plannerId: ${response.body}');
+        throw Exception(
+            'Failed to fetch transports for planner ID=$plannerId: ${response.body}');
       }
     } catch (e) {
-      throw Exception('Failed to fetch transports for planner ID=$plannerId: $e');
+      throw Exception(
+          'Failed to fetch transports for planner ID=$plannerId: $e');
     }
   }
 }

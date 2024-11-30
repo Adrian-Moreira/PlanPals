@@ -82,7 +82,7 @@ AccommodationMongoSchema.pre('findOneAndDelete', async function (next) {
     await CommentsModel.findOneAndDelete(accommodationObjectId)
     await VoteModel.findOneAndDelete(accommodationObjectId)
   } catch (err: any) {
-    next(err)
+    console.error(err)
   }
 
   next()

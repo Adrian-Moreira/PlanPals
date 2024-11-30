@@ -1,4 +1,3 @@
-import CreateCard from '../Common/CreateCard'
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -13,6 +12,15 @@ import apiLib from '../../lib/apiLib'
 import { combineDateAndTime } from '../../lib/dateLib'
 import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
+import config from '../../config'
+
+interface PPLocation {
+  name: string
+  lat: number
+  lon: number
+  country: string
+  state: string
+}
 
 export interface DestinationCreateProps {
   open: boolean
@@ -30,6 +38,8 @@ export default function DestinationCreate(props: DestinationCreateProps) {
   const [startTime, setStartTime] = useState(plannerStartDate)
   const [endTime, setEndTime] = useState(plannerEndDate)
   const [isLoading, setIsLoading] = useState(false)
+  const [locations, setLocations] = useState<PPLocation[]>([])
+  const [selectedLocation, setSelectedLocation] = useState<PPLocation | null>(null)
   const [pUser] = useAtom(ppUserAtom)
   const [fields, handleFieldChange] = useFormFields({
     destinationName: '',
@@ -44,7 +54,11 @@ export default function DestinationCreate(props: DestinationCreateProps) {
             createdBy: pUser.ppUser!._id,
             startDate: combineDateAndTime(startDate, startTime).toISOString(),
             endDate: combineDateAndTime(endDate, endTime).toISOString(),
-            name: fields.destinationName,
+            name: selectedLocation!.name,
+            lat: selectedLocation!.lat,
+            lon: selectedLocation!.lon,
+            country: selectedLocation!.country,
+            state: selectedLocation!.state,
           },
         })
         if (res.data.success) {
@@ -63,23 +77,52 @@ export default function DestinationCreate(props: DestinationCreateProps) {
         onError('Erorr Creating Destination. Please retry later!')
       }
     },
-    [fields.destinationName, startDate, startTime, endDate, endTime, pUser.ppUser],
+    [fields.destinationName, startDate, startTime, endDate, endTime, pUser.ppUser, selectedLocation],
   )
 
   const validateCreateDestinationForm = useCallback(() => {
     const isNameValid = fields.destinationName.length > 0
-    setDestError(!isNameValid)
+    setDestError(!selectedLocation)
     const isTimeValid =
       startDate.isBefore(endDate) &&
       combineDateAndTime(startDate, startTime).isAfter(plannerStartDate) &&
       combineDateAndTime(endDate, endTime).isBefore(plannerEndDate)
     setTimeError(!isTimeValid)
     return isNameValid && isTimeValid
-  }, [fields.destinationName, startDate, endDate, startTime, endTime])
+  }, [fields.destinationName, startDate, endDate, startTime, endTime, selectedLocation])
 
   useEffect(() => {
     validateCreateDestinationForm()
-  }, [fields.destinationName, startDate, endDate, startTime, endTime])
+  }, [fields.destinationName, startDate, endDate, startTime, endTime, selectedLocation])
+
+  const fetchLocations = async (query: string) => {
+    if (!query) {
+      setLocations([])
+      return
+    }
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/geo/1.0/direct?q="${query}"&limit=5&appid=${config.api.OWM_DEFAULT_KEY}`,
+      )
+      const data = await response.json()
+      const formattedLocations: PPLocation[] = data.map((item: any) => ({
+        name: item.name,
+        lat: item.lat,
+        lon: item.lon,
+        country: item.country,
+        state: item.state,
+      }))
+      setLocations(formattedLocations)
+    } catch (error) {
+      console.error('Error fetching locations:', error)
+      setLocations([])
+    }
+  }
+
+  const debouncedFetchLocations = useCallback(
+    MUI.debounce((query: string) => fetchLocations(query), 300),
+    [],
+  )
 
   const renderCreateDestination = useCallback(() => {
     return (
@@ -87,7 +130,32 @@ export default function DestinationCreate(props: DestinationCreateProps) {
         <MUI.Box sx={{ gap: 4 }}>
           <MUI.Box sx={{ flexDirection: 'column' }}>
             <MUI.Stack spacing={2}>
-              <MUI.TextField
+              <MUI.Autocomplete
+                id="destination-search"
+                options={locations}
+                getOptionLabel={(option) =>
+                  option.state ?
+                    `${option.name}, ${option.state} (${option.country})`
+                  : `${option.name} (${option.country})`
+                }
+                value={selectedLocation}
+                onChange={(event, newValue) => {
+                  setSelectedLocation(newValue)
+                }}
+                onInputChange={(event, newInputValue) => {
+                  debouncedFetchLocations(newInputValue)
+                }}
+                renderInput={(params) => (
+                  <MUI.TextField
+                    {...params}
+                    required
+                    error={destError}
+                    helperText={destError && 'Destination selection is required.'}
+                    label="Search Destination"
+                  />
+                )}
+              />
+              {/* <MUI.TextField
                 required
                 error={destError}
                 helperText={destError && 'Destination name is required.'}
@@ -95,7 +163,7 @@ export default function DestinationCreate(props: DestinationCreateProps) {
                 label="Destination Name"
                 value={fields.destinationName}
                 onChange={handleFieldChange}
-              />
+              /> */}
               {timeError && (
                 <MUI.Typography color="error" variant="subtitle1">
                   Dates need to be within the planner's date.
@@ -110,7 +178,17 @@ export default function DestinationCreate(props: DestinationCreateProps) {
         </MUI.Box>
       </MUI.Box>
     )
-  }, [fields.destinationName, destError, timeError, startDate, endDate, startTime, endTime])
+  }, [
+    fields.destinationName,
+    destError,
+    timeError,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
+    locations,
+    selectedLocation,
+  ])
 
   return (
     <AdaptiveDialog

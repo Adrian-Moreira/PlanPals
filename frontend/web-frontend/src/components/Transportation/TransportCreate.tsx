@@ -15,6 +15,8 @@ import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import SelectItems from '../Common/SelectItems'
 import { getVehicleIcon } from './TransportItem'
+import { DraggableMarker } from '../DraggableMarker'
+import { MapContainer, TileLayer } from 'react-leaflet'
 
 const transportTypes = ['Bus', 'Train', 'Car', 'Airplane', 'Metro', 'Tram', 'Bicycle', 'Ferry']
 
@@ -33,6 +35,11 @@ export default function TransportCreate(props: TransportCreateProps) {
   const [endTime, setEndTime] = useState(plannerEndDate)
   const [isLoading, setIsLoading] = useState(false)
   const [pUser] = useAtom(ppUserAtom)
+
+  const [fromPosition, setFromPosition] = useState([51.505, -0.09]);
+  const [toPosition, setToPosition] = useState([51.515, -0.1]);
+  const [fromDraggable, setFromDraggable] = useState(false);
+  const [toDraggable, setToDraggable] = useState(false);
 
   const [transportType, setTransportType] = useState(transportTypes[0])
   const [fields, handleFieldChange] = useFormFields({
@@ -75,6 +82,26 @@ export default function TransportCreate(props: TransportCreateProps) {
                 value={fields.vehicleId}
                 onChange={handleFieldChange}
               />
+              <MUI.Typography variant="body1">
+                From
+              </MUI.Typography>
+              <MapContainer style={{ height: '300px', width: '100%' }} center={[fromPosition[0], fromPosition[1]]} zoom={13} scrollWheelZoom={true}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <DraggableMarker centre={[fromPosition[0], fromPosition[1]]} setCentre={(p) => setFromPosition(p)}></DraggableMarker>
+              </MapContainer>
+              <MUI.Typography variant="body1">
+                To
+              </MUI.Typography>
+              <MapContainer style={{ height: '300px', width: '100%' }} center={[fromPosition[0], fromPosition[1]]} zoom={13} scrollWheelZoom={true}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <DraggableMarker centre={[toPosition[0], toPosition[1]]} setCentre={(p) => setToPosition(p)}></DraggableMarker>
+              </MapContainer>
               {timeError && (
                 <MUI.Typography color="error" variant="subtitle1">
                   Dates need to be within the planner's date.
@@ -89,7 +116,7 @@ export default function TransportCreate(props: TransportCreateProps) {
         </MUI.Box>
       </MUI.Box>
     )
-  }, [transportType, timeError, fields.transportDetails, fields.vehicleId, startDate, endDate, startTime, endTime])
+  }, [transportType, timeError, fields.transportDetails, fields.vehicleId, startDate, endDate, startTime, endTime, fromPosition, toPosition])
 
   const handleSubmitTransportation = useCallback(
     async (event: any) => {
@@ -104,6 +131,9 @@ export default function TransportCreate(props: TransportCreateProps) {
             type: transportType,
             vehicleId: fields.vehicleId,
             details: fields.transportDetails,
+
+            from: fromPosition,
+            to: toPosition
           },
         })
         if (res.data.success) {
@@ -121,21 +151,21 @@ export default function TransportCreate(props: TransportCreateProps) {
         onError('Erorr Creating Transportation. Please retry later!')
       }
     },
-    [fields.transportDetails, fields.vehicleId, startDate, startTime, endDate, endTime, pUser.ppUser],
+    [fields.transportDetails, fields.vehicleId, startDate, startTime, endDate, endTime, pUser.ppUser, fromPosition, toPosition],
   )
 
   const validateCreateTransportForm = useCallback(() => {
     const isTimeValid =
-      startDate.isBefore(endDate) &&
+    combineDateAndTime(startDate, startTime).isBefore(combineDateAndTime(endDate, endTime)) &&
       combineDateAndTime(startDate, startTime).isAfter(plannerStartDate) &&
       combineDateAndTime(endDate, endTime).isBefore(plannerEndDate)
     setTimeError(!isTimeValid)
     return isTimeValid
-  }, [startDate, endDate, startTime, endTime])
+  }, [startDate, endDate, startTime, endTime, plannerStartDate, plannerEndDate])
 
   useEffect(() => {
     validateCreateTransportForm()
-  }, [startDate, endDate, startTime, endTime])
+  }, [startDate, endDate, startTime, endTime, plannerStartDate, plannerEndDate, validateCreateTransportForm])
 
   return (
     <AdaptiveDialog

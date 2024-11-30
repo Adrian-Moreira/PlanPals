@@ -4,6 +4,17 @@ export interface MessageTopic {
 	id: string; // userId | plannerId | userId
 }
 
+/**
+ * Parses a topic string into a Topic object.
+ *
+ * The topic string is expected to be a colon-separated string of the form
+ * "type:id". The type must be one of the MessageTopicType values.
+ *
+ * If the topic string is not valid, this function returns null.
+ *
+ * @param {string} topicStr The topic string to parse.
+ * @returns {Topic|null} A Topic object if the string is valid, null otherwise.
+ */
 export const mkTopic = (topicStr: string): Topic | null => {
 	const topic = topicStr.split(":", 2);
 	const parsedType = topic[0] as MessageTopicType;

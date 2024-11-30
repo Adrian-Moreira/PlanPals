@@ -138,13 +138,13 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
           </MUI.Stack>
           <MUI.Box sx={{ flexDirection: 'column' }}>
             <MUI.Stack spacing={2}>
-              <MUI.Typography variant="h6">Add a Destination</MUI.Typography>
+              {/* <MUI.Typography variant="h6">Add a Destination</MUI.Typography>
               <MUI.TextField
                 id="destinationName"
                 label="Destination"
                 value={fields.destinationName}
                 onChange={handleFieldChange}
-              />
+              /> */}
               <MUI.Typography variant="h6">Add Pals to plan together!</MUI.Typography>
               <MUI.Autocomplete
                 multiple
