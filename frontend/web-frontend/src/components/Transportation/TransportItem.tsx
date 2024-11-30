@@ -76,10 +76,11 @@ export default function TransportItem(props: TransportProps) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const handleDeleteAction = useCallback(async () => {
-    const res = await apiLib.delete(`/planner/${props.plannerId}/transportation/${props._id}`, {
-      params: { userId: props.currentUserId },
-    })
-    if (!res.data.success) {
+    try {
+      const res = await apiLib.delete(`/planner/${props.plannerId}/transportation/${props._id}`, {
+        params: { userId: props.currentUserId },
+      })
+    } catch {
       onError("Error deleting: Transport mightn't be removed")
     }
   }, [])
@@ -149,11 +150,9 @@ export default function TransportItem(props: TransportProps) {
         <CommentButton id={props._id} type={'Transport'} userId={props.currentUserId} plannerId={props.plannerId} />
       </MUI.CardActions>
 
-      {(props.from && props.from[0] && props.from[1] && props.to && props.to[0] && props.to[1]) ?
-        <GeodesicPath
-          from={[props.from[0], props.from[1]]}
-          to={[props.to[0], props.to[1]]}
-        /> : <>  </>}
+      {props.from && props.from[0] && props.from[1] && props.to && props.to[0] && props.to[1] ?
+        <GeodesicPath from={[props.from[0], props.from[1]]} to={[props.to[0], props.to[1]]} />
+      : <> </>}
     </MUI.Card>
   )
 }

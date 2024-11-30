@@ -104,7 +104,7 @@ DestinationMongoSchema.pre('findOneAndDelete', async function (next) {
       ),
     )
   } catch (err: any) {
-    next(err)
+    console.error(err)
   }
 
   next()

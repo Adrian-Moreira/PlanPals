@@ -81,7 +81,7 @@ TransportMongoSchema.pre('findOneAndDelete', async function (next) {
 
     await PlannerModel.findOneAndUpdate({ _id: plannerId }, { $pull: { transportations: transportId } }, { new: true })
   } catch (err: any) {
-    next(err)
+    console.error(err)
   }
 
   next()

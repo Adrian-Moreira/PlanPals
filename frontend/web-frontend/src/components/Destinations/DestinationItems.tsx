@@ -24,16 +24,20 @@ export default function DestinationItems(props: DestinationItemsProps) {
     setIsLoading(true)
     const dList = await Promise.all(
       props.planner.destinations.map(async (did) => {
-        const res = await apiLib
-          .get(`/planner/${props.planner._id}/destination/${did}`, {
-            params: { userId: pUser.ppUser!._id },
-          })
-          .then((res) => res)
-        return res.data.success ? res.data.data : {}
+        try {
+          const res = await apiLib
+            .get(`/planner/${props.planner._id}/destination/${did}`, {
+              params: { userId: pUser.ppUser!._id },
+            })
+            .then((res) => res)
+          return res.data.success ? res.data.data : {}
+        } catch {
+          return {}
+        }
       }),
     )
+    setListOfDestination(dList.filter((d) => d?._id && true) as DestinationProps[])
     setIsLoading(false)
-    setListOfDestination(dList)
   }, [pUser, props.planner._id])
 
   useEffect(() => {
@@ -79,6 +83,7 @@ export default function DestinationItems(props: DestinationItemsProps) {
             lon={d.lon}
             country={d.country}
             state={d.state}
+            currentUserId={pUser.ppUser!._id}
           />
         )),
     )

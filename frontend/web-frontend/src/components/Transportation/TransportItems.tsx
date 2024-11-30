@@ -26,16 +26,18 @@ export default function TransportItems(props: TransportItemsProps) {
     setIsLoading(true)
     const dList = await Promise.all(
       props.planner.transportations.map(async (tid) => {
-        const res = await apiLib
-          .get(`/planner/${props.planner._id}/transportation/${tid}`, {
+        try {
+          const res = await apiLib.get(`/planner/${props.planner._id}/transportation/${tid}`, {
             params: { userId: pUser.ppUser!._id },
           })
-          .then((res) => res)
-        return res.data.success ? res.data.data : {}
+          return res.data.success ? res.data.data : {}
+        } catch {
+          return {}
+        }
       }),
     )
+    setTList(dList.filter((d) => d?._id && true) as TransportProps[])
     setIsLoading(false)
-    setTList(dList)
   }, [pUser, props.planner._id])
 
   useEffect(() => {

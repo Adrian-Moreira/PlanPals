@@ -87,7 +87,7 @@ CommentMongoSchema.pre('findOneAndDelete', async function (next) {
     await CommentsModel.findOneAndDelete(commentObjectId)
     await VoteModel.findOneAndDelete(commentObjectId)
   } catch (err: any) {
-    next(err)
+    console.error(err)
   }
 })
 export const CommentCollection = 'Comment'
