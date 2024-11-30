@@ -45,10 +45,14 @@ async function verifyDestinationExists(req: Request, res: Response, next: NextFu
  * @throws {RecordConflictException} If a destination with the same details already exists.
  */
 const createDestinationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { targetUser, startDate, endDate, name, targetPlanner } = req.body.out
+  const { targetUser, startDate, endDate, name, lat, lon, country, state, targetPlanner } = req.body.out
 
   const newDestination = await DestinationModel.create({
     name,
+    lat,
+    lon,
+    country,
+    state,
     startDate,
     endDate,
     createdBy: targetUser._id,
@@ -82,9 +86,13 @@ const createDestinationDocument = async (req: Request, res: Response, next: Next
  * @throws {RecordNotFoundException} If the destination does not exist.
  */
 const updateDestinationDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { targetDestination, name, startDate, endDate } = req.body.out
+  const { targetDestination, name, lat, lon, country, state, startDate, endDate } = req.body.out
 
   targetDestination.name = name || targetDestination.name
+  targetDestination.lat = lat || targetDestination.lat
+  targetDestination.lon = lon || targetDestination.lon
+  targetDestination.country = country || targetDestination.country
+  targetDestination.state = state || targetDestination.state
   targetDestination.startDate = startDate || targetDestination.startDate
   targetDestination.endDate = endDate || targetDestination.endDate
 

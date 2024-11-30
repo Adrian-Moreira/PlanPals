@@ -25,6 +25,18 @@ const DestinationMongoSchema = new Schema<Destination>(
       type: String,
       required: true,
     },
+    lat: {
+      type: Number,
+    },
+    lon: {
+      type: Number,
+    },
+    country: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
     activities: {
       type: [Schema.Types.ObjectId],
       required: true,
@@ -57,6 +69,11 @@ export const DestinationSchema = z.object({
   name: z.string(),
   activities: z.array(ObjectIdSchema),
   accommodations: z.array(ObjectIdSchema),
+
+  lat: z.number().optional(),
+  lon: z.number().optional(),
+  country: z.string().optional(),
+  state: z.string().optional(),
 
   plannerId: ObjectIdSchema,
 })

@@ -12,6 +12,10 @@ const DestinationRouteSchema = {
       startDate: z.string().datetime().or(z.date()),
       endDate: z.string().datetime().or(z.date()),
       name: z.string().min(1),
+      lat: z.number().optional(),
+      lon: z.number().optional(),
+      country: z.string().optional(),
+      state: z.string().optional(),
     }),
   }),
   getDestinationById: ReqAttrSchema.extend({
@@ -38,6 +42,10 @@ const DestinationRouteSchema = {
     }),
     body: z.object({
       name: z.string().min(1).optional(),
+      lat: z.number().optional(),
+      lon: z.number().optional(),
+      country: z.string().optional(),
+      state: z.string().optional(),
       startDate: z.string().datetime().or(z.date()).optional(),
       endDate: z.string().datetime().or(z.date()).optional(),
     }),
