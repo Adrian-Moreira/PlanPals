@@ -27,7 +27,7 @@ const TodoListRouteSchema = {
       description: z.string().optional(),
       rwUsers: z.array(ObjectIdStringSchema).optional(),
       roUsers: z.array(ObjectIdStringSchema).optional(),
-      items: z.array(ObjectIdStringSchema).optional(),
+      tasks: z.array(ObjectIdStringSchema).optional(),
     }),
   }),
   updateTodoList: ReqAttrSchema.extend({
@@ -36,7 +36,7 @@ const TodoListRouteSchema = {
       description: z.string().optional(),
       rwUsers: z.array(ObjectIdStringSchema).optional(),
       roUsers: z.array(ObjectIdStringSchema).optional(),
-      items: z.array(ObjectIdStringSchema).optional(),
+      tasks: z.array(ObjectIdStringSchema).optional(),
     }),
     query: z.object({
       userId: ObjectIdStringSchema,

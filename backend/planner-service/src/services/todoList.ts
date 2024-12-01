@@ -15,7 +15,7 @@ import { StatusCodes } from 'http-status-codes'
  * @remarks
  * This function is called by the `createTodoList` endpoint.
  * It creates a new TodoList document in the database and adds it to the user.
- * The TodoList document is created with the given name, description, items, and access control lists.
+ * The TodoList document is created with the given name, description, tasks, and access control lists.
  * The function adds the given user to the read-write list of the TodoList.
  * The function returns the new TodoList document in `req.body.result`.
  * The function sets `req.body.dataType` to 'TodoList'.
@@ -24,7 +24,7 @@ import { StatusCodes } from 'http-status-codes'
  * The function sets `req.body.status` to 201 (Created).
  */
 export const createTodoListDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  let { targetUser, name, description, items, rwUsers, roUsers } = req.body.out
+  let { targetUser, name, description, tasks, rwUsers, roUsers } = req.body.out
 
   if (!rwUsers?.includes(targetUser._id)) {
     rwUsers.push(targetUser._id)
@@ -34,7 +34,7 @@ export const createTodoListDocument = async (req: Request, res: Response, next: 
     createdBy: targetUser._id,
     name,
     description,
-    items,
+    tasks,
     rwUsers,
     roUsers,
   })
@@ -59,7 +59,7 @@ export const createTodoListDocument = async (req: Request, res: Response, next: 
  * @remarks
  * This function is called by the `updateTodoList` endpoint.
  * It updates a TodoList document in the database given a TodoList id.
- * The TodoList document is updated with the given name, description, items, and access control lists.
+ * The TodoList document is updated with the given name, description, tasks, and access control lists.
  * The function returns the updated TodoList document in `req.body.result`.
  * The function sets `req.body.dataType` to 'TodoList'.
  * The function sets `req.body.status` to 200 (OK).

@@ -50,7 +50,7 @@ todoListRouter.delete(
     publishUpdateEvent
 )
 
-todoListRouter.use('/:todoListId([0-9a-fA-F]{24})/item', todoTaskRouter)
+todoListRouter.use('/:todoListId([0-9a-fA-F]{24})/task', todoTaskRouter)
 
 export default todoListRouter
 
