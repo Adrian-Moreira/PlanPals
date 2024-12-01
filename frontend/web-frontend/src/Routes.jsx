@@ -4,6 +4,8 @@ import NotFound from './containers/NotFound.jsx'
 import Login from './containers/Login.jsx'
 import Signup from './containers/Signup.jsx'
 import PlannerDetail from './containers/PlannerDetail.jsx'
+import ShoppingLists from './containers/ShoppingLists.jsx'
+import ShoppingListDetail from './containers/ShoppingListDetail.jsx'
 import About from './containers/About.jsx'
 
 export default function Links() {
@@ -15,6 +17,8 @@ export default function Links() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/planner/:id" element={<PlannerDetail />} />
       <Route path="/planners" element={<Home />} />
+      <Route path="/shoppingList/:id" element={<ShoppingListDetail />} />
+      <Route path="/shoppingLists" element={<ShoppingLists />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

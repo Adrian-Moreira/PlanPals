@@ -62,6 +62,7 @@ function App() {
             handleSignup={() => nav('/signup')}
             handleAbout={() => nav('/about')}
             handlePlanners={() => nav('/planners')}
+            handleShoppingLists={() => nav('/shoppingLists')}
             ppUser={pUser}
           ></ResponsiveAppBar>
           <Routes />
