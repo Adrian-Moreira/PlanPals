@@ -5,21 +5,27 @@ import { RecordNotFoundException } from '../exceptions/RecordNotFoundException'
 import { Types } from 'mongoose';
 
 export const createShoppingList = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { name, description, createdBy, rwUsers, items } = req.body.out;
-
-  const shoppingList = await ShoppingListModel.create({
-    name,
-    description,
-    createdBy,
-    rwUsers: [createdBy, ...(rwUsers || [])],
-    items,
-  });
-
-  req.body.result = shoppingList;
-  req.body.dataType = ShoppingListCollection;
-  req.body.status = StatusCodes.CREATED;
-  next();
-};
+    const { name, description, createdBy, rwUsers, items } = req.body.out;
+  
+    try {
+      const uniqueRwUsers = Array.from(new Set([createdBy, ...(rwUsers || [])]));
+  
+      const shoppingList = await ShoppingListModel.create({
+        name,
+        description,
+        createdBy,
+        rwUsers: uniqueRwUsers,
+        items,
+      });
+  
+      req.body.result = shoppingList;
+      req.body.dataType = ShoppingListCollection;
+      req.body.status = StatusCodes.CREATED;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
 
 export const addItemToShoppingList = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { shoppingListId } = req.params;
