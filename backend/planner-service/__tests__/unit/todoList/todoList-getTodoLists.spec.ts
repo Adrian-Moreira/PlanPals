@@ -2,8 +2,8 @@ import sinon from 'sinon'
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals'
 import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { TodoListModel } from '../../models/TodoList'
-import TodoListService from '../../services/todoList'
+import { TodoListModel } from '../../../src/models/TodoList'
+import TodoListService from '../../../src/services/todoList'
 
 describe('TodoList->getTodoLists', () => {
   let todoListMock: sinon.SinonMock
@@ -50,7 +50,7 @@ describe('TodoList->getTodoLists', () => {
   it('should get existing todoLists for a user', async () => {
     req.body.out.targetUser = targetUser1
 
-    todoListMock.expects('find').withArgs({ rwUsers: targetUser1._id }).resolves([existingTodoList])
+    todoListMock.expects('find').withArgs({ createdBy: targetUser1._id }).resolves([existingTodoList])
 
     await TodoListService.getTodoListDocumentsByUserId(req as Request, res as Response, next as NextFunction)
 
@@ -87,7 +87,7 @@ describe('TodoList->getTodoLists', () => {
     req.body.out.targetUser = targetUser2
     req.body.out.access = 'rw'
 
-    todoListMock.expects('find').withArgs({ roUsers: targetUser2._id }).resolves(null)
+    todoListMock.expects('find').withArgs( { $or: [{ createdBy: targetUser2._id }, { rwUsers: targetUser2._id }] }).resolves(null)
 
     await TodoListService.getTodoListDocumentsByUserId(req as Request, res as Response, next as NextFunction)
 

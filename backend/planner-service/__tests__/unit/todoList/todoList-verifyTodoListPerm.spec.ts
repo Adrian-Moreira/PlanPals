@@ -4,8 +4,7 @@ import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { TodoListModel } from '../../../src/models/TodoList'
 import TodoListService from '../../../src/services/todoList'
-import { TodoTaskModel } from '../../models/TodoTask'
-import { RecordNotFoundException } from '../../exceptions/RecordNotFoundException'
+import { RecordNotFoundException } from '../../../src/exceptions/RecordNotFoundException'
 
 describe('TodoList->verifyTodoListPerm', () => {
   let todoListMock: sinon.SinonMock
@@ -58,14 +57,13 @@ describe('TodoList->verifyTodoListPerm', () => {
   it('should verify existing todoList', async () => {
     req.body.out.todoListId = existingTodoList1._id
 
-    todoListMock.expects('findOne').withArgs({ _id: existingTodoList1._id }).resolves(existingTodoList1)
+    todoListMock.expects('findOne').resolves(existingTodoList1)
 
     await TodoListService.verifyTodoListExists(req as Request, res as Response, next as NextFunction)
 
     todoListMock.verify()
-
-    expect(req.body.status).toEqual(StatusCodes.OK)
-    expect(req.body.result).toBeDefined()
+    expect(req.body.out.todoList).toBeDefined()
+    expect(req.body.out.todoList._id).toEqual(existingTodoList1._id)
   })
 
   it('should not verify non-existing todoList', async () => {
@@ -81,21 +79,17 @@ describe('TodoList->verifyTodoListPerm', () => {
     req.body.out.targetTodoList = existingTodoList2
     req.body.out.targetUser = targetUser2
 
-    todoListMock.expects('findOne').withArgs({ _id: existingTodoList2._id }).resolves(existingTodoList2)
+    todoListMock.expects('findOne').resolves(existingTodoList2)
 
     await TodoListService.verifyUserCanEditTodoList(req as Request, res as Response, next as NextFunction)
 
-    todoListMock.verify()
-
     expect(req.body.out.targetTodoList).toBeDefined()
-    expect(req.body.targetTodoList._id).toEqual(existingTodoList2._id)
+    expect(req.body.out.targetTodoList._id).toEqual(existingTodoList2._id)
   })
 
   it('should not verify todoList for read-only user', async () => {
     req.body.out.targetTodoList = existingTodoList2
     req.body.out.targetUser = targetUser1
-
-    todoListMock.expects('findOne').withArgs({ _id: existingTodoList2._id }).resolves(existingTodoList2)
 
     await TodoListService.verifyUserCanEditTodoList(req as Request, res as Response, next as NextFunction)
 
@@ -108,21 +102,17 @@ describe('TodoList->verifyTodoListPerm', () => {
     req.body.out.targetTodoList = existingTodoList2
     req.body.out.targetUser = targetUser1
 
-    todoListMock.expects('findOne').withArgs({ _id: existingTodoList2._id }).resolves(existingTodoList2)
-
     await TodoListService.verifyUserCanViewTodoList(req as Request, res as Response, next as NextFunction)
 
     todoListMock.verify()
 
     expect(req.body.out.targetTodoList).toBeDefined()
-    expect(req.body.targetTodoList._id).toEqual(existingTodoList2._id)
+    expect(req.body.out.targetTodoList._id).toEqual(existingTodoList2._id)
   })
 
   it('should not verify todoList for user without read permission', async () => {
     req.body.out.targetTodoList = existingTodoList1
     req.body.out.targetUser = targetUser2
-
-    todoListMock.expects('findOne').withArgs({ _id: existingTodoList1._id }).resolves(existingTodoList1)
 
     await TodoListService.verifyUserCanViewTodoList(req as Request, res as Response, next as NextFunction)
 

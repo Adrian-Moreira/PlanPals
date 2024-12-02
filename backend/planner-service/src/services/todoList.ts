@@ -42,7 +42,7 @@ export const createTodoListDocument = async (req: Request, res: Response, next: 
   req.body.result = todoList
   req.body.dataType = TodoListCollection
   req.body.todoListId = todoList._id
-  req.body.userIds = [todoList.createdBy, ...todoList.rwUsers, ...todoList.roUsers]
+  req.body.userIds = [todoList.createdBy, ...todoList.roUsers, ...todoList.rwUsers,]
   req.body.status = StatusCodes.CREATED
   next()
 }
@@ -226,7 +226,7 @@ async function verifyUserCanEditTodoList(req: Request, res: Response, next: Next
 
   if (
     !targetTodoList.rwUsers.includes(targetUser._id) &&
-    targetTodoList.createdBy?._id.toString() !== targetUser._id.toString()
+    targetTodoList.createdBy?.toString() !== targetUser._id.toString()
   ) {
     req.body.err = new RecordNotFoundException({
       recordType: 'todoList',
@@ -259,7 +259,7 @@ async function verifyUserCanViewTodoList(req: Request, res: Response, next: Next
   if (
     !targetTodoList.roUsers.includes(targetUser._id) &&
     !targetTodoList.rwUsers.includes(targetUser._id) &&
-    targetTodoList.createdBy?._id.toString() !== targetUser._id.toString()
+    targetTodoList.createdBy?.toString() !== targetUser._id.toString()
   ) {
     req.body.err = new RecordNotFoundException({
       recordType: 'todoList',

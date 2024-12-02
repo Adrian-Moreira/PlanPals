@@ -4,8 +4,6 @@ import { TodoTaskModel } from './TodoTask'
 import { CommentsModel } from './Comment'
 import { VoteModel } from './Vote'
 
-export const TodoListCollection = 'TodoList'
-
 export const ObjectIdSchema = z.instanceof(Types.ObjectId).refine((val) => Types.ObjectId.isValid(val), {
   message: 'Invalid ObjectId',
 })
@@ -26,9 +24,9 @@ const TodoListMongoSchema = new Schema<TodoList>(
     },
     name: { type: String, required: true },
     description: { type: String, required: true },
-    tasks: [{ type: Schema.Types.ObjectId, ref: 'TodoTask' }],
-    rwUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    roUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    tasks: { type: [Schema.Types.ObjectId], required: true, ref: 'TodoTask' },
+    roUsers: { type: [Schema.Types.ObjectId], required: true, ref: 'User' },
+    rwUsers: { type: [Schema.Types.ObjectId], required: true, ref: 'User' },
   },
   { _id: true, timestamps: true },
 )
@@ -70,5 +68,6 @@ TodoListMongoSchema.pre('findOneAndDelete', async function (next) {
   next()
 })
 
+export const TodoListCollection = 'TodoList'
 export const TodoListModel = mongoose.model(TodoListCollection, TodoListMongoSchema)
 export type TodoList = z.infer<typeof TodoListSchema>

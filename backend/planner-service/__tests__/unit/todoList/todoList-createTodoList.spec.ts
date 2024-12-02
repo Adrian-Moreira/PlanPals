@@ -3,7 +3,7 @@ import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals
 import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { TodoTaskModel } from '../../../src/models/TodoTask'
-import TodoTaskService from '../../../src/services/todoTask'
+import TodoListService from '../../../src/services/todoList'
 
 describe('TodoList->createTodoList', () => {
   let todoListMock: sinon.SinonMock
@@ -44,15 +44,8 @@ describe('TodoList->createTodoList', () => {
   })
 
   it('should create todo list', async () => {
-    todoListMock.expects('create').resolves({
-      createdBy: targetUser._id,
-      name: 'test',
-      description: 'test',
-      roUsers: [],
-      rwUsers: [targetUser._id],
-      tasks: [],
-    })
-    await TodoTaskService.createTodoTaskDocument(req as Request, res as Response, next as NextFunction)
+    todoListMock.expects('create').resolves(newTodoList)
+    await TodoListService.createTodoListDocument(req as Request, res as Response, next as NextFunction)
 
     // Verify mocks
     todoListMock.verify()

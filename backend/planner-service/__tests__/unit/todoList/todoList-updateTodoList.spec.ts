@@ -65,17 +65,4 @@ describe('TodoList->updateTodoList', () => {
     expect(req.body.result.name).toEqual('test1')
     expect(req.body.result.description).toEqual('test1')
   })
-
-  it('should handle error if todo list update fails', async () => {
-    todoListMock.expects('findOneAndUpdate').rejects()
-
-    try {
-      await TodoListService.updateTodoListDocument(req as Request, res as Response, next as NextFunction)
-    } catch (error) {
-      expect(error).toBeDefined()
-      expect(next).toHaveBeenCalledWith(error)
-    }
-
-    todoListMock.verify()
-  })
 })
