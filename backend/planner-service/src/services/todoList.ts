@@ -35,8 +35,8 @@ export const createTodoListDocument = async (req: Request, res: Response, next: 
     name,
     description,
     tasks,
-    rwUsers,
     roUsers,
+    rwUsers,
   })
 
   req.body.result = todoList

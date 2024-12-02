@@ -1,5 +1,5 @@
 import RequestUtils, { ReqAttrSchema } from '../utils/RequestUtils'
-import { ObjectIdStringSchema } from '../models/TodoTask'
+import { ObjectIdStringSchema } from '../models/TodoList'
 import z from 'zod'
 
 const TodoTaskRouteSchema = {
