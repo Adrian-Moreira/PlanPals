@@ -2,8 +2,7 @@ import { z } from 'zod';
 import mongoose, { Schema } from 'mongoose';
 import { CommentsModel } from './Comment';
 import { VoteModel } from './Vote';
-
-export const TodoTaskCollection = 'TodoTask';
+import { ObjectIdSchema, TodoListModel } from './TodoList';
 
 const TodoTaskMongoSchema = new Schema<TodoTask>(
   {
@@ -21,18 +20,11 @@ const TodoTaskMongoSchema = new Schema<TodoTask>(
   { _id: true, timestamps: true },
 );
 
-export const ObjectIdStringSchema = z
-  .string()
-  .refine((val) => mongoose.Types.ObjectId.isValid(val), {
-    message: 'Invalid ObjectId',
-  })
-  .transform((val) => new mongoose.Types.ObjectId(val));
-
 export const TodoTaskSchema = z.object({
-  _id: z.string(),
-  todoListId: ObjectIdStringSchema,
-  createdBy: ObjectIdStringSchema,
-  assignedTo: ObjectIdStringSchema,
+  _id: ObjectIdSchema,
+  todoListId: ObjectIdSchema,
+  createdBy: ObjectIdSchema,
+  assignedTo: ObjectIdSchema,
   createdAt: z.string().datetime().or(z.date()),
   updatedAt: z.string().datetime().or(z.date()),
   name: z.string(),
@@ -43,6 +35,7 @@ export const TodoTaskSchema = z.object({
 
 TodoTaskMongoSchema.pre('findOneAndDelete', async function (next) {
   const todoTaskId = this.getQuery()['_id']
+  const todoListId = this.getQuery()['todoListId']
   const todoTaskObjectId = {
     objectId: { id: todoTaskId, collection: 'TodoTask' },
   }
@@ -50,12 +43,15 @@ TodoTaskMongoSchema.pre('findOneAndDelete', async function (next) {
   try {
       await CommentsModel.findOneAndDelete(todoTaskObjectId)
       await VoteModel.findOneAndDelete(todoTaskObjectId)
-  } catch (error) {
+
+      await TodoListModel.findOneAndUpdate({ _id: todoListId }, { $pull: { tasks: todoTaskId } }, { new: true })
+  } catch (error : any) {
       console.error(error)
   }
   next()
   }
 )
 
-export const TodoTaskModel = mongoose.model(TodoTaskCollection, TodoTaskMongoSchema);
+export const TodoTaskCollection = 'TodoTask';
+export const TodoTaskModel = mongoose.model<TodoTask>(TodoTaskCollection, TodoTaskMongoSchema);
 export type TodoTask = z.infer<typeof TodoTaskSchema>;

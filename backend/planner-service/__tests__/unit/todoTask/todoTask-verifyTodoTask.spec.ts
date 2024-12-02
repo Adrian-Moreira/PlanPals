@@ -41,7 +41,7 @@ describe('TodoTask->verifyTodoTask', () => {
     req = {
       body: {
         out: {
-          targetTodoTask: existingTodoTask,
+          targetTodoTaskId: existingTodoTask._id,
           targetTodoList: existingTodoList,
         },
       },
@@ -53,18 +53,15 @@ describe('TodoTask->verifyTodoTask', () => {
     todoTaskMock.restore()
   })
 
-  it('should verify existing todo task', async () => {
+  it('should handle existing todo task', async () => {
     todoTaskMock.expects('findOne').resolves(existingTodoTask)
 
     await TodoTaskService.verifyTodoTaskExists(req as Request, res as Response, next as NextFunction)
 
     // Verify mocks
     todoTaskMock.verify()
-    expect(req.body.status).toEqual(StatusCodes.OK)
-    expect(req.body.result).toBeDefined()
-    expect(req.body.result.name).toEqual('test')
-    expect(req.body.result.assignedTo).toEqual(targetUser._id)
-    expect(req.body.result.isCompleted).toEqual(false)
+    expect(req.body.out.targetTodoTask).toBeDefined()
+    expect(req.body.out.targetTodoTask._id).toEqual(existingTodoTask._id)
   })
 
   it('should handle non-existing todo task', async () => {
@@ -74,7 +71,6 @@ describe('TodoTask->verifyTodoTask', () => {
 
     // Verify mocks
     todoTaskMock.verify()
-    expect(req.body.status).toEqual(StatusCodes.NOT_FOUND)
-    expect(req.body.result).toBeUndefined()
+    expect(req.body.err).toBeDefined()
   })
 })

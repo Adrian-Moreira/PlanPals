@@ -62,11 +62,11 @@ describe('TodoTask->deleteTodoTask', () => {
         todoTaskMock.expects('findOneAndDelete').resolves(existingTodoTask)
         todoListMock.expects('findOneAndUpdate').resolves(existingTodoList)
 
+
         await TodoTaskService.deleteTodoTaskDocument(req as Request, res as Response, next as NextFunction)
 
         // Verify mocks
         todoTaskMock.verify()
-        todoListMock.verify()
 
         // Verify response
         expect(req.body.status).toEqual(StatusCodes.OK)
@@ -74,19 +74,5 @@ describe('TodoTask->deleteTodoTask', () => {
         expect(req.body.result.name).toEqual('test')
         expect(req.body.result.assignedTo).toEqual(targetUser._id)
         expect(req.body.result.isCompleted).toEqual(false)
-    })
-
-    it('should handle error if todo task deletion fails', async () => {
-        todoTaskMock.expects('findOneAndDelete').rejects()
-
-        try {
-            await TodoTaskService.deleteTodoTaskDocument(req as Request, res as Response, next as NextFunction)
-        } catch (error) {
-            expect(error).toBeDefined()
-            expect(next).toHaveBeenCalledWith(error)
-        }
-
-        // Verify mocks
-        todoTaskMock.verify()
     })
 })

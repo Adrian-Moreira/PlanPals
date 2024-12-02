@@ -57,15 +57,16 @@ describe('TodoTask->createTodoTask', () => {
     todoListMock.restore()
   })
 
-  it('should should create new todo task under existing todo list', async () => {
+  it('should create new todo task under existing todo list', async () => {
     todoListMock.expects('findOneAndUpdate').resolves(existingTodoList)
+
     todoTaskMock.expects('create').resolves({
       createdBy: targetUser._id,
       todoListId: existingTodoList._id,
       name: 'test',
       assignedTo: targetUser._id,
       isCompleted: false,
-      dueDate: new Date(),
+      dueDate: newTodoTask.dueDate,
     })
 
     await TodoTaskService.createTodoTaskDocument(req as Request, res as Response, next as NextFunction)
@@ -75,7 +76,7 @@ describe('TodoTask->createTodoTask', () => {
     todoTaskMock.verify()
 
     // Verify response
-    expect(req.body.status).toEqual(StatusCodes.OK)
+    expect(req.body.status).toEqual(StatusCodes.CREATED)
     expect(req.body.result).toBeDefined()
     expect(req.body.result.createdBy).toEqual(targetUser._id)
     expect(req.body.result.todoListId).toEqual(existingTodoList._id)

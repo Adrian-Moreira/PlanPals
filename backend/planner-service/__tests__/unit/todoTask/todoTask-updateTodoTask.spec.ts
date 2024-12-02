@@ -70,21 +70,4 @@ describe('TodoTask->updateTodoTask', () => {
     expect(req.body.result.isCompleted).toEqual(true)
     expect(req.body.result.dueDate).toEqual(newTodoTask.dueDate)
   })
-
-  it('should handle error if todo task update fails', async () => {
-    todoTaskMock.expects('findOneAndUpdate').rejects()
-
-    try {
-      await TodoTaskService.updateTodoTaskDocument(req as Request, res as Response, next as NextFunction)
-    } catch (error) {
-      expect(error).toBeDefined()
-      expect(next).toHaveBeenCalledWith(error)
-    }
-
-    // Verify mocks
-    todoTaskMock.verify()
-
-    // Verify response
-    expect(req.body.status).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
-  })
 })

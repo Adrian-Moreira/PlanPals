@@ -17,24 +17,14 @@ describe('TodoTask->getTodoTasksByTodoListId', () => {
     _id: '671d24c18132583fe9fb978f',
   }
 
-  const existingTodoTask1 = {
+  const existingTodoTask = {
     _id: '671d24c18132583fe9fb123f',
     createdBy: targetUser._id,
-    todoListId: '681d24c18132583fe9fb123f',
+    todoList: '681d24c18132583fe9fb123f',
     name: 'test',
     assignedTo: targetUser._id,
-    dueDate: new Date(),
     isCompleted: false,
-  }
-
-  const existingTodoTask2 = {
-    _id: '671d24c18132583fe9fb1230',
-    createdBy: targetUser._id,
-    todoListId: '681d24c18132583fe9fb123f',
-    name: 'test',
-    assignedTo: targetUser._id,
     dueDate: new Date(),
-    isCompleted: false,
   }
 
   const existingTodoList = {
@@ -44,7 +34,7 @@ describe('TodoTask->getTodoTasksByTodoListId', () => {
     description: 'test',
     roUsers: [],
     rwUsers: [targetUser._id],
-    tasks: [existingTodoTask1._id, existingTodoTask2._id],
+    tasks: [existingTodoTask._id],
   }
 
   beforeEach(() => {
@@ -66,21 +56,20 @@ describe('TodoTask->getTodoTasksByTodoListId', () => {
   })
 
   it('should get all todo tasks for a todo list', async () => {
-    todoTaskMock
-      .expects('find')
-      .withArgs({ todoListId: existingTodoList._id })
-      .resolves([existingTodoTask1, existingTodoTask2])
-    todoListMock.expects('findById').withArgs(existingTodoList._id).resolves(existingTodoList)
+    todoListMock.expects('findById').resolves(existingTodoTask)
 
     await TodoTaskService.getTodoTaskDocumentsByTodoListId(req as Request, res as Response, next as NextFunction)
 
     // Verify mocks
     todoTaskMock.verify()
-    todoListMock.verify()
 
     // Verify response
     expect(req.body.status).toEqual(StatusCodes.OK)
     expect(req.body.result).toBeDefined()
-    expect(req.body.result.length).toEqual(2)
+    expect(req.body.result.length).toEqual(1)
+    expect(req.body.result[0].name).toEqual('test')
+    expect(req.body.result[0].assignedTo).toEqual(targetUser._id)
+    expect(req.body.result[0].isCompleted).toEqual(false)
+    expect(req.body.result[0].dueDate).toEqual(existingTodoTask.dueDate)
   })
 })

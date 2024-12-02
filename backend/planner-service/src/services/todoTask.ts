@@ -14,14 +14,14 @@ import { TodoListModel } from '../models/TodoList'
  * @remarks
  * This function is called by the `createTodoTask` endpoint.
  * It creates a new TodoTask document in the database and adds it to the user.
- * The TodoTask document is created with the given name, description, items, and access control lists.
+ * The TodoTask document is created with the given name, description, tasks, and access control lists.
  * The function adds the given user to the read-write list of the TodoTask.
  * The function returns the new TodoTask document in `req.body.result`.
  * The function sets `req.body.dataType` to 'TodoTask'.
  * The function sets `req.body.status` to 201 (Created).
  */
 const createTodoTaskDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { targetTodoList, todoListId, targetUser, name, assignedTo, dueDate, isCompleted } = req.body.out
+  const { targetUser, targetTodoList, todoListId, name, assignedTo, dueDate, isCompleted } = req.body.out
 
   const createdTodoTask = await TodoTaskModel.create({
     todoListId,
@@ -32,9 +32,9 @@ const createTodoTaskDocument = async (req: Request, res: Response, next: NextFun
     dueDate,
     isCompleted,
   })
-  targetTodoList.items.push(createdTodoTask._id)
+  targetTodoList.tasks.push(createdTodoTask._id)
 
-  await TodoListModel.findOneAndUpdate({ _id: todoListId }, { items: targetTodoList.items }, { new: true })
+  await TodoListModel.findOneAndUpdate({ _id: todoListId }, { tasks: targetTodoList.tasks }, { new: true })
 
   req.body.result = createdTodoTask
   req.body.dataType = TodoTaskCollection
@@ -52,7 +52,7 @@ const createTodoTaskDocument = async (req: Request, res: Response, next: NextFun
  * @remarks
  * This function is called by the `updateTodoTask` endpoint.
  * It updates a TodoTask document in the database given a TodoTask id.
- * The TodoTask document is updated with the given name, description, items, and access control lists.
+ * The TodoTask document is updated with the given name, description, tasks, and access control lists.
  * The function returns the updated TodoTask document in `req.body.result`.
  * The function sets `req.body.dataType` to 'TodoTask'.
  * The function sets `req.body.status` to 200 (OK).
@@ -142,7 +142,7 @@ const getTodoTaskDocumentById = async (req: Request, res: Response, next: NextFu
 const getTodoTaskDocumentsByTodoListId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetTodoList } = req.body.out
 
-  const resultTodoTasks: TodoTask[] = await targetTodoList.items.map((itemId: any) => TodoTaskModel.findById(itemId))
+  const resultTodoTasks: TodoTask[] = await targetTodoList.tasks.map((tid: any) => TodoTaskModel.findById(tid))
 
   req.body.result = await Promise.all(resultTodoTasks).then((results) => results.filter((result) => result !== null))
   req.body.status = StatusCodes.OK
@@ -170,7 +170,6 @@ async function verifyTodoTaskExists(req: Request, res: Response, next: NextFunct
     req.body.err = new RecordNotFoundException({
       recordType: 'todoTask',
       recordId: todoTaskId,
-      message: 'TodoTask does not exist',
     })
     next(req.body.err)
   }
