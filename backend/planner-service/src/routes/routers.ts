@@ -6,6 +6,7 @@ import userRouter from './user'
 import { voteRouter } from './vote'
 import { commentRouter } from './comment'
 import RequestUtils from '../utils/RequestUtils'
+import todoListRouter from './todoList/todoList'
 
 const router = express.Router()
 
@@ -14,6 +15,7 @@ router.use('/planner', plannerRouter)
 router.use('/vote', voteRouter)
 router.use('/comment', commentRouter)
 router.use('/shoppingList', shoppingListRouter)
+router.use('/todoList', todoListRouter)
 
 
 router.use(RequestUtils.mkSuccessResponse)
