@@ -1,15 +1,10 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
 import React, { useCallback, useEffect, useState } from 'react'
-import SelectItems from '../Common/SelectItems'
 import { ppUser, PPUser, ppUserAtom } from '../../lib/authLib'
 import CardActionButtons from '../Common/CardActionButtons'
-import DestinationItems from '../Destinations/DestinationItems'
-import DestinationCreate from '../Destinations/DestinationCreate'
 import AddButton from '../Common/AddButton'
-import TransportItems from '../Transportation/TransportItems'
-import TransportCreate from '../Transportation/TransportCreate'
-import { convertDatePairs } from '../../lib/dateLib'
+import ItemCreate from './ItemCreate'
 import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { onError } from '../../lib/errorLib'
@@ -36,14 +31,10 @@ export interface ShoppingListProps {
   shoppingList: PPShoppingList
 }
 
-// const tabs = ['Destination', 'Transportation']
-
 export default function ShoppingList(props: ShoppingListProps) {
-//   const [selectedTab, setSelectedTab] = useState(tabs[0])
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [currentDestination, setCurrentDestination] = useState({})
   const [creationDialogOpen, setCreationDialogOpen] = useState(false)
   const [pUser] = useAtom(ppUserAtom)
   const nav = useNavigate()
@@ -60,92 +51,27 @@ export default function ShoppingList(props: ShoppingListProps) {
   }, [])
   const handleEditShoppingList = useCallback(async () => {}, [])
 
-  const mkTabItems = useCallback(() => {
-    const elements = [
-      <MUI.Box display={'flex'} flexDirection={'row'} mt={'0.35em'} mb={'-0.3em'}>
-        <MUI.Typography flex={1} sx={{ pt: '0.2em', ml: '0.5em' }} variant="h6">
-          Items
-        </MUI.Typography>
-        {/* <MUI.Box sx={{ marginTop: '-1em' }}>
-          <SelectItems
-            children={tabs.map((selection) => (
-              <MUI.MenuItem key={selection} value={selection}>
-                <MUI.Typography variant="body1">{`${selection}`}</MUI.Typography>
-              </MUI.MenuItem>
-            ))}
-            helperText={''}
-            label={'Viewing'}
-            value={selectedTab}
-            id={'SelectShoppingListTab'}
-            setValue={(v) => {
-              setCreationDialogOpen(false)
-              setSelectedTab(v)
-            }}
-          />
-        </MUI.Box> */}
-        <AddButton
-          sx={{
-            mt: '-0.5em',
-            height: '3.5em',
-            width: '3.5em',
-            '&:hover': {
-              transform: 'scale(1.05)',
-              boxShadow: 3,
-              cursor: 'pointer',
-            },
-          }}
-          onClickListener={() => setCreationDialogOpen(true)}
-        ></AddButton>
-      </MUI.Box>,
-    ]
+  const [userNames, setUserNames] = useState({}) 
 
-    // elements.push(
-    //     <>
-    //       <DestinationCreate
-    //         open={creationDialogOpen}
-    //         setOpen={setCreationDialogOpen}
-    //         shoppingList={props.shoppingList}
-    //         setCurrentDestination={setCurrentDestination}
-    //       ></DestinationCreate>
-    //       <DestinationItems shoppingList={props.shoppingList} setCurrentDestination={setCurrentDestination} />
-    //     </>,
-    //   )
+  const fetchUserName = async (userId) => {
+    if (userNames[userId]) return userNames[userId] 
 
-    // switch (selectedTab) {
-    //   case tabs[0]:
-    //     elements.push(
-    //       <>
-    //         <DestinationCreate
-    //           open={creationDialogOpen}
-    //           setOpen={setCreationDialogOpen}
-    //           planner={props.planner}
-    //           setCurrentDestination={setCurrentDestination}
-    //         ></DestinationCreate>
-    //         <DestinationItems planner={props.planner} setCurrentDestination={setCurrentDestination} />
-    //       </>,
-    //     )
-    //     break
-    //   case tabs[1]:
-    //     elements.push(
-    //       <>
-    //         <TransportCreate
-    //           open={creationDialogOpen}
-    //           setOpen={setCreationDialogOpen}
-    //           planner={props.planner}
-    //         ></TransportCreate>
-    //         <TransportItems planner={props.planner}></TransportItems>
-    //       </>,
-    //     )
-    //     break
-    //   default:
-    //     elements.push(<MUI.Typography variant={'body1'}> No {selectedTab} </MUI.Typography>)
-    //     break
-    // }
+    try {
+      const response = await apiLib.get(`/user/${userId}`) 
+      if (response?.data.success) {
+        const data = response.data.data;
+        setUserNames((prev) => ({ ...prev, [userId]: data.userName })) 
+        return data.userName;
+      } else {
+        console.error(`Failed to fetch username for userId: ${userId}`)
+        return 'Unknown User'
+      }
+    } catch (error) {
+      console.error(`Error fetching username for userId: ${userId}`, error)
+      return 'Unknown User'
+    }
+  }
 
-    return <> {...elements}</>
-  }, [isLoading, creationDialogOpen, props.shoppingList._id])
-
-//   const { startDate, endDate } = convertDatePairs(props.planner.startDate, props.planner.endDate)
   return isLoading ?
       <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
         <MUI.CircularProgress />
@@ -186,26 +112,6 @@ export default function ShoppingList(props: ShoppingListProps) {
               <MUI.CardContent sx={{ ml: '1em' }}>
                 <MUI.Box sx={{ display: 'flex', flexDirection: 'row' }}>
                   <MUI.Stack gap={2} sx={{ flex: 1 }}>
-                    {/* <MUI.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                      <MUIcons.CalendarMonth sx={{ mt: '0.7em' }} />
-                      <MUI.Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                        <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="body2">
-                          {`${startDate}`}
-                        </MUI.Typography>
-                        <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="body2">{`${endDate}`}</MUI.Typography>
-                      </MUI.Box>
-                    </MUI.Box> */}
-                    {/* <MUI.Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                      <MUIcons.PeopleAlt sx={{ mt: '0.7em' }} />
-                      <MUI.Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                        <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="subtitle2">
-                          Pals who can see this shopping list:
-                        </MUI.Typography>
-                        <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="subtitle2">
-                          {props.shoppingList.roUsers.length < 1 ? 'None' : ''}
-                        </MUI.Typography>
-                      </MUI.Box>
-                    </MUI.Box> */}
                     <MUI.Box sx={{ display: 'flex', flexDirection: 'row' }}>
                       <MUIcons.People sx={{ mt: '0.7em' }} />
                       <MUI.Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
@@ -232,7 +138,60 @@ export default function ShoppingList(props: ShoppingListProps) {
             </MUI.Card>
           </MUI.Box>
           <MUI.Box sx={{ m: '0em 0.5em', pt: '1em' }} flex={1}>
-            {mkTabItems()}
+            <MUI.Box display={'flex'} flexDirection={'row'} mt={'0.35em'} mb={'-0.3em'}>
+                <MUI.Typography flex={1} sx={{ pt: '0.2em', ml: '0.5em' }} variant="h6">
+                    Items
+                </MUI.Typography>
+                <AddButton
+                sx={{
+                    mt: '-0.5em',
+                    height: '3.5em',
+                    width: '3.5em',
+                    '&:hover': {
+                    transform: 'scale(1.05)',
+                    boxShadow: 3,
+                    cursor: 'pointer',
+                    },
+                }}
+                onClickListener={() => setCreationDialogOpen(true)}
+                ></AddButton>
+                <ItemCreate
+                    open={creationDialogOpen}
+                    setOpen={setCreationDialogOpen}
+                    shoppingList={props.shoppingList}
+                ></ItemCreate>
+            </MUI.Box>
+            {props.shoppingList.items.map((item) => {
+
+                const [userName, setUserName] = useState('Loading...');
+
+                useEffect(() => {
+                    fetchUserName(item.addedBy).then((name) => setUserName(name));
+                }, [item.addedBy]);
+                return(
+                    <MUI.Card sx={{ borderRadius: '0.5em', marginTop: '0.5em', marginBottom: '0.5em' }}>
+                        <MUI.CardHeader
+                            avatar={<MUIcons.ShoppingCart />}
+                            title={item.name}
+                        ></MUI.CardHeader>
+                        <MUI.CardContent>
+                            <MUI.Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                                <MUIcons.Info sx={{ mt: '0.7em' }} />
+                                <MUI.Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                                <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="body2">
+                                    {`Available at ${item.location}`}
+                                </MUI.Typography>
+                                <MUI.Typography
+                                    sx={{ mt: '0.5em', pl: '1em' }}
+                                    variant="body2"
+                                >{`Created by: ${userName}`}</MUI.Typography>
+                                </MUI.Box>
+                            </MUI.Box>
+                        </MUI.CardContent>
+                    </MUI.Card>
+                )
+            })
+            }            
           </MUI.Box>
         </MUI.Box>
       </MUI.Stack>
