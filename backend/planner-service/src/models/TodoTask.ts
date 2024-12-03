@@ -24,7 +24,7 @@ export const TodoTaskSchema = z.object({
   _id: ObjectIdSchema,
   todoListId: ObjectIdSchema,
   createdBy: ObjectIdSchema,
-  assignedTo: ObjectIdSchema.optional(),
+  assignedTo: ObjectIdSchema,
   createdAt: z.string().datetime().or(z.date()),
   updatedAt: z.string().datetime().or(z.date()),
   name: z.string(),
