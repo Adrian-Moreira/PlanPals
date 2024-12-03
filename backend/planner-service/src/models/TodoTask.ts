@@ -13,7 +13,7 @@ const TodoTaskMongoSchema = new Schema<TodoTask>(
       ref: 'User' 
     },
     name: { type: String, required: true },
-    assignedTo: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
     dueDate: { type: String, required: true },
     isCompleted: { type: Boolean, required: true },
   },
@@ -24,11 +24,10 @@ export const TodoTaskSchema = z.object({
   _id: ObjectIdSchema,
   todoListId: ObjectIdSchema,
   createdBy: ObjectIdSchema,
-  assignedTo: ObjectIdSchema,
+  assignedTo: ObjectIdSchema.optional(),
   createdAt: z.string().datetime().or(z.date()),
   updatedAt: z.string().datetime().or(z.date()),
   name: z.string(),
-  description: z.string(),
   dueDate: z.string(),
   isCompleted: z.boolean(),
 });

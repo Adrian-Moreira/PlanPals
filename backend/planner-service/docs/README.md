@@ -13,6 +13,8 @@ Introduction: to be generated
 - [Vote Endpoints](#vote-endpoints)
 - [Comment Endpoints](#comment-endpoints)
 - [ShoppingList Endpoints](#shopping-list-endpoints)
+- [TodoList Endpoints](#todo-list-endpoints)
+- [TodoTask Endpoints](#todo-task-endpoints)
 
 ---
 
@@ -1118,6 +1120,247 @@ Introduction: to be generated
   Returns confirmation of deletion.
 
 ---
+
+## Todo List Endpoints
+
+**Base URL:** `/todoList`
+
+### Get Todo-Lists
+
+- **URL:** `/todoList`
+- **Method:** `GET`
+- **Description:** Retrieves todo-lists associated with a user.
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description                             |
+  | --------- | ------ | -------- | --------------------------------------- |
+  | `userId`  | string | Yes      | The user's ID.                          |
+  | `access`  | string | No       | Access level (`'ro'` for read-only, `'rw'` for read-write). |
+
+- **Response:**
+
+  Returns a list of todo-lists.
+
+### Create Todo-List
+
+- **URL:** `/todoList`
+- **Method:** `POST`
+- **Description:** Creates a new todo-list.
+- **Request Body:**
+
+  | Field          | Type             | Required | Description                      |
+  | -------------- | ---------------- | -------- | -------------------------------- |
+  | `createdBy`    | string           | Yes      | ID of the user creating the todoList. |
+  | `name`         | string           | Yes      | Name of the todoList.             |
+  | `description`  | string           | No       | Description of the todoList.      |
+  | `tasks`        | array of strings | No       | List of todo-task IDs.           |
+  | `roUsers`      | array of strings | No       | IDs of read-only users.          |
+  | `rwUsers`      | array of strings | No       | IDs of read-write users.         |
+
+- **Response:**
+
+  Returns the created todo-list object.
+
+### Get Todo-List by ID
+
+- **URL:** `/todoList/:todoListId`
+- **Method:** `GET`
+- **Description:** Retrieves a todoList by its ID.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `todoListId` | string | Yes      | The todoList's ID.             |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns the todoList object.
+
+### Update TodoList
+
+- **URL:** `/todoList/:todoListId`
+- **Method:** `PATCH`
+- **Description:** Updates a todoList.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `todoListId` | string | Yes      | The todoList's ID.             |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Request Body:**
+
+  | Field          | Type           | Required | Description                |
+  | -------------- | -------------- | -------- | -------------------------- |
+  | `name`         | string         | No       | Name of the todoList.       |
+  | `description`  | string         | No       | Description of the todoList.|
+
+- **Response:**
+
+  Returns the updated todoList object.
+
+### Delete TodoList
+
+- **URL:** `/todoList/:todoListId`
+- **Method:** `DELETE`
+- **Description:** Deletes a todoList.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description                   |
+  | ----------- | ------ | -------- | ----------------------------- |
+  | `todoListId` | string | Yes      | The todoList's ID.             |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns confirmation of deletion.
+
+---
+
+## Todo-Task Endpoints
+
+**Base URL:** `/todoList/:todoList/todoTask`
+
+### Get TodoTasks by TodoList ID
+
+- **URL:** `/todoList/:todoListId/todoTask`
+- **Method:** `GET`
+- **Description:** Retrieves todoTasks associated with a todoList.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description         |
+  | ----------- | ------ | -------- | ------------------- |
+  | `todoListId` | string | Yes      | The todoList's ID.   |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns a list of todoTask objects.
+
+### Create TodoTask
+
+- **URL:** `/todoList/:todoListId/todoTask`
+- **Method:** `POST`
+- **Description:** Creates a new todoTask within a todoList.
+- **Path Parameters:**
+
+  | Parameter   | Type   | Required | Description         |
+  | ----------- | ------ | -------- | ------------------- |
+  | `todoListId` | string | Yes      | The todoList's ID.   |
+
+- **Request Body:**
+
+  | Field          | Type           | Required | Description                   |
+  | -------------- | -------------- | -------- | ----------------------------- |
+  | `createdBy`    | string         | Yes      | ID of the user creating the todoTask. |
+  | `name`         | string         | Yes      | Name of the todoTask          |
+  | `assignedTo`   | string         | No       | ID of user todoTask is assigned to |
+  | `dueDate`      | string or Date | Yes      | Due date of the task          |
+  | `isCompleted`  | boolean        | Yes      | Indicates of the task is done or not |
+
+
+- **Response:**
+
+  Returns the created todoTask object.
+
+### Get TodoTask by ID
+
+- **URL:** `/todoList/:todoListId/todoTask/:todoTaskId`
+- **Method:** `GET`
+- **Description:** Retrieves a todoTask by ID.
+- **Path Parameters:**
+
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `todoListId`       | string | Yes      | The todoList's ID.             |
+  | `todoTaskId`    | string | Yes      | The todoTask's ID.      |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns the todoTask object.
+
+### Update TodoTask
+
+- **URL:** `/todoList/:todoListId/todoTask/:todoTaskId`
+- **Method:** `PATCH`
+- **Description:** Updates a todoTask.
+- **Path Parameters:**
+
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `todoListId`       | string | Yes      | The todoList's ID.             |
+  | `todoTaskId`| string | Yes      | The todoTask's ID.      |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Request Body:**
+
+  | Field          | Type           | Required | Description                   |
+  | -------------- | -------------- | -------- | ----------------------------- |
+  | `name`         | string         | No      | Name of the todoTask          |
+  | `assignedTo`   | string         | No       | ID of user todoTask is assigned to |
+  | `dueDate`      | string or Date | No      | Due date of the task          |
+  | `isCompleted`  | boolean        | No      | Indicates of the task is done or not |
+
+- **Response:**
+
+  Returns the updated todoTask object.
+
+### Delete TodoTask
+
+- **URL:** `/todoList/:todoListId/todoTask/:todoTaskId`
+- **Method:** `DELETE`
+- **Description:** Deletes a todoTask.
+- **Path Parameters:**
+
+  | Parameter         | Type   | Required | Description                   |
+  | ----------------- | ------ | -------- | ----------------------------- |
+  | `todoListId`       | string | Yes      | The todoList's ID.             |
+  | `todoTaskId`| string | Yes      | The todoTask's ID.      |
+
+- **Query Parameters:**
+
+  | Parameter | Type   | Required | Description        |
+  | --------- | ------ | -------- | ------------------ |
+  | `userId`  | string | Yes      | The user's ID.     |
+
+- **Response:**
+
+  Returns confirmation of deletion.
+
+---
+
 
 # Notes
 
