@@ -16,7 +16,7 @@ export interface ItemCreateProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   shoppingList: PPShoppingList
 }
-export default function TransportCreate(props: ItemCreateProps) {
+export default function ItemCreate(props: ItemCreateProps) {
 
   const [isLoading, setIsLoading] = useState(false)
   const [pUser] = useAtom(ppUserAtom)
@@ -68,8 +68,8 @@ export default function TransportCreate(props: ItemCreateProps) {
           },
         })
         if (res.data.success) {
-          fields.vehicleId = ''
-          fields.transportDetails = ''
+          fields.name = ''
+          fields.location = ''
         } else {
           throw new Error()
         }
