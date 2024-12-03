@@ -9,6 +9,7 @@ import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { onError } from '../../lib/errorLib'
 import { useNavigate } from 'react-router-dom'
+import ShoppingListEditView from './ShoppingListEditView'
 
 export interface PPShoppingListItem {
     addedBy: PPUser
@@ -49,7 +50,9 @@ export default function ShoppingList(props: ShoppingListProps) {
       onError("Error deleting: Shopping List may have not been removed")
     }
   }, [])
-  const handleEditShoppingList = useCallback(async () => {}, [])
+  const handleEditShoppingList = useCallback(async () => {
+
+  }, [])
 
   const [userNames, setUserNames] = useState({}) 
 
@@ -102,6 +105,12 @@ export default function ShoppingList(props: ShoppingListProps) {
                           await handleEditShoppingList()
                         }}
                       ></CardActionButtons>
+                      <ShoppingListEditView
+                        handelCancel={() => setOpenEditDialog(false)}
+                        open={openEditDialog}
+                        setOpen={setOpenEditDialog}
+                        shoppingList={props.shoppingList}
+                      ></ShoppingListEditView>
                     </MUI.Box>
                   </MUI.Box>
                 }
