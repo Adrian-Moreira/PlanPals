@@ -3,6 +3,7 @@ import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals
 import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { TodoTaskModel } from '../../../src/models/TodoTask'
+import { TodoListModel } from '../../../src/models/TodoList'
 import TodoTaskService from '../../../src/services/todoTask'
 
 describe('TodoTask->createTodoTask', () => {
@@ -39,7 +40,7 @@ describe('TodoTask->createTodoTask', () => {
 
   beforeEach(() => {
     todoTaskMock = sinon.mock(TodoTaskModel)
-    todoListMock = sinon.mock(TodoTaskModel)
+    todoListMock = sinon.mock(TodoListModel)
     req = {
       body: {
         out: {
