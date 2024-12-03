@@ -14,6 +14,8 @@ import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { onError } from '../../lib/errorLib'
 import { useNavigate } from 'react-router-dom'
+import ActivityCreate from '../Activities/ActivityCreate'
+import ActivityItems from '../Activities/ActivityItems'
 
 export interface PPPlanner {
   _id: string
@@ -26,6 +28,7 @@ export interface PPPlanner {
   endDate: string
   destinations: string[]
   transportations: string[]
+  activities: string[]
 }
 
 export interface PlannerProps {
@@ -34,7 +37,7 @@ export interface PlannerProps {
   planner: PPPlanner
 }
 
-const tabs = ['Destination', 'Transportation']
+const tabs = ['Destination', 'Transportation', 'Activities']
 
 export default function Planner(props: PlannerProps) {
   const [selectedTab, setSelectedTab] = useState(tabs[0])
@@ -119,6 +122,18 @@ export default function Planner(props: PlannerProps) {
               planner={props.planner}
             ></TransportCreate>
             <TransportItems planner={props.planner}></TransportItems>
+          </>,
+        )
+        break
+      case tabs[2]:
+        elements.push(
+          <>
+            <ActivityCreate
+              open={creationDialogOpen}
+              setOpen={setCreationDialogOpen}
+              planner={props.planner}
+            ></ActivityCreate>
+            <ActivityItems planner={props.planner}></ActivityItems>
           </>,
         )
         break
