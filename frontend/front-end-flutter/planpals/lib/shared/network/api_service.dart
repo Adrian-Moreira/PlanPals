@@ -19,6 +19,7 @@ class ApiService {
             'Failed to load data: ${response.statusCode} - ${response.reasonPhrase}');
       }
     } catch (error) {
+      print("ERROR: $error");
       throw Exception('Failed to load data: $error');
     }
   }
@@ -102,6 +103,7 @@ class ApiService {
   void _handleResponse(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       // Handle error responses
+      print('ERROR, RESPONSE BODY: ${response.body}');
       throw Exception('Failed to load data: ${response.statusCode}');
     }
   }
