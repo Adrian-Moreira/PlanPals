@@ -43,7 +43,6 @@ class ShoppingListService {
 
   Future<ShoppingList> addShoppingItemToShoppingList(String shoppingListId, ShoppingItem shoppingItem) async {
     try {
-      print("ADDING SHOPPING ITEM SERVICE: ${shoppingItem.toJson()}");
       final response = await _apiService.post('/shoppingList/$shoppingListId/item', shoppingItem.toJson());
       return ShoppingList.fromJson(jsonDecode(response.body)['data']);
     } catch (e) {
@@ -54,10 +53,19 @@ class ShoppingListService {
   Future<ShoppingList> updateShoppingList(ShoppingList shoppingList) async {
     try {
       final response = await _apiService.patch('/shoppingList/${shoppingList.id}', shoppingList.toJson());
-      print("UPDATING SHOPPING LIST SERVICE: ${response.body}");
       return ShoppingList.fromJson(jsonDecode(response.body)['data']);
     } catch (e) {
       throw Exception('Failed to update shopping list');
+    }
+  }
+
+
+  Future<ShoppingList> inviteUserToShoppingList(String shoppingListId, String userId) async {
+    try {
+      final response = await _apiService.post('/shoppingList/$shoppingListId/invite', {'userIds':[userId]});
+      return ShoppingList.fromJson(jsonDecode(response.body)['data']);
+    } catch (e) {
+      throw Exception('Failed to invite user to shopping list');
     }
   }
 }

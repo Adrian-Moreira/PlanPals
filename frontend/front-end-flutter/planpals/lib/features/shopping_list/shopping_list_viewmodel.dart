@@ -117,19 +117,44 @@ class ShoppingListViewModel extends ChangeNotifier {
     }
   }
 
-
-
-  Future<void> deleteShoppingItemFromShoppingList(ShoppingList shoppingList, ShoppingItem shoppingItem) async {
+  Future<void> deleteShoppingItemFromShoppingList(
+      ShoppingList shoppingList, ShoppingItem shoppingItem) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       shoppingList.items?.remove(shoppingItem);
-      print("SHOULD BESHOPPING LIST UPDATED SERVICE: ${shoppingList.toJson()}"); 
+      print("SHOULD BESHOPPING LIST UPDATED SERVICE: ${shoppingList.toJson()}");
       print("DELETING SHOPPING ITEM SERVICE: ${shoppingItem.toJson()}");
-      currentShoppingList = await _shoppingListService.updateShoppingList(shoppingList);
+      currentShoppingList =
+          await _shoppingListService.updateShoppingList(shoppingList);
       print("UPDATED SHOPPING LIST SERVICE: ${currentShoppingList!.toJson()}");
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> inviteUserToShoppingList(
+      String shoppingListId, String userId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      ShoppingList updated = await _shoppingListService
+          .inviteUserToShoppingList(shoppingListId, userId);
+
+      _shoppingLists
+          .firstWhere((element) => element.id == shoppingListId)
+          .update(updated);
+
+      currentShoppingList = updated;
+      print(currentShoppingList!.toJson());
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();

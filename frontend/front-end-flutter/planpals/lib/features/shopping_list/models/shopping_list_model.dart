@@ -2,11 +2,11 @@ import 'package:planpals/features/shopping_list/models/shopping_item_model.dart'
 
 class ShoppingList {
   final String id;
-  final String name;
-  final String? description; // Optional property
   final String createdBy;
-  final List<ShoppingItem>? items; // Optional property
-  final List<String>? rwUsers; // Optional property
+  String name;
+  String? description; // Optional property
+  List<ShoppingItem>? items; // Optional property
+  List<String>? rwUsers; // Optional property
 
   ShoppingList({
     required this.id,
@@ -46,5 +46,12 @@ class ShoppingList {
   @override
   String toString() {
     return 'ShoppingList{id: $id, name: $name, description: $description, createdBy: $createdBy, items: $items, rwUsers: $rwUsers}';
+  }
+
+  void update(ShoppingList updated) {
+    name = updated.name;
+    description = updated.description;
+    items = updated.items;
+    rwUsers = updated.rwUsers;
   }
 }

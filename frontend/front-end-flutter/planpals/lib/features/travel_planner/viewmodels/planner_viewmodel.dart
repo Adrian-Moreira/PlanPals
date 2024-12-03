@@ -456,6 +456,15 @@ class PlannerViewModel extends ChangeNotifier {
   }
 
 
+  Future<void> inviteUserToPlanner(String plannerId, String userId) async {
+    try {
+      await _plannerService.inviteUserToPlanner(plannerId, userId);
+    } catch (e) {
+      throw Exception('Failed to invite user to planner');
+    }
+  }
+
+
   void logout() {
     _planners = [];
     _destinations = [];

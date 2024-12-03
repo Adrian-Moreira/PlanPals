@@ -27,9 +27,8 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     setState(() {
-      shoppingList =
-          Provider.of<ShoppingListViewModel>(context, listen: false)
-              .currentShoppingList!;
+      shoppingList = Provider.of<ShoppingListViewModel>(context, listen: false)
+          .currentShoppingList!;
     });
   }
 
@@ -45,6 +44,16 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
             Provider.of<ShoppingListViewModel>(context, listen: false)
                 .currentShoppingList!;
       });
+    });
+  }
+
+  Future<void> _handleOnInviteUser(String userId) async {
+    await Provider.of<ShoppingListViewModel>(context, listen: false)
+        .inviteUserToShoppingList(shoppingList.id, userId);
+
+    setState(() {
+      shoppingList = Provider.of<ShoppingListViewModel>(context, listen: false)
+          .currentShoppingList!;
     });
   }
 
@@ -88,7 +97,8 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                           context: context,
                           builder: (context) => InviteUserDialog(
                               // TODO: Add invite functionality
-                              ));
+
+                              onInvite: _handleOnInviteUser));
                     },
                     icon: const Icon(
                       Icons.group_add,
