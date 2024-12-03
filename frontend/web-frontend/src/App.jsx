@@ -1,6 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useCallback } from 'react'
-import { atom, createStore, Provider, useAtom } from 'jotai'
+import {  useAtom } from 'jotai'
+// import {  toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { NotificationProvider } from './components/Notifications/notificationContext';
+
+
 
 import './App.css'
 import { lightTheme, darkTheme } from './theme'
@@ -38,6 +43,10 @@ function App() {
     handleThemeChange()
   }, [handleThemeChange])
 
+  // useEffect(() => {
+  //   toast.success('Hello, world!');
+  // }, []);
+
   async function handleLogout() {
     setPPUser({
       loggedIn: false,
@@ -48,9 +57,11 @@ function App() {
     nav('/')
   }
 
-  return (
+  return ( //<ToastContainer />
+    
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <NotificationProvider>
       {ppUserAtom && (
         <Container className="App" maxWidth="xl">
           <ResponsiveAppBar
@@ -68,7 +79,9 @@ function App() {
           <Routes />
         </Container>
       )}
+      </NotificationProvider>
     </ThemeProvider>
+    
   )
 }
 
