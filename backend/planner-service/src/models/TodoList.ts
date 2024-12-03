@@ -23,10 +23,10 @@ const TodoListMongoSchema = new Schema<TodoList>(
       ref: 'User',
     },
     name: { type: String, required: true },
-    description: { type: String, required: true },
-    tasks: { type: [Schema.Types.ObjectId], required: true, ref: 'TodoTask' },
+    description: { type: String },
     roUsers: { type: [Schema.Types.ObjectId], required: true, ref: 'User' },
     rwUsers: { type: [Schema.Types.ObjectId], required: true, ref: 'User' },
+    tasks: { type: [Schema.Types.ObjectId], ref: 'TodoTask' },
   },
   { _id: true, timestamps: true },
 )

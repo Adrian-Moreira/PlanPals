@@ -27,6 +27,7 @@ todoListRouter.get(
     TodoListValidator.getTodoListById,
     UserService.verifyUserExists,
     TodoListService.verifyTodoListExists,
+    TodoListService.verifyUserCanViewTodoList,
     TodoListService.getTodoListDocumentById
 )
 
