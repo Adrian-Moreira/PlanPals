@@ -7,7 +7,6 @@ import { useAtom } from 'jotai'
 import { userMapAtom } from '../../lib/appLib'
 import { ppUserAtom, PPUserAuth } from '../../lib/authLib'
 import { onError } from '../../lib/errorLib'
-import AdaptiveDialog from '../Common/AdaptiveDialog'
 import ShoppingListCreateView from './ShoppingListCreateView'
 import { useNavigate } from 'react-router-dom'
 import SelectItems from '../Common/SelectItems'
@@ -172,17 +171,6 @@ export default function ShoppingLists(props: ShoppingListsProps) {
 
         <MUI.Stack gap={8}>
           <MUI.Box sx={{ maxWidth: '100vw', display: 'flex', justifyContent: 'center' }}>
-            {/* <MUI.Typography
-            sx={{
-              maxWidth: { xs: 0, sm: '30vw' },
-              flex: { xs: 0, sm: 1 },
-              ml: '0.5em',
-              pt: { xs: '0.4em', sm: '0.8em' },
-            }}
-            variant="h5"
-          >
-            {shoppingListTitle}
-          </MUI.Typography> */}
             <MUI.Box sx={{ display: 'flex', flexDirection: 'row', pr: '0.5em', flex: 0 }}>
               <SelectItems
                 children={titles.map((selection) => (

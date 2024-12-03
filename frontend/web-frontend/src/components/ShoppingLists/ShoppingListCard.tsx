@@ -1,7 +1,6 @@
 import * as MUI from '@mui/material'
 import PropTypes from 'prop-types'
 import React from 'react'
-//import { convertDatePairs, convertToLongDate } from '../../lib/dateLib'
 
 ShoppingListCard.propTypes = {
   shoppingList: PropTypes.shape({

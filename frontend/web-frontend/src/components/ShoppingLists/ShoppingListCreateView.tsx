@@ -1,11 +1,7 @@
 import React, { useCallback, useEffect, useInsertionEffect, useState } from 'react'
 import * as MUI from '@mui/material/'
 import * as MUIcons from '@mui/icons-material'
-import dayjs from 'dayjs'
 import { useFormFields } from '../../lib/hooksLib'
-import DatePickerValue from '../Common/DatePickerValue'
-import TimePickerValue from '../Common/TimePickerValue'
-import { combineDateAndTime } from '../../lib/dateLib'
 import apiLib from '../../lib/apiLib'
 import { onError } from '../../lib/errorLib'
 import { useNavigate } from 'react-router-dom'
@@ -71,20 +67,7 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
           rwUsers: selectedPals.map((p) => p._id),
         },
       })
-    //   if (res.data.success && fields?.destinationName !== '') {
-    //     const res2 = await apiLib.post(`/planner/${res.data.data._id}/destination`, {
-    //       data: {
-    //         createdBy: pUser.ppUser!._id,
-    //         startDate: combineDateAndTime(startDate, startTime).toISOString(),
-    //         endDate: combineDateAndTime(endDate, endTime).toISOString(),
-    //         name: fields.destinationName,
-    //       },
-    //     })
-    //     if (res2.data.success) {
-    //       props.setOnReload(true)
-    //       nav(`/planner/${res.data.data._id}`)
-    //     }
-    //   }
+
       if (res.data.success) {
         props.setOnReload(true)
         nav(`/shoppingList/${res.data.data._id}`)
@@ -116,13 +99,7 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
           </MUI.Stack>
           <MUI.Box sx={{ flexDirection: 'column' }}>
             <MUI.Stack spacing={2}>
-              {/* <MUI.Typography variant="h6">Add a Destination</MUI.Typography>
-              <MUI.TextField
-                id="destinationName"
-                label="Destination"
-                value={fields.destinationName}
-                onChange={handleFieldChange}
-              /> */}
+
               <MUI.Typography variant="h6">Add Pals to plan together!</MUI.Typography>
               <MUI.Autocomplete
                 multiple
