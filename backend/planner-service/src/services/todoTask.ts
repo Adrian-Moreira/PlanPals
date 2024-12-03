@@ -34,7 +34,7 @@ const createTodoTaskDocument = async (req: Request, res: Response, next: NextFun
 
   targetTodoList.tasks.push(createdTodoTask._id)
 
-  await TodoListModel.findOneAndUpdate({ _id: todoListId }, { tasks: targetTodoList.tasks }, { new: true })
+  await TodoListModel.findOneAndUpdate({ _id: targetTodoList._id }, { tasks: targetTodoList.tasks }, { new: true })
 
   req.body.result = createdTodoTask
   req.body.dataType = TodoTaskCollection

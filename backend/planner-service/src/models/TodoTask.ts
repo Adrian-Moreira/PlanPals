@@ -28,7 +28,7 @@ export const TodoTaskSchema = z.object({
   createdAt: z.string().datetime().or(z.date()),
   updatedAt: z.string().datetime().or(z.date()),
   name: z.string(),
-  dueDate: z.string(),
+  dueDate: z.string().datetime(),
   isCompleted: z.boolean(),
 });
 
