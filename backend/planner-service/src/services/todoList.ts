@@ -172,6 +172,26 @@ export const getTodoListDocumentById = async (req: Request, res: Response, next:
   next()
 }
 
+export const inviteUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { todoListId } = req.params
+  const { userIds } = req.body
+
+  const updatedTodoList = await TodoListModel.findOneAndUpdate(
+    { _id: todoListId },
+    { $addToSet: { rwUsers: { $each: userIds } } },
+    { new: true },
+  )
+
+  if (!updatedTodoList) {
+    req.body.err = new RecordNotFoundException({ recordType: 'todoList', recordId: todoListId })
+    return next(req.body.err)
+  }
+
+  req.body.result = updatedTodoList
+  req.body.status = StatusCodes.OK
+  next()
+}
+
 /**
  * Verifies that a TodoList document exists in the database given a TodoList id.
  * If not, throws a RecordNotFoundException with the TodoList ID and record type of 'todoList'.
@@ -241,7 +261,7 @@ async function verifyUserCanEditTodoList(req: Request, res: Response, next: Next
 
 /**
  * Verifies whether a user has permission to view a specific TodoList.
- * If the user is not the owner or does not have read or read-write access, 
+ * If the user is not the owner or does not have read or read-write access,
  * a RecordNotFoundException is thrown.
  *
  * @param {Request} req - The incoming request from the client containing the targetTodoList and targetUser.
@@ -249,8 +269,8 @@ async function verifyUserCanEditTodoList(req: Request, res: Response, next: Next
  * @param {NextFunction} next - The next function in the middleware chain.
  *
  * @remarks
- * This function checks if the targetUser is in the read-only or read-write user list 
- * or is the creator of the targetTodoList. If the user has permission, the targetTodoList 
+ * This function checks if the targetUser is in the read-only or read-write user list
+ * or is the creator of the targetTodoList. If the user has permission, the targetTodoList
  * is added to the request body output.
  */
 async function verifyUserCanViewTodoList(req: Request, res: Response, next: NextFunction) {
@@ -278,6 +298,7 @@ const TodoListService = {
   deleteTodoListDocument,
   getTodoListDocumentsByUserId,
   getTodoListDocumentById,
+  inviteUsers,
   verifyTodoListExists,
   verifyUserCanEditTodoList,
   verifyUserCanViewTodoList,

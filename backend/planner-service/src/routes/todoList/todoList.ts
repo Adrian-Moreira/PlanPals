@@ -51,6 +51,16 @@ todoListRouter.delete(
     publishUpdateEvent
 )
 
+todoListRouter.post(
+    '/:todoListId([0-9a-fA-F]{24})/invite',
+    TodoListValidator.inviteUsers,
+    UserService.verifyUserExists,
+    TodoListService.verifyTodoListExists,
+    TodoListService.verifyUserCanEditTodoList,
+    TodoListService.inviteUsers,
+    publishUpdateEvent
+)
+
 todoListRouter.use('/:todoListId([0-9a-fA-F]{24})/task', todoTaskRouter)
 
 export default todoListRouter

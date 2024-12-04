@@ -53,6 +53,14 @@ const TodoListRouteSchema = {
       todoListId: ObjectIdStringSchema,
     }),
   }),
+  inviteUsers: ReqAttrSchema.extend({
+    params: z.object({
+      todoListId: ObjectIdStringSchema,
+    }),
+    body: z.object({
+      userIds: z.array(ObjectIdStringSchema),
+    }),
+  }),
 }
 
 const TodoListValidator = RequestUtils.mkParsers(TodoListRouteSchema)
