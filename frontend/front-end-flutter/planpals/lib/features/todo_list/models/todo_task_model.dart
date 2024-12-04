@@ -1,8 +1,9 @@
+import 'package:planpals/shared/utils/date_utils.dart';
 
 class TodoTask {
-  String id;
+  final String id;
+  final String createdBy;
   String todoListId;
-  String createdBy;
   String name;
   String? assignedTo;
   DateTime dueDate; // Can be a string or a Date
@@ -23,7 +24,7 @@ class TodoTask {
     return TodoTask(
       id: json['_id'] ?? '',
       todoListId: json['todoListId'] ?? '',
-      createdBy: json['createdBy']  ?? '',
+      createdBy: json['createdBy'] ?? '',
       name: json['name'] ?? '',
       assignedTo: json['assignedTo'] ?? '',
       dueDate: DateTime.parse(json['dueDate']),
@@ -39,9 +40,15 @@ class TodoTask {
       'createdBy': createdBy,
       'name': name,
       'assignedTo': assignedTo,
-      'dueDate': dueDate,
+      'dueDate': DateTimeToIso.formatToUtcIso(dueDate),
       'isCompleted': isCompleted,
     };
   }
 
+  void update(TodoTask updatedTodoTask) {
+    name = updatedTodoTask.name;
+    assignedTo = updatedTodoTask.assignedTo;
+    dueDate = updatedTodoTask.dueDate;
+    isCompleted = updatedTodoTask.isCompleted;
+  }
 }

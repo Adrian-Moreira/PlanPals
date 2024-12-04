@@ -23,10 +23,10 @@ class _ShoppingListsViewState extends State<ShoppingListsView> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
       _viewModel = Provider.of<ShoppingListViewModel>(context, listen: false);
-      _viewModel.fetchShoppingListsByUserId(user.id);
+      await _viewModel.fetchShoppingListsByUserId(user.id);
     });
   }
 

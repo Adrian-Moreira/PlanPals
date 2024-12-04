@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:planpals/features/todo_list/models/todo_list_model.dart';
 import 'package:planpals/features/todo_list/models/todo_task_model.dart';
@@ -35,13 +34,15 @@ class TodoListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchTodoTasksByTodoListId(String todoListId, String userId) async {
+  Future<void> fetchTodoTasksByTodoListId(
+      String todoListId, String userId) async {
     _isLoading = true;
     _todoTasks = [];
     notifyListeners();
 
     try {
-      _todoTasks = await _todoListService.fetchTodoTasksByTodoListId(todoListId, userId);
+      _todoTasks =
+          await _todoListService.fetchTodoTasksByTodoListId(todoListId, userId);
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -50,7 +51,6 @@ class TodoListViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   Future<TodoList> addTodoList(TodoList todoList) async {
     _isLoading = true;
@@ -91,5 +91,42 @@ class TodoListViewModel extends ChangeNotifier {
     }
 
     return newTodoTask;
+  }
+
+  Future<TodoTask> updateTodoTask(TodoTask todoTask, String userId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    TodoTask updatedTodoTask = todoTask;
+    try {
+      updatedTodoTask = await _todoListService.updateTodoTask(todoTask, userId);
+      _todoTasks
+          .firstWhere((task) => task.id == updatedTodoTask.id)
+          .update(updatedTodoTask);
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+
+    return updatedTodoTask;
+  }
+
+  Future<void> deleteTodoTask(TodoTask todoTask, String userId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    
+    try {
+      await _todoListService.deleteTodoTask(todoTask, userId);
+      _todoTasks.removeWhere((task) => task.id == todoTask.id);
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

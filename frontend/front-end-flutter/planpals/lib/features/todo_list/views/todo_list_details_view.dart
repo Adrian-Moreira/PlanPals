@@ -4,9 +4,11 @@ import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/todo_list/models/todo_list_model.dart';
 import 'package:planpals/features/todo_list/models/todo_task_model.dart';
 import 'package:planpals/features/todo_list/todo_list_viewmodel.dart';
+import 'package:planpals/features/todo_list/views/components/create_todo_task_form.dart';
 import 'package:planpals/features/todo_list/views/components/todo_task_card.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/invite_user_dialog.dart';
+import 'package:planpals/shared/components/navigator_bar.dart';
 import 'package:provider/provider.dart';
 
 class TodoListDetailsView extends StatefulWidget {
@@ -50,7 +52,10 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: NavigatorAppBar(title: todoList.name),
+      body: _buildPage(context),
+    );
   }
 
   Widget _buildPage(BuildContext context) {
@@ -86,8 +91,7 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                           builder: (context) => InviteUserDialog(
                               // TODO: Add invite functionality
 
-                              // onInvite: _handleOnInviteUser));
-                              ));
+                              onInvite: _handleOnInviteUser));
                     },
                     icon: const Icon(
                       Icons.group_add,
@@ -168,7 +172,14 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
       headerIcon: Icons.list_alt,
       emptyMessage: "There is no task",
       functional: functional,
-      onAdd: () {},
+      onAdd: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateTodoTaskForm(todoList: todoList),
+          ),
+        );
+      },
     );
   }
 }

@@ -68,10 +68,10 @@ class _PlannersViewState extends State<PlannersView> {
   void initState() {
     super.initState();
     // Fetch planners when the widget is first created
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
       plannerViewModel = Provider.of<PlannerViewModel>(context, listen: false);
-      plannerViewModel.fetchPlannersByUserId(user.id);
+      await plannerViewModel.fetchPlannersByUserId(user.id);
 
       wsProvider = Provider.of<WebSocketProvider>(context, listen: false);
       final topic = MessageTopic(type: TopicType.planners, id: user.id);
@@ -115,7 +115,7 @@ class _PlannersViewState extends State<PlannersView> {
         : SingleChildScrollView(
             child: GenericListView(
               itemList: plannerViewModel.planners,
-              itemBuilder: (planner) => PlannerCard(
+            itemBuilder: (planner) => PlannerCard(
                 travelPlanner: planner,
               ),
               onAdd: () {},

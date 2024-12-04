@@ -89,7 +89,7 @@ class _CreateTodoListFormState extends State<CreateTodoListForm> {
                         createdBy: user.id,
                         tasks: [],
                         roUsers: [],
-                        rwUsers: [user.id],
+                        rwUsers: [],
                       );
 
                       newTodoList = await viewModel.addTodoList(newTodoList);

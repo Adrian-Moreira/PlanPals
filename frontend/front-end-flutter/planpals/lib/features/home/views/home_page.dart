@@ -42,6 +42,13 @@ class HomePage extends StatelessWidget {
               },
               child: const Text('Go to Shopping Lists'),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/todoLists');
+              },
+              child: const Text('Go to Todo Lists'),
+            ),
           ],
         ),
       ),
