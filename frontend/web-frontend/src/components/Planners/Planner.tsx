@@ -74,18 +74,6 @@ export default function Planner(props: PlannerProps) {
       setNotification?.({ type: 'error', message: "Error deleting: Planner mightn't be removed" });
     }
   }, [props.planner._id, pUser.ppUser, nav, setNotification]);
-  
-  const handleUpdatePlanner = useCallback(async () => {
-    try {
-      const res = await apiLib.put(`/planner/${props.planner._id}`, {
-        params: { userId: pUser.ppUser?._id },
-      });
-      setNotification?.({ type: 'success', message: 'Planner updated successfully!' });
-      nav('/planners');
-    } catch (err) {
-      setNotification?.({ type: 'error', message: "Error updating: Planner mightn't be updated" });
-    }
-  }, [])
 
   const handleEditPlanner = useCallback(async () => {
     if(!editError){
@@ -311,7 +299,7 @@ export default function Planner(props: PlannerProps) {
                           await handleDeletePlanner()
                         }}
                         handleEditAction={async () => {
-                          await handleUpdatePlanner()
+                          await handleEditPlanner()
                         }}
                       ></CardActionButtons>
                     </MUI.Box>
