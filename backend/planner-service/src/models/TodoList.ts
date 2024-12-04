@@ -26,7 +26,8 @@ const TodoListMongoSchema = new Schema<TodoList>(
     description: { type: String },
     roUsers: { type: [Schema.Types.ObjectId], required: true, ref: 'User' },
     rwUsers: { type: [Schema.Types.ObjectId], required: true, ref: 'User' },
-    tasks: { type: [Schema.Types.ObjectId], ref: 'TodoTask' },
+    tasks: [{ type: Schema.Types.ObjectId, ref: 'TodoTask' }],
+    invites: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
   { _id: true, timestamps: true },
 )
@@ -41,6 +42,7 @@ export const TodoListSchema = z.object({
   roUsers: z.array(ObjectIdSchema),
   createdAt: z.string().datetime().or(z.date()),
   updatedAt: z.string().datetime().or(z.date()),
+  invites: z.array(ObjectIdSchema).optional(),
 })
 
 TodoListMongoSchema.pre('findOneAndDelete', async function (next) {
@@ -59,9 +61,10 @@ TodoListMongoSchema.pre('findOneAndDelete', async function (next) {
 
     await Promise.all(
       todoList!.tasks!.map((id: Types.ObjectId) => {
-        TodoTaskModel.findOneAndDelete({ _id: id })
+        TodoTaskModel.findOneAndDelete({ _id: id , todoListId: todoList!._id })
       }),
     )
+
   } catch (error: any) {
     console.error(error)
   }

@@ -13,7 +13,6 @@ todoListRouter.get(
     UserService.verifyUserExists,
     TodoListService.getTodoListDocumentsByUserId
 )
-
 todoListRouter.post(
     '/',
     TodoListValidator.createTodoList,
@@ -21,7 +20,6 @@ todoListRouter.post(
     TodoListService.createTodoListDocument,
     publishUpdateEvent
 )
-
 todoListRouter.get(
     '/:todoListId([0-9a-fA-F]{24})',
     TodoListValidator.getTodoListById,
@@ -30,7 +28,6 @@ todoListRouter.get(
     TodoListService.verifyUserCanViewTodoList,
     TodoListService.getTodoListDocumentById
 )
-
 todoListRouter.patch(
     '/:todoListId([0-9a-fA-F]{24})',
     TodoListValidator.updateTodoList,
@@ -40,7 +37,6 @@ todoListRouter.patch(
     TodoListService.updateTodoListDocument,
     publishUpdateEvent
 )
-
 todoListRouter.delete(
     '/:todoListId([0-9a-fA-F]{24})',
     TodoListValidator.deleteTodoList,
@@ -50,14 +46,12 @@ todoListRouter.delete(
     TodoListService.deleteTodoListDocument,
     publishUpdateEvent
 )
-
 todoListRouter.post(
     '/:todoListId([0-9a-fA-F]{24})/invite',
     TodoListValidator.inviteUsers,
     UserService.verifyUserExists,
     TodoListService.verifyTodoListExists,
     TodoListService.verifyUserCanEditTodoList,
-    TodoListService.inviteUsers,
     publishUpdateEvent
 )
 

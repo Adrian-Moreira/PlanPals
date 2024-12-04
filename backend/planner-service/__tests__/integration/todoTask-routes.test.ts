@@ -29,22 +29,22 @@ describe('Integration Test: TodoTask API', () => {
     await TodoTaskModel.deleteMany({})
 
     testUser1 = await UserModel.create({
-      username: 'testUser1',
+      userName: 'testUser1',
       preferredName: 'Test User 1',
     })
 
     testUser2 = await UserModel.create({
-      username: 'testUser2',
+      userName: 'testUser2',
       preferredName: 'Test User 2',
     })
 
     testUser3 = await UserModel.create({
-      username: 'testUser3',
+      userName: 'testUser3',
       preferredName: 'Test User 3',
     })
 
     testUser4 = await UserModel.create({
-      username: 'testUser4',
+      userName: 'testUser4',
       preferredName: 'Test User 4',
     })
 
@@ -71,7 +71,7 @@ describe('Integration Test: TodoTask API', () => {
       name: 'Test Todo Task 1',
       todoListId: testTodoList._id,
       dueDate: new Date().toISOString(),
-      completed: false,
+      isCompleted: false,
     })
 
     testTodoList.tasks.push(testTodoTask1._id)
