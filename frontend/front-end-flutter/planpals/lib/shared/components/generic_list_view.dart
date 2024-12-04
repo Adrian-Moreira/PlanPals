@@ -62,11 +62,11 @@ class GenericListView<T> extends StatelessWidget {
           physics: scrollable
               ? const ScrollPhysics()
               : const NeverScrollableScrollPhysics(),
-          itemCount: itemList.length, // increment by 1 for the header
+          itemCount: itemList.length,
           itemBuilder: (context, index) {
             return itemBuilder(
               itemList[index],
-            ); // Adjust index because 0 is used for header
+            ); 
           });
     } else {
       return Column(

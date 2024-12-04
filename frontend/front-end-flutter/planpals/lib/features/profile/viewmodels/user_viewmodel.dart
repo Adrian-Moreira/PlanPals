@@ -26,7 +26,7 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       print("USERVIEWMODEL: FETCHING USER: $userName");
-      fetchedUser= await _userService.fetchUserByUserName(userName);
+      fetchedUser = await _userService.fetchUserByUserName(userName);
       print('USERVIEWMODEL: FETCHED USER: $_user');
     } catch (error) {
       _errorMessage = error.toString();

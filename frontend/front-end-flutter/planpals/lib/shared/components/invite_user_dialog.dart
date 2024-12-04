@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/features/profile/models/user_model.dart';
+import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class InviteUserDialog extends StatefulWidget {
+  final Function(String)? onInvite;
+
+  const InviteUserDialog({super.key, required this.onInvite});
+
   @override
   _InviteUserDialogState createState() => _InviteUserDialogState();
 }
@@ -9,10 +16,47 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
   final TextEditingController _usernameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  late User _userToInvite;
+
+  bool _isCheckingUsername = false;
+  String? _usernameError;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> validateUsername(UserViewModel viewModel) async {
+    setState(() {
+      _isCheckingUsername = true;
+      _usernameError = null;
+    });
+
+    String username = _usernameController.text;
+
+    // Check if the user exists in the database
+    User? fetchedUser = await viewModel.fetchUserByUserName(username);
+
+    if (fetchedUser == null) {
+      setState(() {
+        _usernameError = 'User not found. Please enter a valid username.';
+      });
+    }
+
+    setState(() {
+      _isCheckingUsername = false;
+    });
+
+    _userToInvite = fetchedUser!;
+  }
+
   @override
   Widget build(BuildContext context) {
+    UserViewModel userViewModel = Provider.of<UserViewModel>(context, listen: false);
+
     return AlertDialog(
-      title: Text('Invite User'),
+      title: const Text('Invite User'),
       content: Form(
         key: _formKey,
         child: Column(
@@ -22,16 +66,28 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
               controller: _usernameController,
               decoration: InputDecoration(
                 labelText: 'Enter username to invite',
+                errorText: _usernameError,
+                suffixIcon: _isCheckingUsername
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : null,
               ),
+              onChanged: (value) {
+                // Clear error message on input change
+                if (_usernameError != null) {
+                  setState(() {
+                    _usernameError = null;
+                  });
+                }
+              },
               validator: (value) {
-                // Validate username input
                 if (value == null || value.isEmpty) {
                   return 'Please enter a username.';
                 }
-                if (!isUserInDatabase(value)) {
-                  return 'No such user found. Please check the username.';
-                }
-                return null; // No validation errors
+                return null;
               },
             ),
           ],
@@ -39,39 +95,30 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             if (_formKey.currentState?.validate() == true) {
-              String username = _usernameController.text;
+              await validateUsername(userViewModel);
 
-              // Add your invite logic here
-              print('Inviting $username');
+              if (_usernameError == null) {
+                String username = _usernameController.text;
 
-              // Close the dialog
-              Navigator.of(context).pop();
+                // Trigger the onInvite callback
+                widget.onInvite?.call(_userToInvite.id);
+
+                // Close the dialog
+                Navigator.of(context).pop();
+              }
             }
           },
-          child: Text('Invite'),
+          child: const Text('Invite'),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
       ],
     );
-  }
-
-  // Simulate a method to check if the user exists in the database
-  bool isUserInDatabase(String username) {
-    // Replace this with your actual database check
-    List<String> validUsernames = ['user1@example.com', 'user2@example.com'];
-    return validUsernames.contains(username);
-  }
-
-  // Simple username validation method
-  bool isValidUsername(String username) {
-    // Use a regex or a more sophisticated validation if needed
-    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(username);
   }
 }
