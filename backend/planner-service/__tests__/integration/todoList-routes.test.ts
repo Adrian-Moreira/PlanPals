@@ -84,71 +84,14 @@ describe('Integration Test: TodoList API', () => {
       expect(response.body.data).toHaveLength(1)
     })
 
-    it('should return Not Found', async () => {
+    it('should return OK and get todo lists for user', async () => {
       const response = await request(app.app)
         .get(`/todoList?userId=${testUser2._id.toString()}`)
         .expect('Content-Type', /json/)
-        .expect(StatusCodes.NOT_FOUND)
-
-      expect(response.body.success).toBe(false)
-    })
-
-    it('should return OK and get todoLists for user with access rw', async () => {
-      const response = await request(app.app)
-        .get(`/todoList?userId=${testUser1._id.toString()}&access=rw`)
-        .expect('Content-Type', /json/)
         .expect(StatusCodes.OK)
 
       expect(response.body.success).toBe(true)
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].name).toBe('Test Todo List')
-    })
-
-    it('should return OK and get todoLists for user with access ro', async () => {
-      const response = await request(app.app)
-        .get(`/todoList?userId=${testUser2._id.toString()}&access=ro`)
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.OK)
-
-      expect(response.body.success).toBe(true)
-      expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].name).toBe('Test Todo List')
-    })
-
-    it('should return Not Found', async () => {
-      const response = await request(app.app)
-        .get(`/todoList?userId=${testUser2._id.toString()}&access=rw`)
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.NOT_FOUND)
-
-      expect(response.body.success).toBe(false)
-    })
-
-    it('should return Bad Request', async () => {
-      const response = await request(app.app)
-        .get(`/todoList?userId=RandomUser&access=rw`)
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.BAD_REQUEST)
-
-      expect(response.body.success).toBe(false)
-    })
-
-    it('should return Bad Request', async () => {
-      const response = await request(app.app)
-        .get(`/todoList?userId=${testUser1._id.toString()}&access=RandomAccess`)
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.BAD_REQUEST)
-
-      expect(response.body.success).toBe(false)
-    })
-
-    it('should return Not Found', async () => {
-      const response = await request(app.app)
-        .get(`/todoList?userId=${testUser1._id.toString()}&access=ro`)
-        .expect('Content-Type', /json/)
-        .expect(StatusCodes.NOT_FOUND)
-
-      expect(response.body.success).toBe(false)
     })
 
     it('should return Bad Request', async () => {

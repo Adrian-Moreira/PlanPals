@@ -127,19 +127,9 @@ export const deleteTodoListDocument = async (req: Request, res: Response, next: 
 export const getTodoListDocumentsByUserId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetUser, access } = req.body.out
 
-  let resultTodoList
-
-  switch (access) {
-    case 'rw':
-      resultTodoList = await TodoListModel.find({ $or: [{ createdBy: targetUser._id }, { rwUsers: targetUser._id }] })
-      break
-    case 'ro':
-      resultTodoList = await TodoListModel.find({ roUsers: targetUser._id })
-      break
-    default:
-      resultTodoList = await TodoListModel.find({ createdBy: targetUser._id })
-      break
-  }
+  let resultTodoList = await TodoListModel.find({
+    $or: [{ createdBy: targetUser._id }, { rwUsers: targetUser._id }, { roUsers: targetUser._id }],
+  })
 
   if (!resultTodoList || resultTodoList.length === 0) {
     req.body.err = new RecordNotFoundException({
@@ -246,10 +236,7 @@ async function verifyTodoListExists(req: Request, res: Response, next: NextFunct
 async function verifyUserCanEditTodoList(req: Request, res: Response, next: NextFunction) {
   const { todoList, targetUser } = req.body.out
 
-  if (
-    todoList.rwUsers.includes(targetUser._id) ||
-    todoList.createdBy?.toString() === targetUser._id.toString()
-  ) {
+  if (todoList.rwUsers.includes(targetUser._id) || todoList.createdBy?.toString() === targetUser._id.toString()) {
     req.body.out = { ...req.body.out, todoList }
   } else {
     req.body.err = new RecordNotFoundException({
