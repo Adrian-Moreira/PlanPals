@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes'
 import { UserModel } from '../../src/models/User'
 import { TodoListModel } from '../../src/models/TodoList'
 import { TodoTaskModel } from '../../src/models/TodoTask'
+import e from 'express'
 
 let app: PlanPals
 
@@ -84,14 +85,13 @@ describe('Integration Test: TodoList API', () => {
       expect(response.body.data).toHaveLength(1)
     })
 
-    it('should return OK and get todo lists for user', async () => {
+    it('should return Not Found', async () => {
       const response = await request(app.app)
         .get(`/todoList?userId=${testUser2._id.toString()}`)
         .expect('Content-Type', /json/)
-        .expect(StatusCodes.OK)
+        .expect(StatusCodes.NOT_FOUND)
 
-      expect(response.body.success).toBe(true)
-      expect(response.body.data).toHaveLength(1)
+      expect(response.body.success).toBe(false)
     })
 
     it('should return Bad Request', async () => {

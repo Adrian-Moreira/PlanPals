@@ -33,7 +33,7 @@ describe('TodoList->deleteTodoList with Cascade Deletion', () => {
     req = {
       body: {
         out: {
-          targetTodoList: existingTodoList,
+          todoList: existingTodoList,
         },
       },
     }
@@ -45,7 +45,7 @@ describe('TodoList->deleteTodoList with Cascade Deletion', () => {
   })
 
   it('should delete existing todo list', async () => {
-    todoListMock.expects('findOneAndDelete').resolves(existingTodoList)
+    todoListMock.expects('findOneAndDelete').withArgs({ _id: existingTodoList._id }).resolves(existingTodoList)
 
     await TodoListService.deleteTodoListDocument(req as Request, res as Response, next as NextFunction)
 

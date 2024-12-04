@@ -66,14 +66,16 @@ export const createTodoListDocument = async (req: Request, res: Response, next: 
  * The function sets `req.body.status` to 200 (OK).
  */
 export const updateTodoListDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { todoList, name, description, rwUsers, roUsers } = req.body.out
+  const { todoList, targetTodoList, name, description, rwUsers, roUsers } = req.body.out
 
-  todoList.name = name || todoList.name
-  todoList.description = description || todoList.description
-  todoList.rwUsers = rwUsers || todoList.rwUsers
-  todoList.roUsers = roUsers || todoList.roUsers
+  const list = todoList ?? targetTodoList
 
-  const savedTodoList = await TodoListModel.findOneAndUpdate({ _id: todoList._id }, todoList, { new: true })
+  list.name = name || list.name
+  list.description = description || list.description
+  list.rwUsers = rwUsers || list.rwUsers
+  list.roUsers = roUsers || list.roUsers
+
+  const savedTodoList = await TodoListModel.findOneAndUpdate({ _id: list._id }, list, { new: true })
 
   req.body.result = savedTodoList
   req.body.dataType = TodoListCollection
@@ -99,7 +101,10 @@ export const deleteTodoListDocument = async (req: Request, res: Response, next: 
   const { todoList } = req.body.out
 
   const targetTodoList = await TodoListModel.findOneAndDelete({ _id: todoList._id })
-  await TodoTaskModel.deleteMany({ todoListId: todoList._id })
+
+  for (const taskId of todoList.tasks) {
+    await TodoTaskModel.findOneAndDelete({ _id: taskId })
+  }
 
   req.body.result = targetTodoList
   req.body.dataType = TodoListCollection
@@ -127,9 +132,19 @@ export const deleteTodoListDocument = async (req: Request, res: Response, next: 
 export const getTodoListDocumentsByUserId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetUser, access } = req.body.out
 
-  let resultTodoList = await TodoListModel.find({
-    $or: [{ createdBy: targetUser._id }, { rwUsers: targetUser._id }, { roUsers: targetUser._id }],
-  })
+  let resultTodoList
+
+  switch (access) {
+    case 'rw':
+      resultTodoList = await TodoListModel.find({ $or: [{ createdBy: targetUser._id }, { rwUsers: targetUser._id }] })
+      break
+    case 'ro':
+      resultTodoList = await TodoListModel.find({ roUsers: targetUser._id })
+      break
+    default:
+      resultTodoList = await TodoListModel.find({ createdBy: targetUser._id })
+      break
+  }
 
   if (!resultTodoList || resultTodoList.length === 0) {
     req.body.err = new RecordNotFoundException({
@@ -157,9 +172,11 @@ export const getTodoListDocumentsByUserId = async (req: Request, res: Response, 
  * The function sets the response status to 200 (OK).
  */
 export const getTodoListDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { todoList } = req.body.out
+  const { targetTodoList, todoList } = req.body.out
+  
+  const list = todoList ?? targetTodoList;
 
-  req.body.result = todoList
+  req.body.result = list
   req.body.status = StatusCodes.OK
   next()
 }
@@ -234,14 +251,19 @@ async function verifyTodoListExists(req: Request, res: Response, next: NextFunct
  * If the user has permission, the targetTodoList is added to the request body output.
  */
 async function verifyUserCanEditTodoList(req: Request, res: Response, next: NextFunction) {
-  const { todoList, targetUser } = req.body.out
+  const { targetTodoList, todoList, targetUser } = req.body.out
 
-  if (todoList.rwUsers.includes(targetUser._id) || todoList.createdBy?.toString() === targetUser._id.toString()) {
-    req.body.out = { ...req.body.out, todoList }
+  const list = todoList ?? targetTodoList;
+
+  if (
+    list.rwUsers.includes(targetUser._id) ||
+    list.createdBy?.toString() === list._id.toString()
+  ) {
+    req.body.out = { ...req.body.out, list }
   } else {
     req.body.err = new RecordNotFoundException({
       recordType: 'todoList',
-      recordId: todoList._id,
+      recordId: list._id,
     })
     next(req.body.err)
   }
@@ -264,20 +286,22 @@ async function verifyUserCanEditTodoList(req: Request, res: Response, next: Next
  * is added to the request body output.
  */
 async function verifyUserCanViewTodoList(req: Request, res: Response, next: NextFunction) {
-  const { targetUser, todoList } = req.body.out
+  const { targetUser, todoList, targetTodoList } = req.body.out
+
+  const list = todoList ?? targetTodoList;
 
   if (
-    !todoList.roUsers.includes(targetUser._id) &&
-    !todoList.rwUsers.includes(targetUser._id) &&
-    todoList.createdBy?.toString() !== targetUser._id.toString()
+    !list.roUsers.includes(targetUser._id) &&
+    !list.rwUsers.includes(targetUser._id) &&
+    list.createdBy?.toString() !== targetUser._id.toString()
   ) {
     req.body.err = new RecordNotFoundException({
-      recordType: 'todoList',
-      recordId: todoList._id,
+      recordType: 'list',
+      recordId: list._id,
     })
     next(req.body.err)
   } else {
-    req.body.out = { ...req.body.out, todoList }
+    req.body.out = { ...req.body.out, list }
   }
   next()
 }
