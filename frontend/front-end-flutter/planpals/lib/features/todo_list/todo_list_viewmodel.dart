@@ -129,4 +129,25 @@ class TodoListViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> inviteUserToTodoList(String todoListId, String userId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    
+    try {
+      TodoList updated = await _todoListService.inviteUserToTodoList(todoListId, userId);
+
+      _todoLists
+          .firstWhere((todoList) => todoList.id == todoListId)
+          .update(updated);
+
+      currentTodoList = updated;
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

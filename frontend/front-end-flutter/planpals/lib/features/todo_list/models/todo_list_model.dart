@@ -54,4 +54,12 @@ class TodoList {
       'rwUsers': rwUsers,
     };
   }
+
+  void update(TodoList updated) {
+    name = updated.name;
+    description = updated.description;
+    tasks = updated.tasks;
+    roUsers = updated.roUsers;
+    rwUsers = updated.rwUsers;
+  }
 }

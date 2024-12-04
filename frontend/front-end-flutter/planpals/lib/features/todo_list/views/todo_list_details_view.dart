@@ -41,13 +41,8 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
   }
 
   Future<void> _handleOnInviteUser(String userId) async {
-    // await Provider.of<TodoListViewModel>(context, listen: false)
-    //     .inviteUserToShoppingList(shoppingList.id, userId);
-
-    // setState(() {
-    //   shoppingList = Provider.of<ShoppingListViewModel>(context, listen: false)
-    //       .currentShoppingList!;
-    // });
+    await Provider.of<TodoListViewModel>(context, listen: false)
+        .inviteUserToTodoList(todoList.id, userId);
   }
 
   @override
@@ -88,10 +83,8 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                     onPressed: () {
                       showDialog(
                           context: context,
-                          builder: (context) => InviteUserDialog(
-                              // TODO: Add invite functionality
-
-                              onInvite: _handleOnInviteUser));
+                          builder: (context) =>
+                              InviteUserDialog(onInvite: _handleOnInviteUser));
                     },
                     icon: const Icon(
                       Icons.group_add,

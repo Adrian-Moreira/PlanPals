@@ -40,7 +40,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
 
     if (fetchedUser == null) {
       setState(() {
-        _usernameError = 'User not found. Please enter a valid username.';
+        _usernameError = 'User not found.';
       });
     }
 
@@ -53,7 +53,8 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
 
   @override
   Widget build(BuildContext context) {
-    UserViewModel userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    UserViewModel userViewModel =
+        Provider.of<UserViewModel>(context, listen: false);
 
     return AlertDialog(
       title: const Text('Invite User'),
@@ -105,6 +106,8 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
                 // Trigger the onInvite callback
                 widget.onInvite?.call(_userToInvite.id);
 
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Invited $username successfully!')));
                 // Close the dialog
                 Navigator.of(context).pop();
               }
