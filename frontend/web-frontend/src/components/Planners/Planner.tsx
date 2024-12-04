@@ -175,34 +175,34 @@ export default function Planner(props: PlannerProps) {
 
   //NEAR REAL TIME UPDATES-----------------------
 
-  // useEffect(() => {
-  //   if (!pUser.ppUser) return
-  //   if (webSocket.readyState !== 1) return
-  //   subscribe([{ type: 'planners', id: pUser.ppUser._id }])
-  // }, [pUser.ppUser, subscribe, onReload, isLoading])
+  useEffect(() => {
+    if (!pUser.ppUser) return
+    if (webSocket.readyState !== 1) return
+    subscribe([{ type: 'planners', id: pUser.ppUser._id }])
+  }, [pUser.ppUser, subscribe, onReload, isLoading])
 
-  // useEffect(() => {
-  //   if (!pUser.ppUser) return
-  //   const relevantEntries = Object.entries(messages).filter(
-  //     ([, msg]) =>
-  //       msg.topic.type === 'planners' && msg.topic.id === pUser.ppUser!._id && msg.message.type === 'Planner',
-  //   )
-  //   relevantEntries.forEach(([msgId, msg]) => {
-  //     switch (msg.action) {
-  //       case 'update':
+  useEffect(() => {
+    if (!pUser.ppUser) return
+    const relevantEntries = Object.entries(messages).filter(
+      ([, msg]) =>
+        msg.topic.type === 'planners' && msg.topic.id === pUser.ppUser!._id && msg.message.type === 'Planner',
+    )
+    relevantEntries.forEach(([msgId, msg]) => {
+      switch (msg.action) {
+        case 'update':
           
-  //         props.planner.name = msg.message.data.name
-  //         props.planner.description = msg.message.data.description
+          props.planner.name = msg.message.data.name
+          props.planner.description = msg.message.data.description
 
-  //         delete messages[msgId]
-  //         break
-  //       case 'delete':
-  //         nav('/planners')
-  //         delete messages[msgId]
-  //         break
-  //     }
-  //   })
-  // }, [messages,])
+          delete messages[msgId]
+          break
+        case 'delete':
+          nav('/planners')
+          delete messages[msgId]
+          break
+      }
+    })
+  }, [messages,])
 
 
   //EDIT PLANNER FORM-------------------------------------
