@@ -53,6 +53,7 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
   }, [fields.shoppingListName, fields.shoppingListDescription])
 
   useEffect(() => {
+    fetchPalList();
     validateShoppingListForm()
   }, [validateShoppingListForm])
 

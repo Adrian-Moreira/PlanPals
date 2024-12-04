@@ -25,10 +25,25 @@ export default function ShoppingListCreateView(props: ShoppingListEditViewProps)
     shoppingListName: props.shoppingList.name,
     shoppingListDescription: props.shoppingList.description,
   })
+  const [palList, setPalList] = React.useState<PPUser[]>([])
+  const [selectedPals, setSelectedPals] = React.useState<PPUser[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [userMap] = useAtom(userMapAtom)
   const [pUser] = useAtom(ppUserAtom)
   const [pError, setPError] = useState(false)
+
+  const fetchPalList = useCallback(async () => {
+    try {
+      const res = await apiLib.get('/user/ls', {})
+      const pals: PPUser[] = res.data.data
+      pals.map((p) => userMap.set(p._id, p))
+      setPalList(pals)
+      return res.data.success ? pals : []
+    } catch {
+      console.error('No Users Fetched')
+      return []
+    }
+  }, [])
 
   const validateShoppingListForm = useCallback(() => {
     const isNameValid = fields.shoppingListName.length > 0
@@ -38,12 +53,27 @@ export default function ShoppingListCreateView(props: ShoppingListEditViewProps)
   }, [fields.shoppingListName, fields.shoppingListDescription])
 
   useEffect(() => {
+    fetchPalList();
     validateShoppingListForm()
   }, [validateShoppingListForm])
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
     setIsLoading(true)
+    if(selectedPals.length > 0){
+      try {
+        const res = await apiLib.post(`/shoppingList/${props.shoppingList._id}/invite`, {
+          data: {
+            userIds: selectedPals.map((p) => p._id)
+          },
+        })
+        if (res.data.success) {
+          setSelectedPals([])
+        }
+      } catch (e) {
+        onError(e)
+      }
+    }
     try {
       const res = await apiLib.patch(`/shoppingList/${props.shoppingList._id}`, {
         data: {
@@ -59,6 +89,7 @@ export default function ShoppingListCreateView(props: ShoppingListEditViewProps)
     } catch (e) {
       onError(e)
     }
+    
   }
 
   const renderEditShoppingList = useCallback(() => {
@@ -80,6 +111,39 @@ export default function ShoppingListCreateView(props: ShoppingListEditViewProps)
               onChange={handleFieldChange}
             />
           </MUI.Stack>
+          <MUI.Box sx={{ flexDirection: 'column' }}>
+            <MUI.Stack spacing={2}>
+
+              <MUI.Typography variant="h6">Add Pals to plan together!</MUI.Typography>
+              <MUI.Autocomplete
+                multiple
+                id="pals-selection"
+                options={palList.filter((user) => user._id !== pUser.ppUser?._id)}
+                value={selectedPals}
+                onChange={(_, newValue) => setSelectedPals(newValue)}
+                getOptionLabel={(option) => option.preferredName || option.userName}
+                renderInput={(params) => (
+                  <MUI.TextField {...params} variant="outlined" label="Select Pals" placeholder="Search pals..." />
+                )}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => {
+                    const { key, ...otherProps } = getTagProps({ index })
+                    return (
+                      <MUI.Chip
+                        key={option._id} // Use explicit key
+                        label={option.preferredName || option.userName}
+                        {...otherProps}
+                        onDelete={() => {
+                          const newSelected = selectedPals.filter((pal) => pal._id !== option._id)
+                          setSelectedPals(newSelected)
+                        }}
+                      />
+                    )
+                  })
+                }
+              />
+            </MUI.Stack>
+          </MUI.Box>
         </MUI.Box>
       </MUI.Box>
     )
@@ -88,6 +152,8 @@ export default function ShoppingListCreateView(props: ShoppingListEditViewProps)
     fields.shoppingListName,
     handleSubmit,
     props.open,
+    palList,
+    selectedPals,
   ])
 
   return (
