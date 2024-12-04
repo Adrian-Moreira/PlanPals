@@ -21,7 +21,7 @@ todoTaskRouter.post(
     TodoTaskValidator.createTodoTask,
     UserService.verifyUserExists,
     TodoListService.verifyTodoListExists,
-    TodoListService.verifyUserCanViewTodoList,
+    TodoListService.verifyUserCanEditTodoList,
     TodoTaskService.createTodoTaskDocument,
     publishUpdateEvent
 )
