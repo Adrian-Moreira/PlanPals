@@ -14,6 +14,10 @@ import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { onError } from '../../lib/errorLib'
 import { useNavigate } from 'react-router-dom'
+import ActivityCreate from '../Activities/ActivityCreate'
+import ActivityItems from '../Activities/ActivityItems'
+import { useFormFields } from '../../lib/hooksLib'
+import { useWebSocket } from '../../lib/wsLib'
 //import { toast } from 'react-toastify'
 import { NotificationContext  } from '../../components/Notifications/notificationContext';
 
@@ -28,6 +32,7 @@ export interface PPPlanner {
   endDate: string
   destinations: string[]
   transportations: string[]
+  activities: string[]
 }
 
 export interface PlannerProps {
@@ -36,20 +41,27 @@ export interface PlannerProps {
   planner: PPPlanner
 }
 
-//const { setNotification } = useContext(NotificationContext);
-
-const tabs = ['Destination', 'Transportation']
+const tabs = ['Destination', 'Transportation', 'Activities']
 
 export default function Planner(props: PlannerProps) {
+  const [selectedTab, setSelectedTab] = useState(tabs[0])
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openEditDialog, setOpenEditDialog] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentDestination, setCurrentDestination] = useState({})
+  const [creationDialogOpen, setCreationDialogOpen] = useState(false)
+  const [pUser] = useAtom(ppUserAtom)
+  const [editError, setEditError] = useState(false)
+  const { webSocket, messages, subscribe, unsubscribe } = useWebSocket()
+  const [onReload, setOnReload] = useState(false)
+  const nav = useNavigate()
+//const { setNotification } = useContext(NotificationContext);
   const { setNotification } = useContext(NotificationContext); // Use context here
-  const [selectedTab, setSelectedTab] = useState(tabs[0]);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentDestination, setCurrentDestination] = useState({});
-  const [creationDialogOpen, setCreationDialogOpen] = useState(false);
-  const [pUser] = useAtom(ppUserAtom);
-  const nav = useNavigate();
+
+  const [fields, handleFieldChange] = useFormFields({
+    plannerName: '' + props.planner.name,
+    plannerDescription: '' + props.planner.description,
+  })
 
   const handleDeletePlanner = useCallback(async () => {
     try {
@@ -73,7 +85,25 @@ export default function Planner(props: PlannerProps) {
     } catch (err) {
       setNotification?.({ type: 'error', message: "Error updating: Planner mightn't be updated" });
     }
-  }, [props.planner._id, pUser.ppUser, nav, setNotification]);
+  }, [])
+
+  const handleEditPlanner = useCallback(async () => {
+    if(!editError){
+      try {
+        console.log(fields.plannerName)
+
+        const res = await apiLib.patch(`/planner/${props.planner._id}?userId=${pUser.ppUser!._id}`, {
+          data: {
+            name: fields.plannerName,
+            description: fields.plannerDescription
+          }
+        })
+        setOpenEditDialog(false)
+      } catch {
+        onError("Error editing: Planner mightn't been edited")
+      }
+    }
+  }, [fields.plannerName, fields.plannerDescription, editError])
 
   const mkTabItems = useCallback(() => {
     const elements = [
@@ -139,6 +169,18 @@ export default function Planner(props: PlannerProps) {
           </>,
         )
         break
+      case tabs[2]:
+        elements.push(
+          <>
+            <ActivityCreate
+              open={creationDialogOpen}
+              setOpen={setCreationDialogOpen}
+              planner={props.planner}
+            ></ActivityCreate>
+            <ActivityItems planner={props.planner}></ActivityItems>
+          </>,
+        )
+        break
       default:
         elements.push(<MUI.Typography variant={'body1'}> No {selectedTab} </MUI.Typography>)
         break
@@ -146,6 +188,100 @@ export default function Planner(props: PlannerProps) {
 
     return <> {...elements}</>
   }, [isLoading, selectedTab, creationDialogOpen, props.planner._id])
+
+  
+  //NEAR REAL TIME UPDATES-----------------------
+
+  useEffect(() => {
+    if (!pUser.ppUser) return
+    if (webSocket.readyState !== 1) return
+    subscribe([{ type: 'planners', id: pUser.ppUser._id }])
+  }, [pUser.ppUser, subscribe, onReload, isLoading])
+
+  useEffect(() => {
+    if (!pUser.ppUser) return
+    const relevantEntries = Object.entries(messages).filter(
+      ([, msg]) =>
+        msg.topic.type === 'planners' && msg.topic.id === pUser.ppUser!._id && msg.message.type === 'Planner',
+    )
+    relevantEntries.forEach(([msgId, msg]) => {
+      switch (msg.action) {
+        case 'update':
+          
+          props.planner.name = msg.message.data.name
+          props.planner.description = msg.message.data.description
+
+          delete messages[msgId]
+          break
+        case 'delete':
+          nav('/planners')
+          delete messages[msgId]
+          break
+      }
+    })
+  }, [messages,])
+
+
+  //EDIT PLANNER FORM-------------------------------------
+
+  const getEditForm = useCallback(() => {
+    return (
+      <MUI.Box sx={{ mt: '1em', mb: '0em' }}>
+        <MUI.Box sx={{ gap: 4 }}>
+          <MUI.Stack spacing={2}>
+            <MUI.TextField
+              required
+              id="plannerName"
+              label="Planner Name"
+              error={editError}
+              helperText={editError && 'Name cannot be blank.'}
+              value={fields.plannerName}
+              onChange={handleFieldChange}
+            />
+            <MUI.TextField
+              id="plannerDescription"
+              label="Planner Description"
+              value={fields.plannerDescription}
+              onChange={handleFieldChange}
+            />
+          </MUI.Stack>
+          <MUI.Box sx={{ flexDirection: 'column' }}>
+            <MUI.Stack spacing={2}>
+              {/* add editting users who can view planner here if we have time */}
+            </MUI.Stack>
+          </MUI.Box>
+        </MUI.Box>
+      </MUI.Box>
+    )
+    
+  }, [
+    fields.plannerDescription,
+    fields.plannerName,
+    editError,
+  ])
+
+  const validateEditPlannerForm = useCallback(() => {
+    const isNameValid = fields.plannerName.length > 0
+    setEditError(!isNameValid)
+    return isNameValid
+  }, [fields.plannerName])
+
+  useEffect(() => {
+    validateEditPlannerForm()
+  }, [fields.plannerName])
+
+  function getRWUsers(){
+    let list = ''
+
+    props.planner.rwUsers.map((u) =>{
+      list += u + ', '
+    })
+
+    list = list.slice(0, list.length - 2)
+    
+    return list
+  }
+
 
   const { startDate, endDate } = convertDatePairs(props.planner.startDate, props.planner.endDate)
   return isLoading ?
@@ -162,9 +298,9 @@ export default function Planner(props: PlannerProps) {
                     <MUI.Box sx={{ mt: '0.8em' }}>
                       <CardActionButtons
                         titleDelete={'Do you really want to delete this planner?'}
-                        titleEdit={''}
+                        titleEdit={'Editting Planner'}
                         messageDelete={'This will remove everything associated with this planner.'}
-                        childrensEdit={<></>}
+                        childrensEdit={getEditForm()}
                         labelDelete={'PlannerDeleteDialog'}
                         labelEdit={'PlannerEditDialog'}
                         openEdit={openEditDialog}
@@ -215,7 +351,7 @@ export default function Planner(props: PlannerProps) {
                           Pals who can edit this planner:
                         </MUI.Typography>
                         <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="subtitle2">
-                          {props.planner.rwUsers.length < 1 ? 'None' : ''}
+                          {props.planner.rwUsers.length < 1 ? 'None' : getRWUsers()}
                         </MUI.Typography>
                       </MUI.Box>
                     </MUI.Box>

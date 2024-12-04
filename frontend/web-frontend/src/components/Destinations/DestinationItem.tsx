@@ -1,7 +1,7 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useEffect, useState } from 'react'
-import { convertDatePairs } from '../../lib/dateLib'
+import React, { useCallback, useEffect, useState } from 'react'
+import { combineDateAndTime, convertDatePairs } from '../../lib/dateLib'
 import VoteButtons from '../Votes/VoteButtons'
 import CommentButton from '../Comments/CommentButton'
 import config from '../../config'
@@ -12,9 +12,12 @@ import { MapContainer, Marker, Popup } from 'react-leaflet'
 import { TileLayer } from 'react-leaflet/TileLayer'
 import CardActionButtons from '../Common/CardActionButtons'
 import { onError } from '../../lib/errorLib'
-import { useCallback } from 'react'
 import apiLib from '../../lib/apiLib'
-import DestinationCreate from './DestinationCreate'
+import DatePickerValue from '../Common/DatePickerValue'
+import TimePickerValue from '../Common/TimePickerValue'
+import { PPPlanner } from '../Planners/Planner'
+import { useFormFields } from '../../lib/hooksLib'
+import AdaptiveDialog from '../Common/AdaptiveDialog'
 
 interface WeatherInfo {
   temp: number
@@ -33,11 +36,19 @@ export interface DestinationProps {
   country?: string
   state?: string
   currentUserId: string
+  planner: PPPlanner
   onClickHandler: () => void
 }
 
 export default function DestinationItem(props: DestinationProps) {
   const { startDate, endDate } = convertDatePairs(props.startDate, props.endDate)
+  const plannerStartDate = dayjs(props.planner.startDate)
+  const plannerEndDate = dayjs(props.planner.endDate)
+  const [startTime, setStartTime] = useState(dayjs(props.startDate))
+  const [endTime, setEndTime] = useState(dayjs(props.endDate))
+  const [editStartDate, setEditStartDate] = useState(dayjs(props.startDate))
+  const [editEndDate, setEditEndDate] = useState(dayjs(props.endDate))
+  const [timeError, setTimeError] = useState(false)
   const [weather, setWeather] = useState<WeatherInfo | null>(null)
   const [pUser] = useAtom(ppUserAtom)
   const regionName = new Intl.DisplayNames(['en'], { type: 'region' })
@@ -90,6 +101,7 @@ export default function DestinationItem(props: DestinationProps) {
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
+
   const handleDeleteAction = useCallback(async () => {
     const res = await apiLib.delete(`/planner/${props.plannerId}/destination/${props._id}`, {
       params: { userId: props.currentUserId },
@@ -100,14 +112,64 @@ export default function DestinationItem(props: DestinationProps) {
   }, [])
 
   const handleEditAction = useCallback(async () => {
-    const res = await apiLib.patch(`/planner/${props.plannerId}/destination/${props._id}`, {
-      params: { userId: props.currentUserId },
-      data: {},
-    })
-    if (!res.data.success) {
-      onError("Error deleting: Destination mightn't be updated")
+    if(!timeError){
+      console.log(editStartDate)
+
+      const res = await apiLib.patch(`/planner/${props.plannerId}/destination/${props._id}?userId=${props.currentUserId}`, {
+        data: {
+          startDate: editStartDate,
+          endDate: editEndDate
+        },
+      })
+      setOpenEditDialog(false)
+      if (!res.data.success) {
+        onError("Error deleting: Destination mightn't be updated")
+      }
     }
-  }, [])
+  }, [editStartDate, editEndDate, timeError])
+
+  //EDIT PLANNER FORM-------------------------------------
+
+  const getEditForm = useCallback(() => {
+    return (
+      <MUI.Box sx={{ mt: '1em', mb: '0em' }}>
+        <MUI.Box sx={{ gap: 4 }}>
+          <MUI.Box sx={{ flexDirection: 'column' }}>
+            <MUI.Stack spacing={2}>
+              {timeError && (
+                <MUI.Typography color="error" variant="subtitle1">
+                  Dates need to be within the planner's date.
+                </MUI.Typography>
+              )}
+              <DatePickerValue label={'From'} field={editStartDate} setField={setEditStartDate}></DatePickerValue>
+              <TimePickerValue label={'From'} field={startTime} setField={setStartTime}></TimePickerValue>
+              <DatePickerValue label={'To'} field={editEndDate} setField={setEditEndDate}></DatePickerValue>
+              <TimePickerValue label={'To'} field={endTime} setField={setEndTime}></TimePickerValue>
+            </MUI.Stack>
+          </MUI.Box>
+        </MUI.Box>
+      </MUI.Box>
+    )
+  }, [
+    editStartDate,
+    editEndDate,
+    startDate,
+    endDate,
+    timeError,
+  ])
+
+  const validateEditPlannerForm = useCallback(() => {
+    const isTimeValid =
+      editStartDate.isBefore(editEndDate) &&
+      combineDateAndTime(editStartDate, startTime).isAfter(plannerStartDate) &&
+      combineDateAndTime(editEndDate, endTime).isBefore(plannerEndDate)
+    setTimeError(!isTimeValid)
+    return isTimeValid
+  }, [editStartDate, editStartDate])
+
+  useEffect(() => {
+    validateEditPlannerForm()
+  }, [editStartDate, editStartDate])
 
   return (
     <MUI.Card sx={{ borderRadius: '0.5em', marginTop: '0.5em', marginBottom: '0.5em' }} key={props._id}>
@@ -129,11 +191,13 @@ export default function DestinationItem(props: DestinationProps) {
             setOpenDelete={setOpenDeleteDialog}
             handleDeleteAction={handleDeleteAction}
             titleEdit={'Editing destination'}
-            childrensEdit={<></>}
+            childrensEdit={getEditForm()}
             labelEdit={'TransportItemEdit'}
             openEdit={openEditDialog}
             setOpenEdit={setOpenEditDialog}
-            handleEditAction={handleEditAction}
+            handleEditAction={async () => {
+              await handleEditAction()
+            }}
           ></CardActionButtons>
         }
         subheader={
