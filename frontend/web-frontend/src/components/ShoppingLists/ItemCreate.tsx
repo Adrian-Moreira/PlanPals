@@ -9,6 +9,7 @@ import apiLib from '../../lib/apiLib'
 import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import { PPShoppingList } from './ShoppingList'
+import { useNavigate } from 'react-router-dom'
 
 
 export interface ItemCreateProps {
@@ -17,6 +18,7 @@ export interface ItemCreateProps {
   shoppingList: PPShoppingList
 }
 export default function ItemCreate(props: ItemCreateProps) {
+  const nav = useNavigate()
 
   const [isLoading, setIsLoading] = useState(false)
   const [pUser] = useAtom(ppUserAtom)
@@ -70,6 +72,8 @@ export default function ItemCreate(props: ItemCreateProps) {
         if (res.data.success) {
           fields.name = ''
           fields.location = ''
+          //Hacked in fix to shopping list refresh
+          nav(`/shoppingLists`)
         } else {
           throw new Error()
         }
