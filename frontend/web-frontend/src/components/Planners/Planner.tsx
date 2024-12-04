@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,useContext } from 'react'
 import SelectItems from '../Common/SelectItems'
 import { ppUser, PPUser, ppUserAtom } from '../../lib/authLib'
 import CardActionButtons from '../Common/CardActionButtons'
@@ -14,6 +14,8 @@ import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { onError } from '../../lib/errorLib'
 import { useNavigate } from 'react-router-dom'
+//import { toast } from 'react-toastify'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
 
 export interface PPPlanner {
   _id: string
@@ -34,29 +36,44 @@ export interface PlannerProps {
   planner: PPPlanner
 }
 
+//const { setNotification } = useContext(NotificationContext);
+
 const tabs = ['Destination', 'Transportation']
 
 export default function Planner(props: PlannerProps) {
-  const [selectedTab, setSelectedTab] = useState(tabs[0])
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
-  const [openEditDialog, setOpenEditDialog] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [currentDestination, setCurrentDestination] = useState({})
-  const [creationDialogOpen, setCreationDialogOpen] = useState(false)
-  const [pUser] = useAtom(ppUserAtom)
-  const nav = useNavigate()
+  const { setNotification } = useContext(NotificationContext); // Use context here
+  const [selectedTab, setSelectedTab] = useState(tabs[0]);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentDestination, setCurrentDestination] = useState({});
+  const [creationDialogOpen, setCreationDialogOpen] = useState(false);
+  const [pUser] = useAtom(ppUserAtom);
+  const nav = useNavigate();
 
   const handleDeletePlanner = useCallback(async () => {
     try {
       const res = await apiLib.delete(`/planner/${props.planner._id}`, {
         params: { userId: pUser.ppUser?._id },
-      })
-      nav('/planners')
-    } catch {
-      onError("Error deleting: Planner mightn't be removed")
+      });
+      setNotification?.({ type: 'success', message: 'Planner deleted successfully!' }); 
+      nav('/planners');
+    } catch (err) {
+      setNotification?.({ type: 'error', message: "Error deleting: Planner mightn't be removed" });
     }
-  }, [])
-  const handleEditPlanner = useCallback(async () => {}, [])
+  }, [props.planner._id, pUser.ppUser, nav, setNotification]);
+  
+  const handleUpdatePlanner = useCallback(async () => {
+    try {
+      const res = await apiLib.put(`/planner/${props.planner._id}`, {
+        params: { userId: pUser.ppUser?._id },
+      });
+      setNotification?.({ type: 'success', message: 'Planner updated successfully!' });
+      nav('/planners');
+    } catch (err) {
+      setNotification?.({ type: 'error', message: "Error updating: Planner mightn't be updated" });
+    }
+  }, [props.planner._id, pUser.ppUser, nav, setNotification]);
 
   const mkTabItems = useCallback(() => {
     const elements = [
@@ -158,7 +175,7 @@ export default function Planner(props: PlannerProps) {
                           await handleDeletePlanner()
                         }}
                         handleEditAction={async () => {
-                          await handleEditPlanner()
+                          await handleUpdatePlanner()
                         }}
                       ></CardActionButtons>
                     </MUI.Box>
