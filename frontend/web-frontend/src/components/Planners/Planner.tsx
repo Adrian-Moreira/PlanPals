@@ -172,8 +172,10 @@ export default function Planner(props: PlannerProps) {
     return <> {...elements}</>
   }, [isLoading, selectedTab, creationDialogOpen, props.planner._id])
 
-
+  
   //NEAR REAL TIME UPDATES-----------------------
+
+  console.log(props.planner.destinations)
 
   useEffect(() => {
     if (!pUser.ppUser) return
