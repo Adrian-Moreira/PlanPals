@@ -21,7 +21,7 @@ class TodoListService {
 
   Future<List<TodoList>> fetchTodoListsByUserId(String userId) async {
     try {
-      final response = await _apiService.get('/todoList?userId=$userId');
+      final response = await _apiService.get('/todoList?userId=$userId&access=rw');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       print("TODOLIST SERVICE FETCHING BY USERID: $jsonList");
       return jsonList.map((json) => TodoList.fromJson(json)).toList();
