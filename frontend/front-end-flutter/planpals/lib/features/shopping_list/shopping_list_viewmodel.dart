@@ -154,7 +154,6 @@ class ShoppingListViewModel extends ChangeNotifier {
           .update(updated);
 
       currentShoppingList = updated;
-      print(currentShoppingList!.toJson());
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
