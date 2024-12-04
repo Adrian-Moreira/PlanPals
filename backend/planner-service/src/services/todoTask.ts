@@ -60,8 +60,6 @@ const createTodoTaskDocument = async (req: Request, res: Response, next: NextFun
 const updateTodoTaskDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { targetTodoTask, name, assignedTo, dueDate, isCompleted } = req.body.out
 
-  console.log(`UPDATE TODO TASK: ${req.body}`)
-
   targetTodoTask.name = name || targetTodoTask.name
   targetTodoTask.assignedTo = assignedTo || targetTodoTask.assignedTo
   targetTodoTask.dueDate = dueDate || targetTodoTask.dueDate

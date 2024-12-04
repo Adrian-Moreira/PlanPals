@@ -45,7 +45,7 @@ describe('TodoTask->createTodoTask', () => {
       body: {
         out: {
           targetUser,
-          targetTodoList: existingTodoList,
+          todoList: existingTodoList,
           ...newTodoTask,
         },
       },
