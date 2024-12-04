@@ -22,6 +22,7 @@ export interface ActivityCreateProps {
 }
 export default function ActivityCreate(props: ActivityCreateProps) {
   const [nameError, setNameError] = useState(false)
+  const [locationError, setLocationError] = useState(false)
   const [destError, setDestError] = useState(false)
   const [durationError, setDurationError] = useState(false)
   const [timeError, setTimeError] = useState(false)
@@ -37,6 +38,7 @@ export default function ActivityCreate(props: ActivityCreateProps) {
 
   const [fields, handleFieldChange] = useFormFields({
     activityName: '',
+    activityLocation: '',
     duration: 0,
   })
   const handleSubmitActivity = useCallback(
@@ -48,6 +50,7 @@ export default function ActivityCreate(props: ActivityCreateProps) {
           data: {
             createdBy: pUser.ppUser!._id,
             name: fields.activityName,
+            location: fields.activityLocation,
             startDate: combineDateAndTime(startDate, startTime).toISOString(),
             duration: Number(fields.duration),
           },
@@ -61,6 +64,7 @@ export default function ActivityCreate(props: ActivityCreateProps) {
           setDurationError(false)
           props.setOpen(false)
           fields.activityName = ''
+          fields.activityLocation = ''
           fields.duration = 0
         } else {
           throw new Error()
@@ -69,18 +73,20 @@ export default function ActivityCreate(props: ActivityCreateProps) {
         onError('Erorr Creating Activity. Please retry later!')
       }
     },
-    [fields.activityName, startDate, startTime, fields.duration, pUser.ppUser],
+    [fields.activityName, startDate, startTime, fields.duration, pUser.ppUser, fields.activityLocation],
   )
 
   const validateCreateActivityForm = useCallback(() => {
     const isNameValid = fields.activityName.length > 0
     setNameError(!isNameValid)
+    const isLocationValid = fields.activityLocation.length > 0
+    setLocationError(!isLocationValid)
     const isDurationValid = fields.duration > 0
     setDurationError(!isDurationValid)
     const isTimeValid =
       combineDateAndTime(startDate, startTime).isAfter(plannerStartDate) && combineDateAndTime(startDate, startTime).isBefore(plannerEndDate)
     setTimeError(!isTimeValid)
-    return isNameValid && isTimeValid && isDurationValid
+    return isNameValid && isTimeValid && isDurationValid && isLocationValid
   }, [fields.activityName, startDate, fields.duration, startTime])
 
   useEffect(() => {
@@ -116,6 +122,15 @@ export default function ActivityCreate(props: ActivityCreateProps) {
                 value={fields.activityName}
                 onChange={handleFieldChange}
               />
+              <MUI.TextField
+                required
+                id="activityLocation"
+                label="Location"
+                error={locationError}
+                helperText={locationError && 'Location cannot be blank.'}
+                value={fields.activityLocation}
+                onChange={handleFieldChange}
+              />
               {timeError && (
                 <MUI.Typography color="error" variant="subtitle1">
                   Dates need to be within the planner's date.
@@ -147,6 +162,7 @@ export default function ActivityCreate(props: ActivityCreateProps) {
     fields.duration,
     startTime,
     destination,
+    fields.activityLocation
   ])
 
   return (

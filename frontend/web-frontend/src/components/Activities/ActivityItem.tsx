@@ -50,11 +50,87 @@ export default function ActivityItem(props: ActivityProps) {
     }
   }, [])
 
+
+ //EDIT PLANNER FORM-------------------------------------
+
+//  const getEditForm = useCallback(() => {
+//   return (
+//     <MUI.Box sx={{ mt: '1em', mb: '0em' }}>
+//       <MUI.Box sx={{ gap: 4 }}>
+//         <MUI.Box sx={{ flexDirection: 'column' }}>
+//         <SelectItems
+//               children={transportTypes.map((t) => (
+//                 <MUI.MenuItem key={t} value={t}>
+//                   <MUI.Typography variant="body1">
+//                     {getVehicleIcon(t)}
+//                     {`   ${t}`}
+//                   </MUI.Typography>
+//                 </MUI.MenuItem>
+//               ))}
+//               helperText={'Select transport type'}
+//               label={'Transport Type'}
+//               value={transportType}
+//               id={`trasport-items-${props.planner._id}`}
+//               setValue={setTransportType}
+//             ></SelectItems>
+//             <MUI.TextField
+//               helperText={'Optional'}
+//               id="transportDetails"
+//               label="Details"
+//               value={fields.transportDetails}
+//               onChange={handleFieldChange}
+//             />
+//             <MUI.TextField
+//               helperText={'Optional'}
+//               id="vehicleId"
+//               label="Vehicle ID"
+//               value={fields.vehicleId}
+//               onChange={handleFieldChange}
+//             />
+//           <MUI.Stack spacing={2}>
+//             {timeError && (
+//               <MUI.Typography color="error" variant="subtitle1">
+//                 Dates need to be within the planner's date.
+//               </MUI.Typography>
+//             )}
+//             <DatePickerValue label={'From'} field={editStartDate} setField={setEditStartDate}></DatePickerValue>
+//             <TimePickerValue label={'From'} field={startTime} setField={setStartTime}></TimePickerValue>
+//             <DatePickerValue label={'To'} field={editEndDate} setField={setEditEndDate}></DatePickerValue>
+//             <TimePickerValue label={'To'} field={endTime} setField={setEndTime}></TimePickerValue>
+//           </MUI.Stack>
+//         </MUI.Box>
+//       </MUI.Box>
+//     </MUI.Box>
+//   )
+// }, [
+//   editStartDate,
+//   editEndDate,
+//   startDate,
+//   endDate,
+//   timeError,
+//   fields.vehicleId,
+//   fields.transportDetails,
+//   transportType
+// ])
+
+// const validateEditPlannerForm = useCallback(() => {
+//   const isTimeValid =
+//     editStartDate.isBefore(editEndDate) &&
+//     combineDateAndTime(editStartDate, startTime).isAfter(plannerStartDate) &&
+//     combineDateAndTime(editEndDate, endTime).isBefore(plannerEndDate)
+//   setTimeError(!isTimeValid)
+//   return isTimeValid
+// }, [editStartDate, editStartDate])
+
+// useEffect(() => {
+//   validateEditPlannerForm()
+// }, [editStartDate, editStartDate])
+
   return (
     <MUI.Card sx={{ borderRadius: '0.5em', marginTop: '0.5em', marginBottom: '0.5em' }} key={props._id}>
       <MUI.CardHeader
         avatar={<MUIcons.LocationOn />}
-        title={props.name}
+        title={props.name + ' @ ' + props.locationName}
         action={
           <CardActionButtons
             titleDelete={`Deleting Activity:`}
@@ -64,7 +140,7 @@ export default function ActivityItem(props: ActivityProps) {
             setOpenDelete={setOpenDeleteDialog}
             handleDeleteAction={handleDeleteAction}
             titleEdit={'Editing Activity'}
-            childrensEdit={<></>}
+            childrensEdit={/*getEditForm()*/<></>}
             labelEdit={'ActivityItemEdit'}
             openEdit={openEditDialog}
             setOpenEdit={setOpenEditDialog}

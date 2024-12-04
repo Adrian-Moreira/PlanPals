@@ -92,6 +92,7 @@ export default function ActivityItems(props: ActivityItemsProps) {
             plannerId={props.planner._id}
             currentUserId={pUser.ppUser!._id}
             destinationId={d.destinationId}
+            locationName={d.location}
           />
         )),
     )
