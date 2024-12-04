@@ -125,7 +125,21 @@ export default function ShoppingList(props: ShoppingListProps) {
                       <MUIcons.People sx={{ mt: '0.7em' }} />
                       <MUI.Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                         <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="subtitle2">
-                          Pals who can edit this shopping list:
+                          Pals who can edit this shopping list: 
+                          {props.shoppingList.rwUsers.map((user) => {
+
+                            const [userName, setUserName] = useState('Loading...');
+
+                            useEffect(() => {
+                                fetchUserName(user).then((name) => setUserName(name));
+                            }, [user]);
+                            return(
+                                <MUI.Typography>
+                                  {userName}
+                                </MUI.Typography>
+                            )
+                            })
+                          }
                         </MUI.Typography>
                         <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="subtitle2">
                           {props.shoppingList.rwUsers.length < 1 ? 'None' : ''}

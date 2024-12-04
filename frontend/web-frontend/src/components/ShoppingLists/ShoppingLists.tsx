@@ -14,8 +14,7 @@ import { useWebSocket } from '../../lib/wsLib'
 import AddButton from '../Common/AddButton'
 import { PPShoppingList } from './ShoppingList'
 
-const titles = ['My Shopping Lists', 'Shopping Lists View Only', 'Shopping Lists I Can Edit']
-const paths = ['/shoppingList', '/shoppingList?access=ro', '/shoppingList?access=rw']
+const shoppingListURL = '/shoppingList'
 const sortFunctions: { name: string; mapper: (shoppingLists: PPShoppingList[]) => PPShoppingList[] }[] = [
   {
     name: 'List Name',
@@ -40,8 +39,6 @@ export default function ShoppingLists(props: ShoppingListsProps) {
   const [createNew, setCreateNew] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [onReload, setOnReload] = useState(false)
-  const [shoppingListTitle, setShoppingListTitle] = useState(titles[2])
-  const [shoppingListURL, setShoppingListURL] = useState(paths[2])
   const [sortingBy, setSortingBy] = useState(sortFunctions[0].name)
   const { webSocket, messages, subscribe, unsubscribe } = useWebSocket()
 
@@ -76,7 +73,7 @@ export default function ShoppingLists(props: ShoppingListsProps) {
         setIsLoading(false)
         if (!res || !pList || !res.data.success || pList.length < 1) {
           setShoppingListList([])
-          if (shoppingListTitle === titles[0]) setCreateNew(true)
+          setCreateNew(true)
         }
       }
     },
@@ -97,20 +94,6 @@ export default function ShoppingLists(props: ShoppingListsProps) {
   useEffect(() => {
     onLoad()
   }, [onLoad, onReload])
-
-  useEffect(() => {
-    switch (shoppingListTitle) {
-      case titles[0]:
-        setShoppingListURL(paths[0])
-        break
-      case titles[1]:
-        setShoppingListURL(paths[1])
-        break
-      case titles[2]:
-        setShoppingListURL(paths[2])
-        break
-    }
-  }, [shoppingListTitle])
 
   const sortShoppingListList = (pList: PPShoppingList[], sortBy: string) => {
     return sortFunctions.find((func) => func.name === sortBy)?.mapper([...pList]) ?? []
@@ -172,18 +155,6 @@ export default function ShoppingLists(props: ShoppingListsProps) {
         <MUI.Stack gap={8}>
           <MUI.Box sx={{ maxWidth: '100vw', display: 'flex', justifyContent: 'center' }}>
             <MUI.Box sx={{ display: 'flex', flexDirection: 'row', pr: '0.5em', flex: 0 }}>
-              <SelectItems
-                children={titles.map((selection) => (
-                  <MUI.MenuItem key={selection} value={selection}>
-                    <MUI.Typography variant="body1">{`${selection}`}</MUI.Typography>
-                  </MUI.MenuItem>
-                ))}
-                helperText={''}
-                label={'Viewing'}
-                value={shoppingListTitle}
-                id={'SelectShoppingListsView'}
-                setValue={setShoppingListTitle}
-              ></SelectItems>
               <SelectItems
                 children={sortFunctions.map((sortFunc) => (
                   <MUI.MenuItem key={sortFunc.name} value={sortFunc.name}>
