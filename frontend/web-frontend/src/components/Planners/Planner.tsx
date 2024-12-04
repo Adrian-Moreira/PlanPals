@@ -175,8 +175,6 @@ export default function Planner(props: PlannerProps) {
   
   //NEAR REAL TIME UPDATES-----------------------
 
-  console.log(props.planner.destinations)
-
   useEffect(() => {
     if (!pUser.ppUser) return
     if (webSocket.readyState !== 1) return
@@ -255,6 +253,19 @@ export default function Planner(props: PlannerProps) {
     validateEditPlannerForm()
   }, [fields.plannerName])
 
+  function getRWUsers(){
+    let list = ''
+
+    props.planner.rwUsers.map((u) =>{
+      list += u + ', '
+    })
+
+    list = list.slice(0, list.length - 2)
+    
+    return list
+  }
+
+
   const { startDate, endDate } = convertDatePairs(props.planner.startDate, props.planner.endDate)
   return isLoading ?
       <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
@@ -323,7 +334,7 @@ export default function Planner(props: PlannerProps) {
                           Pals who can edit this planner:
                         </MUI.Typography>
                         <MUI.Typography sx={{ mt: '0.5em', pl: '1em' }} variant="subtitle2">
-                          {props.planner.rwUsers.length < 1 ? 'None' : ''}
+                          {props.planner.rwUsers.length < 1 ? 'None' : getRWUsers()}
                         </MUI.Typography>
                       </MUI.Box>
                     </MUI.Box>
