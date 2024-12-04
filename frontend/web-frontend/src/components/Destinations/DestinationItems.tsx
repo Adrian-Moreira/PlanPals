@@ -5,7 +5,7 @@ import DestinationItem, { DestinationProps } from './DestinationItem'
 import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { ppUserAtom } from '../../lib/authLib'
-import { PPPlanner } from '../Planners/Planner'
+import Planner, { PPPlanner } from '../Planners/Planner'
 import { useWebSocket } from '../../lib/wsLib'
 
 export interface DestinationItemsProps {
@@ -84,6 +84,7 @@ export default function DestinationItems(props: DestinationItemsProps) {
             country={d.country}
             state={d.state}
             currentUserId={pUser.ppUser!._id}
+            planner={props.planner}
           />
         )),
     )
