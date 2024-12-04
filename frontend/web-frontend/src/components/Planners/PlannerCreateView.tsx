@@ -187,9 +187,6 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
   ]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div>
         <AdaptiveDialog
           open={props.open}
           setOpen={props.setOpen}
@@ -206,7 +203,5 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
             handleSubmit(e);
           }}
         ></AdaptiveDialog>
-      </div>
-    </ThemeProvider>
   );
 }
