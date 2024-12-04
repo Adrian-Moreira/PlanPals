@@ -2,7 +2,7 @@ import sinon from 'sinon'
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals'
 import { Request, Response, NextFunction } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { TodoTaskModel } from '../../../src/models/TodoTask'
+import { TodoListModel } from '../../../src/models/TodoList'
 import TodoListService from '../../../src/services/todoList'
 
 describe('TodoList->createTodoList', () => {
@@ -27,7 +27,7 @@ describe('TodoList->createTodoList', () => {
   }
 
   beforeEach(() => {
-    todoListMock = sinon.mock(TodoTaskModel)
+    todoListMock = sinon.mock(TodoListModel)
     req = {
       body: {
         out: {
@@ -51,7 +51,7 @@ describe('TodoList->createTodoList', () => {
     todoListMock.verify()
 
     // Verify response
-    expect(req.body.status).toEqual(StatusCodes.OK)
+    expect(req.body.status).toEqual(StatusCodes.CREATED)
     expect(req.body.result).toBeDefined()
     expect(req.body.result.createdBy).toEqual(targetUser._id)
     expect(req.body.result.name).toEqual('test')
