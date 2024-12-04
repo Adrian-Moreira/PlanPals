@@ -87,6 +87,7 @@ export default function TransportItems(props: TransportItemsProps) {
             from={t.from}
             to={t.to}
             currentUserId={pUser.ppUser!._id}
+            planner={props.planner}
           />
         )),
     )
