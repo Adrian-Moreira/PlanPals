@@ -31,10 +31,10 @@ export default function CardActionButtons(props: CardActionButtonsProps) {
         onConfirmHandler={async () => {
           await props.handleEditAction()
         }}
-        cancelEnable={false}
-        confirmEnable={false}
-        confirmButtonLabel={''}
-        cancelButtonLabel={''}
+        cancelEnable={true}
+        confirmEnable={true}
+        confirmButtonLabel={'Confirm'}
+        cancelButtonLabel={'Cancel'}
       ></AdaptiveDialog>
       <MUI.IconButton aria-label="settings" onClick={() => props.setOpenEdit(true)}>
         <MUIcons.Edit />
