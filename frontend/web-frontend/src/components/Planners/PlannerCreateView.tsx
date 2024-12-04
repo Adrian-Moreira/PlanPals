@@ -187,26 +187,21 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
   ]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div>
-        <AdaptiveDialog
-          open={props.open}
-          setOpen={props.setOpen}
-          label={'CreateNewPlanner'}
-          title={'Creating a New Planner'}
-          children={renderCreatePlanner()}
-          cancelEnable={props.hasPlanner}
-          confirmEnable={true}
-          confirmButtonLabel="Save and Continue"
-          confirmIcon={<MUIcons.Save sx={{ mr: '0.5em' }} />}
-          cancelButtonLabel="Cancel"
-          cancelIcon={<MUIcons.Cancel sx={{ mr: '0.5em' }} />}
-          onConfirmHandler={(e) => {
-            handleSubmit(e);
-          }}
-        ></AdaptiveDialog>
-      </div>
-    </ThemeProvider>
+    <AdaptiveDialog
+      open={props.open}
+      setOpen={props.setOpen}
+      label={'CreateNewPlanner'}
+      title={'Creating a New Planner'}
+      children={renderCreatePlanner()}
+      cancelEnable={props.hasPlanner}
+      confirmEnable={true}
+      confirmButtonLabel="Save and Continue"
+      confirmIcon={<MUIcons.Save sx={{ mr: '0.5em' }} />}
+      cancelButtonLabel="Cancel"
+      cancelIcon={<MUIcons.Cancel sx={{ mr: '0.5em' }} />}
+      onConfirmHandler={(e) => {
+        handleSubmit(e);
+      }}
+    ></AdaptiveDialog>
   );
 }
