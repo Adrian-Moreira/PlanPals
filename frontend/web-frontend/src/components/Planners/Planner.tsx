@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,useContext } from 'react'
 import SelectItems from '../Common/SelectItems'
 import { ppUser, PPUser, ppUserAtom } from '../../lib/authLib'
 import CardActionButtons from '../Common/CardActionButtons'
@@ -18,6 +18,8 @@ import ActivityCreate from '../Activities/ActivityCreate'
 import ActivityItems from '../Activities/ActivityItems'
 import { useFormFields } from '../../lib/hooksLib'
 import { useWebSocket } from '../../lib/wsLib'
+//import { toast } from 'react-toastify'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
 
 export interface PPPlanner {
   _id: string
@@ -53,6 +55,8 @@ export default function Planner(props: PlannerProps) {
   const { webSocket, messages, subscribe, unsubscribe } = useWebSocket()
   const [onReload, setOnReload] = useState(false)
   const nav = useNavigate()
+//const { setNotification } = useContext(NotificationContext);
+  const { setNotification } = useContext(NotificationContext); // Use context here
 
   const [fields, handleFieldChange] = useFormFields({
     plannerName: '' + props.planner.name,
@@ -63,10 +67,23 @@ export default function Planner(props: PlannerProps) {
     try {
       const res = await apiLib.delete(`/planner/${props.planner._id}`, {
         params: { userId: pUser.ppUser?._id },
-      })
-      nav('/planners')
-    } catch {
-      onError("Error deleting: Planner mightn't be removed")
+      });
+      setNotification?.({ type: 'success', message: 'Planner deleted successfully!' }); 
+      nav('/planners');
+    } catch (err) {
+      setNotification?.({ type: 'error', message: "Error deleting: Planner mightn't be removed" });
+    }
+  }, [props.planner._id, pUser.ppUser, nav, setNotification]);
+  
+  const handleUpdatePlanner = useCallback(async () => {
+    try {
+      const res = await apiLib.put(`/planner/${props.planner._id}`, {
+        params: { userId: pUser.ppUser?._id },
+      });
+      setNotification?.({ type: 'success', message: 'Planner updated successfully!' });
+      nav('/planners');
+    } catch (err) {
+      setNotification?.({ type: 'error', message: "Error updating: Planner mightn't be updated" });
     }
   }, [])
 
@@ -294,7 +311,7 @@ export default function Planner(props: PlannerProps) {
                           await handleDeletePlanner()
                         }}
                         handleEditAction={async () => {
-                          await handleEditPlanner()
+                          await handleUpdatePlanner()
                         }}
                       ></CardActionButtons>
                     </MUI.Box>

@@ -4,7 +4,8 @@
     "sso": "aws sso login --sso-session=pp"
   },
   "dependencies": {
-    "amqplib": "^0.10.4"
+    "amqplib": "^0.10.4",
+    "react-toastify": "^10.0.6"
   },
   "devDependencies": {
     "prettier": "3.3.3",

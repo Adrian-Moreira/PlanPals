@@ -41,6 +41,11 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
     functional = planner.rwUsers.contains(user!.id);
   }
 
+  Future<void> _handleOnInviteUser(String userId) async {
+    await Provider.of<PlannerViewModel>(context, listen: false)
+        .inviteUserToPlanner(planner.plannerId, userId);
+  }
+
   Future<void> fetchData() async {
     await Provider.of<PlannerViewModel>(context, listen: false)
         .fetchDestinationsAndTransportsByPlannerId(
@@ -97,6 +102,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                                 context: context,
                                 builder: (context) => InviteUserDialog(
                                     // TODO: Add invite functionality
+                                    onInvite: _handleOnInviteUser
                                     ));
                           },
                           icon: const Icon(

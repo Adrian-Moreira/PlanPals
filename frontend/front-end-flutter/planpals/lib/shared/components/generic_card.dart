@@ -13,6 +13,8 @@ class GenericCard extends StatefulWidget {
   final Vote? vote;
   final String? objectId;
   final String? type;
+  final bool? commentable;
+  final bool? voteable;
 
   const GenericCard({
     super.key,
@@ -25,6 +27,8 @@ class GenericCard extends StatefulWidget {
     required this.functional,
     this.objectId,
     this.type,
+    this.commentable = true,
+    this.voteable = true,
   });
 
   @override
@@ -40,6 +44,11 @@ class _GenericCardState extends State<GenericCard> {
   @override
   void initState() {
     super.initState();
+
+
+    if (widget.vote == null) {
+      return;
+    }
 
     vote = widget.vote!;
 
@@ -63,7 +72,10 @@ class _GenericCardState extends State<GenericCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               widget.subtitle,
-              Row(children: [
+
+              widget.commentable == true && widget.voteable == true
+
+              ? Row(children: [
                 _buildVoteButtons(context, vote), // Add vote buttons
 
                 const SizedBox(
@@ -85,9 +97,18 @@ class _GenericCardState extends State<GenericCard> {
                       );
                     },
                     icon: const Icon(Icons.comment)),
-              ]),
-              const SizedBox(height: 10),
-              widget.extraInfo ?? Container(),
+              ])
+              
+              : Container(),
+              
+              widget.extraInfo != null
+                ? Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      widget.extraInfo!,
+                    ],
+                  )
+                : Container(),
             ],
           ),
         ),
