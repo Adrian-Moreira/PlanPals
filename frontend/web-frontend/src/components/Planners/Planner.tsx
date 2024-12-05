@@ -20,6 +20,8 @@ import { useFormFields } from '../../lib/hooksLib'
 import { useWebSocket } from '../../lib/wsLib'
 //import { toast } from 'react-toastify'
 import { NotificationContext  } from '../../components/Notifications/notificationContext';
+import AccommodationCreate from '../Accommodations/AccommodationCreate'
+import AccommodationItems from '../Accommodations/AccommodationItems'
 
 export interface PPPlanner {
   _id: string
@@ -41,7 +43,7 @@ export interface PlannerProps {
   planner: PPPlanner
 }
 
-const tabs = ['Destination', 'Transportation', 'Activities']
+const tabs = ['Destination', 'Transportation', 'Activities', 'Accommodations']
 
 export default function Planner(props: PlannerProps) {
   const [selectedTab, setSelectedTab] = useState(tabs[0])
@@ -166,6 +168,18 @@ export default function Planner(props: PlannerProps) {
               planner={props.planner}
             ></ActivityCreate>
             <ActivityItems planner={props.planner}></ActivityItems>
+          </>,
+        )
+        break
+      case tabs[3]:
+        elements.push(
+          <>
+            <AccommodationCreate
+              open={creationDialogOpen}
+              setOpen={setCreationDialogOpen}
+              planner={props.planner}
+            ></AccommodationCreate>
+            <AccommodationItems planner={props.planner}></AccommodationItems>
           </>,
         )
         break

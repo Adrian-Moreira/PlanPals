@@ -124,7 +124,7 @@ export default function TransportItem(props: TransportProps) {
         onError("Error deleting: Transport mightn't be updated")
       }
     }
-  }, [fields.transportDetails, fields.vehicleId, editStartDate, editEndDate, timeError])
+  }, [fields.transportDetails, fields.vehicleId, editStartDate, editEndDate, timeError, transportType])
 
   //EDIT PLANNER FORM-------------------------------------
 
