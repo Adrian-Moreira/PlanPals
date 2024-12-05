@@ -38,7 +38,7 @@ TodoTaskMongoSchema.pre('findOneAndDelete', async function (next) {
   const todoTaskObjectId = {
     objectId: { id: todoTaskId, collection: 'TodoTask' },
   }
-
+  
   try {
       await CommentsModel.findOneAndDelete(todoTaskObjectId)
       await VoteModel.findOneAndDelete(todoTaskObjectId)

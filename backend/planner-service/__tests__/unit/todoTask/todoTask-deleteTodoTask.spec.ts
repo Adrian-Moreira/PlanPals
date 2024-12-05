@@ -46,7 +46,7 @@ describe('TodoTask->deleteTodoTask', () => {
             body: {
                 out: {
                     targetTodoTask: existingTodoTask,
-                    targetTodoList: existingTodoList,
+                    todoList: existingTodoList,
                 },
             },
         }

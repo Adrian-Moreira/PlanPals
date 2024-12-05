@@ -1235,11 +1235,11 @@ Introduction: to be generated
 
 ## Todo-Task Endpoints
 
-**Base URL:** `/todoList/:todoList/todoTask`
+**Base URL:** `/todoList/:todoList/task`
 
 ### Get TodoTasks by TodoList ID
 
-- **URL:** `/todoList/:todoListId/todoTask`
+- **URL:** `/todoList/:todoListId/task`
 - **Method:** `GET`
 - **Description:** Retrieves todoTasks associated with a todoList.
 - **Path Parameters:**
@@ -1256,13 +1256,13 @@ Introduction: to be generated
 
 - **Response:**
 
-  Returns a list of todoTask objects.
+  Returns a list of task objects.
 
 ### Create TodoTask
 
-- **URL:** `/todoList/:todoListId/todoTask`
+- **URL:** `/todoList/:todoListId/task`
 - **Method:** `POST`
-- **Description:** Creates a new todoTask within a todoList.
+- **Description:** Creates a new task within a todoList.
 - **Path Parameters:**
 
   | Parameter   | Type   | Required | Description         |
@@ -1273,28 +1273,28 @@ Introduction: to be generated
 
   | Field          | Type           | Required | Description                   |
   | -------------- | -------------- | -------- | ----------------------------- |
-  | `createdBy`    | string         | Yes      | ID of the user creating the todoTask. |
-  | `name`         | string         | Yes      | Name of the todoTask          |
-  | `assignedTo`   | string         | No       | ID of user todoTask is assigned to |
+  | `createdBy`    | string         | Yes      | ID of the user creating the task. |
+  | `name`         | string         | Yes      | Name of the task          |
+  | `assignedTo`   | string         | No       | ID of user task is assigned to |
   | `dueDate`      | string or Date | Yes      | Due date of the task          |
   | `isCompleted`  | boolean        | Yes      | Indicates of the task is done or not |
 
 
 - **Response:**
 
-  Returns the created todoTask object.
+  Returns the created task object.
 
 ### Get TodoTask by ID
 
-- **URL:** `/todoList/:todoListId/todoTask/:todoTaskId`
+- **URL:** `/todoList/:todoListId/task/:todoTaskId`
 - **Method:** `GET`
-- **Description:** Retrieves a todoTask by ID.
+- **Description:** Retrieves a task by ID.
 - **Path Parameters:**
 
   | Parameter         | Type   | Required | Description                   |
   | ----------------- | ------ | -------- | ----------------------------- |
   | `todoListId`       | string | Yes      | The todoList's ID.             |
-  | `todoTaskId`    | string | Yes      | The todoTask's ID.      |
+  | `todoTaskId`    | string | Yes      | The task's ID.      |
 
 - **Query Parameters:**
 
@@ -1304,19 +1304,19 @@ Introduction: to be generated
 
 - **Response:**
 
-  Returns the todoTask object.
+  Returns the task object.
 
 ### Update TodoTask
 
-- **URL:** `/todoList/:todoListId/todoTask/:todoTaskId`
+- **URL:** `/todoList/:todoListId/task/:todoTaskId`
 - **Method:** `PATCH`
-- **Description:** Updates a todoTask.
+- **Description:** Updates a task.
 - **Path Parameters:**
 
   | Parameter         | Type   | Required | Description                   |
   | ----------------- | ------ | -------- | ----------------------------- |
   | `todoListId`       | string | Yes      | The todoList's ID.             |
-  | `todoTaskId`| string | Yes      | The todoTask's ID.      |
+  | `todoTaskId`| string | Yes      | The task's ID.      |
 
 - **Query Parameters:**
 
@@ -1328,26 +1328,26 @@ Introduction: to be generated
 
   | Field          | Type           | Required | Description                   |
   | -------------- | -------------- | -------- | ----------------------------- |
-  | `name`         | string         | No      | Name of the todoTask          |
-  | `assignedTo`   | string         | No       | ID of user todoTask is assigned to |
+  | `name`         | string         | No      | Name of the task          |
+  | `assignedTo`   | string         | No       | ID of user task is assigned to |
   | `dueDate`      | string or Date | No      | Due date of the task          |
   | `isCompleted`  | boolean        | No      | Indicates of the task is done or not |
 
 - **Response:**
 
-  Returns the updated todoTask object.
+  Returns the updated task object.
 
 ### Delete TodoTask
 
-- **URL:** `/todoList/:todoListId/todoTask/:todoTaskId`
+- **URL:** `/todoList/:todoListId/task/:todoTaskId`
 - **Method:** `DELETE`
-- **Description:** Deletes a todoTask.
+- **Description:** Deletes a task.
 - **Path Parameters:**
 
   | Parameter         | Type   | Required | Description                   |
   | ----------------- | ------ | -------- | ----------------------------- |
   | `todoListId`       | string | Yes      | The todoList's ID.             |
-  | `todoTaskId`| string | Yes      | The todoTask's ID.      |
+  | `todoTaskId`| string | Yes      | The task's ID.      |
 
 - **Query Parameters:**
 

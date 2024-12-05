@@ -42,7 +42,7 @@ describe('TodoTask->verifyTodoTask', () => {
       body: {
         out: {
           targetTodoTaskId: existingTodoTask._id,
-          targetTodoList: existingTodoList,
+          todoList: existingTodoList,
         },
       },
     }

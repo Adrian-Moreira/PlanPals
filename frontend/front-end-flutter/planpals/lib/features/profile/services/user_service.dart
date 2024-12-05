@@ -34,6 +34,7 @@ class UserService {
   Future<User> addUser(User user) async {
     try {
       final response = await _apiService.post('/user', user.toJson());
+      print("STATUS CODE: ${response.statusCode}");
 
       if (response.statusCode == 201) {
         final userData = json.decode(response.body);

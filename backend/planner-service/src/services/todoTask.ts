@@ -21,7 +21,7 @@ import { TodoListModel } from '../models/TodoList'
  * The function sets `req.body.status` to 201 (Created).
  */
 const createTodoTaskDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { targetUser, targetTodoList, todoListId, name, assignedTo, dueDate, isCompleted } = req.body.out
+  const { targetUser, todoList, todoListId, name, assignedTo, dueDate, isCompleted } = req.body.out
 
   const createdTodoTask = await TodoTaskModel.create({
     todoListId,
@@ -32,9 +32,9 @@ const createTodoTaskDocument = async (req: Request, res: Response, next: NextFun
     isCompleted,
   })
 
-  targetTodoList.tasks.push(createdTodoTask._id)
+  todoList.tasks.push(createdTodoTask._id)
 
-  await TodoListModel.findOneAndUpdate({ _id: targetTodoList._id }, { tasks: targetTodoList.tasks }, { new: true })
+  await TodoListModel.findOneAndUpdate({ _id: todoList._id }, { tasks: todoList.tasks }, { new: true })
 
   req.body.result = createdTodoTask
   req.body.dataType = TodoTaskCollection
@@ -90,11 +90,11 @@ const updateTodoTaskDocument = async (req: Request, res: Response, next: NextFun
  * The function sets `req.body.status` to 200 (OK).
  */
 const deleteTodoTaskDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { targetTodoList, targetTodoTask } = req.body.out
+  const { todoList, targetTodoTask } = req.body.out
 
   const deletedTodoTask = await TodoTaskModel.findOneAndDelete({
     _id: targetTodoTask._id,
-    todoListId: targetTodoList._id,
+    todoListId: todoList._id,
   })
 
   req.body.result = deletedTodoTask
@@ -140,9 +140,9 @@ const getTodoTaskDocumentById = async (req: Request, res: Response, next: NextFu
  * The function sets `req.body.status` to 200 (OK).
  */
 const getTodoTaskDocumentsByTodoListId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { targetTodoList } = req.body.out
+  const { todoList } = req.body.out
 
-  const resultTodoTasks: TodoTask[] = await targetTodoList.tasks.map((tid: any) => TodoTaskModel.findById(tid))
+  const resultTodoTasks: TodoTask[] = await todoList.tasks.map((tid: any) => TodoTaskModel.findById(tid))
 
   req.body.result = await Promise.all(resultTodoTasks).then((results) => results.filter((result) => result !== null))
   req.body.status = StatusCodes.OK
@@ -163,8 +163,8 @@ const getTodoTaskDocumentsByTodoListId = async (req: Request, res: Response, nex
  * Otherwise, it adds the TodoTask to `req.body.out` and calls `next()`.
  */
 async function verifyTodoTaskExists(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const { targetTodoList, todoTaskId } = req.body.out
-  const targetTodoTask = await TodoTaskModel.findOne({ _id: todoTaskId, todoListId: targetTodoList._id })
+  const { todoList, todoTaskId } = req.body.out
+  const targetTodoTask = await TodoTaskModel.findOne({ _id: todoTaskId, todoListId: todoList._id })
 
   if (!targetTodoTask) {
     req.body.err = new RecordNotFoundException({

@@ -43,7 +43,7 @@ describe('TodoTask->getTodoTasksByTodoListId', () => {
     req = {
       body: {
         out: {
-          targetTodoList: existingTodoList,
+          todoList: existingTodoList,
         },
       },
     }
