@@ -13,6 +13,7 @@ class GenericListView<T> extends StatelessWidget {
   final double? headerIconSize;
   final Color? headerColor;
   final bool? showHeader;
+  final bool? showEmptyMessage;
 
   const GenericListView({
     super.key,
@@ -28,6 +29,7 @@ class GenericListView<T> extends StatelessWidget {
     this.headerIconSize, // true if the list is scrollable, false if not.
     this.headerColor,
     this.showHeader = true,
+    this.showEmptyMessage = true,
   });
 
   @override
@@ -81,17 +83,20 @@ class GenericListView<T> extends StatelessWidget {
             );
           });
     } else {
-      return Column(
-        children: [
-          const SizedBox(height: 5),
-          Text(
-            emptyMessage,
-            style: TextStyle(
-                fontSize: 20,
-                color: headerColor ?? const Color.fromARGB(255, 100, 100, 100)),
-          ),
-        ],
-      );
+      return showEmptyMessage == false
+          ? const SizedBox()
+          : Column(
+              children: [
+                const SizedBox(height: 5),
+                Text(
+                  emptyMessage,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: headerColor ??
+                          const Color.fromARGB(255, 100, 100, 100)),
+                ),
+              ],
+            );
     }
   }
 }

@@ -42,6 +42,16 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
   Future<void> _handleOnComplete() async {
     todoTask.isCompleted = !todoTask.isCompleted;
     _todoListViewModel.updateTodoTask(todoTask, user.id);
+
+    if (_todoListViewModel.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_todoListViewModel.errorMessage!)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Updated Task Successfully!')),
+      );
+    }
   }
 
   @override
@@ -85,11 +95,12 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
                             ),
                       ),
                       const SizedBox(height: 8),
-          
+
                       // Due Date
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                          const Icon(Icons.calendar_today,
+                              size: 16, color: Colors.grey),
                           const SizedBox(width: 8),
                           Text(
                             'Due: ${DateTimeFormat.formatDateTime(dueDate)}',
@@ -97,14 +108,16 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
                           ),
                         ],
                       ),
-          
+
                       const SizedBox(height: 8),
-          
+
                       // Completion Status
                       Row(
                         children: [
                           Icon(
-                            isCompleted ? Icons.check_circle : Icons.circle_outlined,
+                            isCompleted
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
                             color: isCompleted ? Colors.green : Colors.red,
                             size: 16,
                           ),
@@ -121,7 +134,7 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
                     ],
                   ),
                 ),
-          
+
                 // Mark as Completed Button
                 if (!isCompleted)
                   IconButton(

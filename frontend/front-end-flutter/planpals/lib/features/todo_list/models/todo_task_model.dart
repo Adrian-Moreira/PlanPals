@@ -14,7 +14,7 @@ class TodoTask {
     required this.todoListId,
     required this.createdBy,
     required this.name,
-    this.assignedTo,
+    this.assignedTo = '',
     required this.dueDate,
     required this.isCompleted,
   });

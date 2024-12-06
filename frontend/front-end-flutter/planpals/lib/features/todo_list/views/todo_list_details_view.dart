@@ -59,17 +59,6 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
   }
 
   Widget _buildPage(BuildContext context) {
-    User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
-
-    List<TodoTask> tasks = Provider.of<TodoListViewModel>(context).todoTasks;
-
-    List<TodoTask> completedTasks =
-        tasks.where((task) => task.isCompleted).toList();
-    List<TodoTask> uncompletedTasks =
-        tasks.where((task) => !task.isCompleted).toList();
-
-    var functional = todoList.rwUsers.contains(user.id);
-
     return CustomScrollView(
       slivers: [
         // Sliver app bar
@@ -161,17 +150,7 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                 const SizedBox(
                   height: 10,
                 ),
-                _buildTaskList(context, uncompletedTasks, functional, true),
-
-                const SizedBox(
-                  height: 10,
-                ),
-                Divider(height: 1),
-                const SizedBox(
-                  height: 10,
-                ),
-
-                _buildTaskList(context, completedTasks, functional, false),
+                _buildTaskList(context),
                 const SizedBox(
                   height: 10,
                 ),
@@ -183,10 +162,28 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
     );
   }
 
-  Widget _buildTaskList(BuildContext context, List<TodoTask> tasks,
-      bool functional, bool showHeader) {
-    tasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+  Widget _buildTaskList(BuildContext context) {
+    User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
 
+    List<TodoTask> tasks = Provider.of<TodoListViewModel>(context).todoTasks;
+
+    List<TodoTask> completedTasks =
+        tasks.where((task) => task.isCompleted).toList();
+    List<TodoTask> uncompletedTasks =
+        tasks.where((task) => !task.isCompleted).toList();
+
+    completedTasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    uncompletedTasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+
+    return Column(
+      children: [
+        _buildUncompletedTaskList(uncompletedTasks, uncompletedTasks.isEmpty && completedTasks.isEmpty),
+        _buildCompletedTaskList(completedTasks),
+      ],
+    );
+  }
+
+  Widget _buildUncompletedTaskList(List<TodoTask> tasks, bool showMessage) {
     return GenericListView(
       itemList: tasks,
       itemBuilder: (task) => TodoTaskCard(
@@ -206,7 +203,32 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
         );
       },
       headerColor: Colors.white,
-      showHeader: showHeader,
+      showEmptyMessage: showMessage,
+    );
+  }
+
+  Widget _buildCompletedTaskList(List<TodoTask> tasks) {
+    return GenericListView(
+      itemList: tasks,
+      itemBuilder: (task) => TodoTaskCard(
+        todoTask: task,
+        // functional: functional,
+      ),
+      headerTitle: "Tasks",
+      headerIcon: Icons.list_alt,
+      functional: functional,
+      onAdd: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateTodoTaskForm(todoList: todoList),
+          ),
+        );
+      },
+      headerColor: Colors.white,
+      showHeader: false,
+      emptyMessage: "There is no task",
+      showEmptyMessage: false,
     );
   }
 }
