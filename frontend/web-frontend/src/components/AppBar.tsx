@@ -15,7 +15,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { ThemeProvider } from '@mui/material/styles'
 import './AppBar.css'
 import { PopoverVirtualElement } from '@mui/material'
-const pages = ['About', 'Planners', 'Shopping Lists', 'To-do Lists']
+const pages = ['About', 'Planners', 'Shopping Lists']
 const welcome = [
   'Login',
   //, 'Signup'
