@@ -49,10 +49,9 @@ plannerRouter.delete(
 )
 plannerRouter.post(
   '/:plannerId([0-9a-fA-F]{24})/invite',
-  PlannerValidator.inviteIntoPlanner,
-  UserService.verifyUserExists,
-  PlannerService.verifyPlannerExists,
-  PlannerService.verifyUserCanEditPlanner,
+  PlannerValidator.inviteUsers,
+  PlannerService.inviteUsers,
+  publishUpdateEvent
 )
 
 plannerRouter.use('/:plannerId([0-9a-fA-F]{24})/transportation', transportationRouter)

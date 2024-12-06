@@ -240,6 +240,27 @@ async function verifyUserCanViewPlanner(req: Request, res: Response, next: NextF
   next()
 }
 
+export const inviteUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { plannerId } = req.params
+  const { userIds } = req.body
+
+  const updatedPlanner = await PlannerModel.findOneAndUpdate(
+    { _id: plannerId },
+    { $addToSet: { rwUsers: { $each: userIds } } },
+    { new: true },
+  )
+
+  if (!updatedPlanner) {
+    req.body.err = new RecordNotFoundException({ recordType: 'planner', recordId: plannerId })
+    return next(req.body.err)
+  }
+
+  req.body.result = updatedPlanner
+  req.body.status = StatusCodes.OK
+  next()
+}
+
+
 const PlannerService = {
   verifyPlannerExists,
   verifyUserCanEditPlanner,
@@ -249,6 +270,7 @@ const PlannerService = {
   deletePlannerDocument,
   getPlannerDocumentsByUserId,
   getPlannerDocumentByPlannerId,
+  inviteUsers
 }
 
 export default PlannerService

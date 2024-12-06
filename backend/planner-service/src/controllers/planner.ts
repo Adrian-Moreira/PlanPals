@@ -73,6 +73,14 @@ const PlannerRouteSchema = {
       plannerId: ObjectIdStringSchema,
     }),
   }),
+  inviteUsers: ReqAttrSchema.extend({
+    params: z.object({
+      plannerId: ObjectIdStringSchema,
+    }),
+    body: z.object({
+      userIds: z.array(ObjectIdStringSchema),
+    }),
+  }),
 }
 
 const PlannerValidator = RequestUtils.mkParsers(PlannerRouteSchema)
