@@ -8,6 +8,7 @@ const ShoppingListRouteSchema = {
       name: z.string().min(1),
       description: z.string().optional(),
       createdBy: ObjectIdStringSchema,
+      rwUsers: z.array(ObjectIdStringSchema).optional(), 
       items: z.array(ItemSchema).optional(),
     }),
   }),
