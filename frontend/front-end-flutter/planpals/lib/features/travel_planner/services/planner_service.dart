@@ -323,7 +323,12 @@ class PlannerService {
 
   Future<void> inviteUserToPlanner(String plannerId, String userId) async {
     try {
-      await _apiService.post('/planner/$plannerId/invite/', {'userId': userId});
+      //  await _apiService.post('/planner/$plannerId/invite/', {'userId': userId});
+      final response = await _apiService.post(
+        '/planner/$plannerId/invite?userId=$userId',
+        {'userId': userId},
+      );
+      print("INVITE RESPONSE: ${response.body}");
     } catch (e) {
       throw Exception('Failed to invite user to planner');
     }

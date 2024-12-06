@@ -29,6 +29,7 @@ class ApiService {
     final url = Uri.parse('$baseUrl$endpoint');
 
     try {
+      print("SERVICE POST DATA: $jsonData");
       final response = await http.post(
         url,
         body: jsonEncode(jsonData),

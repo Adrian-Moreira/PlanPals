@@ -154,6 +154,7 @@ export const getPlannerDocumentByPlannerId = async (req: Request, res: Response,
   next()
 }
 
+
 /**
  * Verify that a planner with the given ID exists in the database. If not, throw
  * a RecordNotFoundException with the planner ID and record type of 'planner'.

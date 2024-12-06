@@ -9,6 +9,8 @@ import 'package:planpals/features/todo_list/views/components/todo_task_card.dart
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/invite_user_dialog.dart';
 import 'package:planpals/shared/components/navigator_bar.dart';
+import 'package:planpals/shared/styles/app_styles.dart';
+import 'package:planpals/shared/styles/background.dart';
 import 'package:provider/provider.dart';
 
 class TodoListDetailsView extends StatefulWidget {
@@ -47,13 +49,27 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: NavigatorAppBar(title: todoList.name),
-      body: _buildPage(context),
+    return Background(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: const NavigatorAppBar(title: "Todo List Details"),
+        body: _buildPage(context),
+      ),
     );
   }
 
   Widget _buildPage(BuildContext context) {
+    User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
+
+    List<TodoTask> tasks = Provider.of<TodoListViewModel>(context).todoTasks;
+
+    List<TodoTask> completedTasks =
+        tasks.where((task) => task.isCompleted).toList();
+    List<TodoTask> uncompletedTasks =
+        tasks.where((task) => !task.isCompleted).toList();
+
+    var functional = todoList.rwUsers.contains(user.id);
+
     return CustomScrollView(
       slivers: [
         // Sliver app bar
@@ -74,10 +90,13 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(
+                  height: 10,
+                ),
                 ListTile(
                   title: Text(
                     todoList.name,
-                    style: const TextStyle(fontSize: 30),
+                    style: TextStyles.titleLarge,
                   ),
                   trailing: IconButton(
                     onPressed: () {
@@ -89,6 +108,7 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                     icon: const Icon(
                       Icons.group_add,
                       size: 40,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -108,9 +128,10 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                   ),
                   title: const Text(
                     'Description',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text(todoList.description!),
+                  subtitle: Text(todoList.description!,
+                      style: TextStyles.subtitleMedium),
                 ),
                 ListTile(
                   leading: Container(
@@ -128,9 +149,10 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                   ),
                   title: const Text(
                     'Members',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text('${todoList.rwUsers.length} members'),
+                  subtitle: Text('${todoList.rwUsers.length} members',
+                      style: TextStyles.subtitleMedium),
                 ),
                 const SizedBox(
                   height: 20,
@@ -139,7 +161,20 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                 const SizedBox(
                   height: 10,
                 ),
-                _buildTaskList(context),
+                _buildTaskList(context, uncompletedTasks, functional, true),
+
+                const SizedBox(
+                  height: 10,
+                ),
+                Divider(height: 1),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                _buildTaskList(context, completedTasks, functional, false),
+                const SizedBox(
+                  height: 10,
+                ),
               ],
             ),
           ),
@@ -148,12 +183,9 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
     );
   }
 
-  Widget _buildTaskList(BuildContext context) {
-    User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
-
-    List<TodoTask> tasks = Provider.of<TodoListViewModel>(context).todoTasks;
-
-    var functional = todoList.rwUsers.contains(user.id);
+  Widget _buildTaskList(BuildContext context, List<TodoTask> tasks,
+      bool functional, bool showHeader) {
+    tasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
 
     return GenericListView(
       itemList: tasks,
@@ -173,6 +205,8 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
           ),
         );
       },
+      headerColor: Colors.white,
+      showHeader: showHeader,
     );
   }
 }

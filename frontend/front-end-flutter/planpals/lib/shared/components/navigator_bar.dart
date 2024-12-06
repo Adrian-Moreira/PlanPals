@@ -6,10 +6,11 @@ import 'package:planpals/features/travel_planner/viewmodels/planner_viewmodel.da
 import 'package:provider/provider.dart';
 
 class NavigatorAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
+  final String? title;
+  
   const NavigatorAppBar({
     super.key,
-    required this.title,
+    this.title,
   });
 
   @override
@@ -26,7 +27,7 @@ class NavigatorAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
-        title,
+        title ?? '',
         style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -43,6 +44,7 @@ class NavigatorAppBar extends StatelessWidget implements PreferredSizeWidget {
           Navigator.pop(context);
         },
         tooltip: 'Back',
+        color: Colors.white,
       ),
       actions: <Widget>[
         PopupMenuButton<String>(

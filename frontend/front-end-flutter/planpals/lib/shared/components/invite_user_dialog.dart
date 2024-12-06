@@ -95,6 +95,14 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
         ),
       ),
       actions: [
+
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+
         TextButton(
           onPressed: () async {
             if (_formKey.currentState?.validate() == true) {
@@ -114,12 +122,6 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
             }
           },
           child: const Text('Invite'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
         ),
       ],
     );

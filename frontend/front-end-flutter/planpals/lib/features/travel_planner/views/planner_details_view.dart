@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/create/create_destination_form.dart';
 import 'package:planpals/features/travel_planner/views/components/Forms/create/create_transport_form.dart';
+import 'package:planpals/shared/styles/background.dart';
+import 'package:planpals/shared/styles/app_styles.dart';
 import 'package:provider/provider.dart';
 import 'package:planpals/features/profile/models/user_model.dart';
 import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
@@ -54,9 +56,12 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: NavigatorAppBar(title: widget.travelPlanner.name),
-      body: _buildPlanner(context, widget.travelPlanner),
+    return Background(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: const NavigatorAppBar(title: "Travel Planner Details"),
+        body: _buildPlanner(context, widget.travelPlanner),
+      ),
     );
   }
 
@@ -88,14 +93,19 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+
+                      const SizedBox(
+                        height: 10,
+                      ),
+
                       ListTile(
                         title: Text(
                           widget.travelPlanner.name,
-                          style: const TextStyle(fontSize: 30),
+                          style: TextStyles.titleLarge,
                         ),
                         subtitle: Text(
                             '${DateTimeFormat.formatDate(widget.travelPlanner.startDate)} - ${DateTimeFormat.formatDate(widget.travelPlanner.endDate)}',
-                            style: const TextStyle(fontSize: 18)),
+                            style: const TextStyle(fontSize: 18, color: Color.fromARGB(200, 255, 255, 255))),
                         trailing: IconButton(
                           onPressed: () {
                             showDialog(
@@ -108,6 +118,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                           icon: const Icon(
                             Icons.group_add,
                             size: 40,
+                            color: Color.fromARGB(255, 255, 255, 255),
                           ),
                         ),
                       ),
@@ -116,8 +127,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                           padding: const EdgeInsets.all(
                               10), // Padding around the icon
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(
-                                255, 223, 223, 223), // Background color
+                            color: const Color.fromARGB(255, 223, 223, 223), // Background color
                             borderRadius:
                                 BorderRadius.circular(8), // Rounded corners
                           ),
@@ -128,9 +138,9 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         ),
                         title: const Text(
                           'Description',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyles.titleSmall,
                         ),
-                        subtitle: Text(widget.travelPlanner.description),
+                        subtitle: Text(widget.travelPlanner.description, style: TextStyles.subtitleMedium),
                       ),
                       ListTile(
                         leading: Container(
@@ -149,13 +159,13 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         ),
                         title: Text(
                           '${widget.travelPlanner.endDate.difference(widget.travelPlanner.startDate).inDays} Days',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyles.titleSmall,
                         ),
                         subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${destinations.length} Destinations'),
-                              Text('${transportations.length} Transportations'),
+                              Text('${destinations.length} Destinations', style: TextStyles.subtitleSmall),
+                              Text('${transportations.length} Transportations', style: TextStyles.subtitleSmall),
                             ]),
                       ),
                       ListTile(
@@ -175,17 +185,13 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         ),
                         title: const Text(
                           'Members',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyles.titleSmall,
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                '${planner.rwUsers.length} Read-Write Members'),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text('${planner.roUsers.length} Read-Only Members'),
+                                '${planner.rwUsers.length} Members', style: TextStyles.subtitleMedium),
                           ],
                         ),
                       ),
@@ -237,6 +243,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
       headerIcon: Icons.landscape,
       emptyMessage: "There is no destination",
       functional: functional,
+      headerColor: Colors.white,
     );
   }
 
@@ -258,6 +265,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
       emptyMessage: "There is no transportation",
       functional: functional,
       scrollable: false,
+      headerColor: Colors.white,
     );
   }
 }
