@@ -25,9 +25,7 @@ class UserViewModel extends ChangeNotifier {
     User? fetchedUser;
 
     try {
-      print("USERVIEWMODEL: FETCHING USER: $userName");
       fetchedUser = await _userService.fetchUserByUserName(userName);
-      print('USERVIEWMODEL: FETCHED USER: $_user');
     } catch (error) {
       _errorMessage = error.toString();
     } finally {
@@ -49,10 +47,8 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print("USERVIEWMODEL: ADDING USER: $user");
       // Call the service to add the planner
       _user = await _userService.addUser(user);
-      print("USERVIEWMODEL: ADDED USER AFTER: $user");
 
       // Notify listeners about the change in state
       notifyListeners();
