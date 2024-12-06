@@ -58,18 +58,9 @@ export default function ShoppingList(props: ShoppingListProps) {
       onError("Error deleting: Shopping List may have not been removed")
     }
   }, [])
+
   const handleEditShoppingList = useCallback(async () => {
-    //try {
-      // To Josh : this is jay please add the logic here I added the try catch to implement error handling and notifications 
-      //}
-      setNotification?.({ type: 'success', message: 'Shopping List updated successfully' });
 
-      nav('/shoppingLists')
-    //} catch {
-      setNotification?.({ type: 'error', message: 'Error updating: Shopping List may have not been updated' });
-
-      onError("Error deleting: Shopping List may have not been removed")
-    //}
   }, [])
 
   const [userNames, setUserNames] = useState({}) 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useInsertionEffect, useState } from 'react'
+import React, { useCallback, useEffect, useInsertionEffect, useState, useContext } from 'react'
 import * as MUI from '@mui/material/'
 import * as MUIcons from '@mui/icons-material'
 import { useFormFields } from '../../lib/hooksLib'
@@ -10,6 +10,7 @@ import { PPUser, ppUserAtom } from '../../lib/authLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import { userMapAtom } from '../../lib/appLib'
 import { PPShoppingList } from './ShoppingList'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
 
 export interface ShoppingListEditViewProps {
   handelCancel: () => void
@@ -18,7 +19,7 @@ export interface ShoppingListEditViewProps {
   shoppingList: PPShoppingList
 }
 
-export default function ShoppingListCreateView(props: ShoppingListEditViewProps) {
+export default function ShoppingListEditView(props: ShoppingListEditViewProps) {
   const nav = useNavigate()
 
   const [fields, handleFieldChange] = useFormFields({
@@ -31,6 +32,7 @@ export default function ShoppingListCreateView(props: ShoppingListEditViewProps)
   const [userMap] = useAtom(userMapAtom)
   const [pUser] = useAtom(ppUserAtom)
   const [pError, setPError] = useState(false)
+  const { setNotification } = useContext(NotificationContext); 
 
   const fetchPalList = useCallback(async () => {
     try {
@@ -83,10 +85,15 @@ export default function ShoppingListCreateView(props: ShoppingListEditViewProps)
       })
 
       if (res.data.success) {
-        nav(`/shoppingList/${res.data.data._id}`)
+        // nav(`/shoppingList/${res.data.data._id}`)
+        setNotification?.({ type: 'success', message: 'Shopping List updated successfully' });
+
+        nav('/shoppingLists')
       }
       setIsLoading(false)
     } catch (e) {
+      setNotification?.({ type: 'error', message: 'Error updating: Shopping List may have not been updated' });
+
       onError(e)
     }
     
