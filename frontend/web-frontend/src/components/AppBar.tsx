@@ -15,7 +15,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { ThemeProvider } from '@mui/material/styles'
 import './AppBar.css'
 import { PopoverVirtualElement } from '@mui/material'
-const pages = ['About', 'Planners', 'Shopping Lists']
+const pages = ['About', 'Planners', 'Shopping Lists', 'To-do Lists']
 const welcome = [
   'Login',
   //, 'Signup'
@@ -35,6 +35,7 @@ function ResponsiveAppBar({
   handleAbout,
   handlePlanners,
   handleShoppingLists,
+  handleTodoLists,
   backToHomeHandler,
   ppUser,
 }) {
@@ -77,6 +78,9 @@ function ResponsiveAppBar({
           break
         case 'Shopping Lists':
           handleShoppingLists()
+          break
+        case 'To-do Lists':
+          handleTodoLists()
           break
         case 'About':
           handleAbout()

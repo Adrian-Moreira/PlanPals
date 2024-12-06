@@ -8,33 +8,33 @@ import * as MUI from '@mui/material'
 import { useAtom } from 'jotai'
 import { userMapAtom } from '../lib/appLib.ts'
 import { useWebSocket } from '../lib/wsLib.ts'
-import ShoppingList from '../components/ShoppingLists/ShoppingList.tsx'
+import TodoList from '../components/TodoLists/TodoList.tsx'
 
-function ShoppingListDetail() {
+function TodoListDetail() {
   const nav = useNavigate()
   const { id } = useParams()
   const [isLoading, setIsLoading] = useState(true)
 
-  const [shoppingListDetails, setShoppingListDetails] = useState({})
+  const [todoListDetails, setTodoListDetails] = useState({})
   const [onReload, setReload] = useState(true)
   const [pUser, setPPUser] = useAtom(ppUserAtom)
   const [userMap, setUserMap] = useAtom(userMapAtom)
   const { subscribe, webSocket } = useWebSocket()
   useEffect(() => {
-    if (!shoppingListDetails._id || !onReload) return
+    if (!todoListDetails._id || !onReload) return
     setTimeout(() => {
-      if (webSocket.readyState === 1) subscribe([{ type: 'shoppingList', id: shoppingListDetails._id }])
+      if (webSocket.readyState === 1) subscribe([{ type: 'todoList', id: todoListDetails._id }])
       setReload(false)
     }, 500)
-  }, [shoppingListDetails, webSocket.readyState, onReload])
+  }, [todoListDetails, webSocket.readyState, onReload])
 
-  const fetchShoppingListDetails = useCallback(
+  const fetchTodoListDetails = useCallback(
     async (pUser) => {
       if (!pUser) return
       try {
-        const shoppingList = await apiLib.get(`/shoppingList/${id}`, { params: { userId: pUser._id } })
+        const todoList = await apiLib.get(`/todoList/${id}`, { params: { userId: pUser._id } })
         let creator
-        const creatorId = shoppingList.data.data.createdBy
+        const creatorId = todoList.data.data.createdBy
         if (userMap.has(creatorId)) {
           creator = userMap.get(creatorId)
         } else {
@@ -46,7 +46,7 @@ function ShoppingListDetail() {
             creator = {}
           }
         }
-        setShoppingListDetails({ ...shoppingList.data.data, createdBy: creator })
+        setTodoListDetails({ ...todoList.data.data, createdBy: creator })
       } catch (error) {
         onError(error)
       }
@@ -56,18 +56,18 @@ function ShoppingListDetail() {
   const onLoad = useCallback(async () => {
     try {
       if (!pUser.loggedIn) nav('/login')
-      await fetchShoppingListDetails(pUser.ppUser).then(() => setIsLoading(false))
+      await fetchTodoListDetails(pUser.ppUser).then(() => setIsLoading(false))
     } catch {
       nav('/login')
     }
-  }, [setIsLoading, setPPUser, fetchShoppingListDetails, pUser, nav])
+  }, [setIsLoading, setPPUser, fetchTodoListDetails, pUser, nav])
   useEffect(() => {
     onLoad()
   }, [onLoad])
-  return isLoading || !shoppingListDetails.name ?
+  return isLoading || !todoListDetails.name ?
       <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
         <MUI.CircularProgress />
       </MUI.Box>
-    : <ShoppingList key={shoppingListDetails._id} id={shoppingListDetails._id} shoppingList={shoppingListDetails}></ShoppingList>
+    : <TodoList key={todoListDetails._id} id={todoListDetails._id} todoList={todoListDetails}></TodoList>
 }
-export default ShoppingListDetail
+export default TodoListDetail

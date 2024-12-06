@@ -1,39 +1,40 @@
 import * as MUI from '@mui/material/'
 import * as MUIcons from '@mui/icons-material'
 import React, { useEffect, useCallback, useState } from 'react'
-import ShoppingListCard from './ShoppingListCard'
+import TodoListCard from './TodoListCard'
 import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { userMapAtom } from '../../lib/appLib'
 import { ppUserAtom, PPUserAuth } from '../../lib/authLib'
 import { onError } from '../../lib/errorLib'
-import ShoppingListCreateView from './ShoppingListCreateView'
+import TodoListCreateView from './TodoListCreateView'
 import { useNavigate } from 'react-router-dom'
 import SelectItems from '../Common/SelectItems'
 import { useWebSocket } from '../../lib/wsLib'
 import AddButton from '../Common/AddButton'
-import { PPShoppingList } from './ShoppingList'
+import { PPTodoList } from './TodoList'
+import { access } from 'fs'
 
-const shoppingListURL = '/shoppingList'
-const sortFunctions: { name: string; mapper: (shoppingLists: PPShoppingList[]) => PPShoppingList[] }[] = [
+const todoListURL = '/todoList'
+const sortFunctions: { name: string; mapper: (todoLists: PPTodoList[]) => PPTodoList[] }[] = [
   {
     name: 'List Name',
-    mapper: (shoppingLists: PPShoppingList[]) => shoppingLists.sort((p1, p2) => p1.name.localeCompare(p2.name)),
+    mapper: (todoLists: PPTodoList[]) => todoLists.sort((p1, p2) => p1.name.localeCompare(p2.name)),
   },
   {
     name: 'Creator Name',
-    mapper: (shoppingLists: PPShoppingList[]) =>
-        shoppingLists.sort((p1, p2) => p1.createdBy.preferredName.localeCompare(p2.createdBy.preferredName)),
+    mapper: (todoLists: PPTodoList[]) =>
+        todoLists.sort((p1, p2) => p1.createdBy.preferredName.localeCompare(p2.createdBy.preferredName)),
   },
 ]
 
-export interface ShoppingListsProps {
-    shoppingListOnClickHandler: (shoppingList: any) => () => void
+export interface TodoListsProps {
+    todoListOnClickHandler: (todoList: any) => () => void
 }
 
-export default function ShoppingLists(props: ShoppingListsProps) {
+export default function TodoLists(props: TodoListsProps) {
   const nav = useNavigate()
-  const [shoppingListList, setShoppingListList] = useState<PPShoppingList[]>([])
+  const [todoListList, setTodoListList] = useState<PPTodoList[]>([])
   const [userMap, setUserMap] = useAtom(userMapAtom)
   const [pUser, setPPUser] = useAtom(ppUserAtom)
   const [createNew, setCreateNew] = useState(false)
@@ -42,10 +43,10 @@ export default function ShoppingLists(props: ShoppingListsProps) {
   const [sortingBy, setSortingBy] = useState(sortFunctions[0].name)
   const { webSocket, messages, subscribe, unsubscribe } = useWebSocket()
 
-  const fetchShoppingListCreator = useCallback(
-    async (userId: any, shoppingListList: any[]) => {
+  const fetchTodoListCreator = useCallback(
+    async (userId: any, todoListList: any[]) => {
       return await Promise.all(
-        shoppingListList.map(async (p) => {
+        todoListList.map(async (p) => {
           if (userMap.has(p.createdBy)) return { ...p, createdBy: userMap.get(p.createdBy) }
           const { user, ok } = await apiLib.getUserById(p.createdBy)
           if (!ok) return { ...p, createdBy: { userName: 'nil', preferredName: 'nil' } }
@@ -56,100 +57,100 @@ export default function ShoppingLists(props: ShoppingListsProps) {
     [userMap],
   )
 
-  const fetchShoppingLists = useCallback(
+  const fetchTodoLists = useCallback(
     async (userId: any) => {
       if (!userId || !pUser.loggedIn) return
       let res: { data: { data: any; success: any } } | undefined = undefined
       let pList: any[] | undefined = undefined
       try {
         setIsLoading(true)
-        res = await apiLib.get(shoppingListURL, { params: { userId } })
+        res = await apiLib.get(todoListURL, { params: { userId: userId, access: 'rw' } })
         if (res?.data.success) pList = res.data.data
         else throw new Error()
-        const shoppingListsWithCreators = await fetchShoppingListCreator(userId, pList!)
-        setShoppingListList(shoppingListsWithCreators)
+        const todoListsWithCreators = await fetchTodoListCreator(userId, pList!)
+        setTodoListList(todoListsWithCreators)
         setCreateNew(false)
       } catch {
         setIsLoading(false)
         if (!res || !pList || !res.data.success || pList.length < 1) {
-          setShoppingListList([])
+          setTodoListList([])
         }
       }
     },
-    [fetchShoppingListCreator, pUser.loggedIn, shoppingListURL],
+    [fetchTodoListCreator, pUser.loggedIn, todoListURL],
   )
 
   const onLoad = useCallback(async () => {
     try {
       if (!pUser.loggedIn) nav('/login')
-      await fetchShoppingLists(pUser.ppUser!._id)
+      await fetchTodoLists(pUser.ppUser!._id)
     } catch {
-      onError('Error fetching Shopping Lists')
+      onError('Error fetching To-do Lists')
     } finally {
       setIsLoading(false)
     }
-  }, [fetchShoppingLists, pUser.loggedIn, setPPUser])
+  }, [fetchTodoLists, pUser.loggedIn, setPPUser])
 
   useEffect(() => {
     onLoad()
   }, [onLoad, onReload])
 
-  const sortShoppingListList = (pList: PPShoppingList[], sortBy: string) => {
+  const sortTodoListList = (pList: PPTodoList[], sortBy: string) => {
     return sortFunctions.find((func) => func.name === sortBy)?.mapper([...pList]) ?? []
   }
 
   useEffect(() => {
-    const sortedList = sortShoppingListList(shoppingListList, sortingBy)
-    if (JSON.stringify(sortedList) !== JSON.stringify(shoppingListList)) {
-      setShoppingListList(sortedList)
+    const sortedList = sortTodoListList(todoListList, sortingBy)
+    if (JSON.stringify(sortedList) !== JSON.stringify(todoListList)) {
+      setTodoListList(sortedList)
     }
   }, [sortingBy])
 
   useEffect(() => {
     if (!pUser.ppUser) return
     if (webSocket.readyState !== 1) return
-    subscribe([{ type: 'shoppingLists', id: pUser.ppUser._id }])
+    subscribe([{ type: 'todoLists', id: pUser.ppUser._id }])
   }, [pUser.ppUser, subscribe, onReload, isLoading])
 
   useEffect(() => {
     if (!pUser.ppUser) return
     const relevantEntries = Object.entries(messages).filter(
       ([, msg]) =>
-        msg.topic.type === 'shoppingLists' && msg.topic.id === pUser.ppUser!._id && msg.message.type === 'shoppingLists',
+        msg.topic.type === 'todoLists' && msg.topic.id === pUser.ppUser!._id && msg.message.type === 'todoLists',
     )
     relevantEntries.forEach(([msgId, msg]) => {
-      let shoppingList = msg.message.data
+      let todoList = msg.message.data
       switch (msg.action) {
         case 'update':
-          if (userMap.has(shoppingList.createdBy)) {
-            shoppingList = {
-              ...shoppingList,
-              createdBy: userMap.get(shoppingList.createdBy),
+          if (userMap.has(todoList.createdBy)) {
+            todoList = {
+              ...todoList,
+              createdBy: userMap.get(todoList.createdBy),
             }
           }
-          setShoppingListList([...shoppingListList.filter((p) => p._id !== shoppingList._id), shoppingList])
+          setTodoListList([...todoListList.filter((p) => p._id !== todoList._id), todoList])
           delete messages[msgId]
           break
         case 'delete':
-          setShoppingListList(shoppingListList.filter((p) => p._id !== shoppingList._id))
+          setTodoListList(todoListList.filter((p) => p._id !== todoList._id))
           delete messages[msgId]
           break
       }
     })
-  }, [messages, pUser, shoppingListList, userMap])
+  }, [messages, pUser, todoListList, userMap])
 
   return isLoading ?
       <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
         <MUI.CircularProgress />
       </MUI.Box>
     : <>
-        <ShoppingListCreateView
+        <TodoListCreateView
           handelCancel={() => setCreateNew(false)}
-          hasShoppingList={shoppingListList.length > 0}
+          hasTodoList={todoListList.length > 0}
           setOnReload={setOnReload}
           open={createNew}
           setOpen={setCreateNew}
-        ></ShoppingListCreateView>
+        ></TodoListCreateView>
 
         <MUI.Stack gap={8}>
           <MUI.Box sx={{ maxWidth: '100vw', display: 'flex', justifyContent: 'center' }}>
@@ -163,7 +164,7 @@ export default function ShoppingLists(props: ShoppingListsProps) {
                 helperText={''}
                 label={'Sort By'}
                 value={sortingBy}
-                id={'SelectShoppingListsSort'}
+                id={'SelectTodoListsSort'}
                 setValue={setSortingBy}
               ></SelectItems>
               <AddButton
@@ -196,14 +197,14 @@ export default function ShoppingLists(props: ShoppingListsProps) {
               spacing={2}
               wrap={'wrap'}
             >
-              {!(shoppingListList.length > 0) && <MUI.Typography variant="h5">No Shopping Lists</MUI.Typography>}
-              {shoppingListList.map((shoppingList) => (
-                <ShoppingListCard
-                  key={shoppingList._id}
-                  shoppingList={shoppingList}
-                  onClick={props.shoppingListOnClickHandler(shoppingList)}
-                  className={'ShoppingListCard'}
-                ></ShoppingListCard>
+              {!(todoListList.length > 0) && <MUI.Typography variant="h5">No To-do Lists</MUI.Typography>}
+              {todoListList.map((todoList) => (
+                <TodoListCard
+                  key={todoList._id}
+                  todoList={todoList}
+                  onClick={props.todoListOnClickHandler(todoList)}
+                  className={'TodoListCard'}
+                ></TodoListCard>
               ))}
             </MUI.Grid2>
           </MUI.Box>

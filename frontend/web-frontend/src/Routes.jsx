@@ -6,6 +6,8 @@ import Signup from './containers/Signup.jsx'
 import PlannerDetail from './containers/PlannerDetail.jsx'
 import ShoppingLists from './containers/ShoppingLists.jsx'
 import ShoppingListDetail from './containers/ShoppingListDetail.jsx'
+import TodoLists from './containers/TodoLists.jsx'
+import TodoListDetail from './containers/TodoListDetail.jsx'
 import About from './containers/About.jsx'
 
 export default function Links() {
@@ -19,6 +21,8 @@ export default function Links() {
       <Route path="/planners" element={<Home />} />
       <Route path="/shoppingList/:id" element={<ShoppingListDetail />} />
       <Route path="/shoppingLists" element={<ShoppingLists />} />
+      <Route path="/todoList/:id" element={<TodoListDetail />} />
+      <Route path="/todoLists" element={<TodoLists />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

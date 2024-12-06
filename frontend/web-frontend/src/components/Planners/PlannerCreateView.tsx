@@ -67,8 +67,7 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
     const isNameValid = fields.plannerName.length > 0;
     setPError(!isNameValid);
     const isTimeValid =
-      startDate.isBefore(endDate) &&
-      combineDateAndTime(endDate, endTime).isBefore(new Date());
+      startDate.isBefore(endDate)
     setTimeError(!isTimeValid);
     return isNameValid && isTimeValid;
   }, [fields.plannerName, startDate, endDate, startTime, endTime]);
@@ -76,6 +75,10 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
   useEffect(() => {
     fetchPalList();
   }, []);
+
+  useEffect(() => {
+    validatePlannerForm();
+  }, [fields.plannerName, startDate, endDate, endTime, startTime]);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -112,6 +115,8 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
           <MUI.Stack spacing={2}>
             <MUI.TextField
               required
+              error={pError}
+              helperText={pError && 'Name cannot be blank.'}
               id="plannerName"
               label="Planner Name"
               value={fields.plannerName}
@@ -126,6 +131,11 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
             <MUI.Typography variant="h6">Select Dates</MUI.Typography>
             <MUI.Box sx={{ display: 'flex', flexGrow: 1, flexDirection: { xs: 'column', md: 'row' } }}>
               <MUI.Stack sx={{ flex: 1, m: '0.5em 0.5em' }} spacing={2}>
+              {timeError && (
+                <MUI.Typography color="error" variant="subtitle1">
+                  Start date must be before the end date.
+                </MUI.Typography>
+              )}
                 <DatePickerValue label={'From'} field={startDate} setField={setStartDate}></DatePickerValue>
                 <TimePickerValue label={'From'} field={startTime} setField={setStartTime}></TimePickerValue>
               </MUI.Stack>
@@ -194,7 +204,7 @@ export default function PlannerCreateView(props: PlannerCreateViewProps) {
           title={'Creating a New Planner'}
           children={renderCreatePlanner()}
           cancelEnable={props.hasPlanner}
-          confirmEnable={true}
+          confirmEnable={!pError && !timeError}
           confirmButtonLabel="Save and Continue"
           confirmIcon={<MUIcons.Save sx={{ mr: '0.5em' }} />}
           cancelButtonLabel="Cancel"
