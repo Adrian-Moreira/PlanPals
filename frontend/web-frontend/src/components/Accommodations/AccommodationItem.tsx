@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useContext } from 'react'
 import { combineDateAndTime, convertDatePairs } from '../../lib/dateLib'
 import VoteButtons from '../Votes/VoteButtons'
 import CommentButton from '../Comments/CommentButton'
@@ -17,6 +17,8 @@ import { PPPlanner } from '../Planners/Planner'
 import dayjs from 'dayjs'
 import DatePickerValue from '../Common/DatePickerValue'
 import TimePickerValue from '../Common/TimePickerValue'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 export interface AccommodationProps {
   _id: string
@@ -46,6 +48,8 @@ export default function AccommodationItem(props: AccommodationProps) {
   const [nameError, setNameError] = useState(false)
   const [locationError, setLocationError] = useState(false)
   const [endTime, setEndTime] = useState(plannerEndDate)
+  const { setNotification } = useContext(NotificationContext); 
+
 
   const [fields, handleFieldChange] = useFormFields({
     accommodationName: '' + props.name,
@@ -57,9 +61,20 @@ export default function AccommodationItem(props: AccommodationProps) {
       params: { userId: props.currentUserId },
     })
     if (!res.data.success) {
+
+      setNotification?.({
+        type: 'error',
+        message: 'Error deleting: Accommodation may not have been deleted.',
+      });
+
       onError("Error deleting: Accommodation mightn't be removed")
+    }else {
+      setNotification?.({
+        type: 'success',
+        message: 'Success Deleting: Accommodation Deleted successfully!',
+      });
     }
-  }, [])
+  }, [setNotification])
 
   const handleEditAction = useCallback(async () => {
     if(validateEditPlannerForm()){
@@ -74,10 +89,19 @@ export default function AccommodationItem(props: AccommodationProps) {
       })
       setOpenEditDialog(false)
       if (!res.data.success) {
+        setNotification?.({
+          type: 'error',
+          message: 'Error updating: Accommodation may not have been updated.',
+        });
         onError("Error deleting: Accommodation mightn't be updated")
+      }else {
+        setNotification?.({
+          type: 'success',
+          message: 'updated successfully: Accommodation updated successfully!',
+        });
       }
     }
-  }, [fields.accommodationName, fields.accommodationLocation, editStartDate, editEndDate])
+  }, [fields.accommodationName, fields.accommodationLocation, editStartDate, editEndDate,setNotification])
 
 
  //EDIT PLANNER FORM-------------------------------------

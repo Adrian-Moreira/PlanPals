@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { useFormFields } from '../../lib/hooksLib'
 import { PPPlanner } from '../Planners/Planner'
 import dayjs from 'dayjs'
@@ -13,6 +13,7 @@ import { combineDateAndTime } from '../../lib/dateLib'
 import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import config from '../../config'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
 
 interface PPLocation {
   name: string
@@ -41,6 +42,8 @@ export default function DestinationCreate(props: DestinationCreateProps) {
   const [locations, setLocations] = useState<PPLocation[]>([])
   const [selectedLocation, setSelectedLocation] = useState<PPLocation | null>(null)
   const [pUser] = useAtom(ppUserAtom)
+  const { setNotification } = useContext(NotificationContext); 
+
   const [fields, handleFieldChange] = useFormFields({
     destinationName: '',
   })
@@ -62,6 +65,7 @@ export default function DestinationCreate(props: DestinationCreateProps) {
           },
         })
         if (res.data.success) {
+          setNotification?.({ type: 'success', message: 'Destination created successfully!' });
           setStartDate(plannerStartDate)
           setStartTime(plannerStartDate)
           setEndDate(plannerEndDate)
@@ -74,10 +78,11 @@ export default function DestinationCreate(props: DestinationCreateProps) {
           throw new Error()
         }
       } catch (e) {
+        setNotification?.({ type: 'error', message: 'Error creating destination. Please retry later!' });
         onError('Erorr Creating Destination. Please retry later!')
       }
     },
-    [fields.destinationName, startDate, startTime, endDate, endTime, pUser.ppUser, selectedLocation],
+    [fields.destinationName, startDate, startTime, endDate, endTime, pUser.ppUser, selectedLocation, setNotification],
   )
 
   const validateCreateDestinationForm = useCallback(() => {

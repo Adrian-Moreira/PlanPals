@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,useContext } from 'react'
 import { useFormFields } from '../../lib/hooksLib'
 import { PPPlanner } from '../Planners/Planner'
 import dayjs from 'dayjs'
@@ -14,6 +14,8 @@ import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import config from '../../config'
 import SelectItems from '../Common/SelectItems'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 export interface ActivityCreateProps {
   open: boolean
@@ -35,6 +37,8 @@ export default function ActivityCreate(props: ActivityCreateProps) {
   const [pUser] = useAtom(ppUserAtom)
   const activityDestination = ''
   const [destination, setDestination] = useState(activityDestination)
+  const { setNotification } = useContext(NotificationContext); 
+
 
   const [fields, handleFieldChange] = useFormFields({
     activityName: '',
@@ -56,6 +60,7 @@ export default function ActivityCreate(props: ActivityCreateProps) {
           },
         })
         if (res.data.success) {
+          setNotification?.({ type: 'success', message: 'Activity created successfully!' });
           setStartDate(plannerStartDate)
           setStartTime(plannerStartDate)
           setDestError(false)
@@ -70,10 +75,11 @@ export default function ActivityCreate(props: ActivityCreateProps) {
           throw new Error()
         }
       } catch (e) {
+        setNotification?.({ type: 'error', message: 'Error creating activity. Please try again.' });
         onError('Erorr Creating Activity. Please retry later!')
       }
     },
-    [fields.activityName, startDate, startTime, fields.duration, pUser.ppUser, fields.activityLocation],
+    [fields.activityName, startDate, startTime, fields.duration, pUser.ppUser, fields.activityLocation,setNotification],
   )
 
   const validateCreateActivityForm = useCallback(() => {

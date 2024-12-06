@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,useContext } from 'react'
 import { useFormFields } from '../../lib/hooksLib'
 import { PPPlanner } from '../Planners/Planner'
 import dayjs from 'dayjs'
@@ -14,6 +14,8 @@ import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import config from '../../config'
 import SelectItems from '../Common/SelectItems'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 export interface AccommodationCreateProps {
   open: boolean
@@ -34,6 +36,8 @@ export default function AccommodationCreate(props: AccommodationCreateProps) {
   const [pUser] = useAtom(ppUserAtom)
   const accommodationDestination = ''
   const [destination, setDestination] = useState(accommodationDestination)
+  const { setNotification } = useContext(NotificationContext); 
+
 
   const [fields, handleFieldChange] = useFormFields({
     accommodationName: '',
@@ -63,7 +67,15 @@ export default function AccommodationCreate(props: AccommodationCreateProps) {
           props.setOpen(false)
           fields.accommodationName = ''
           fields.accommodationLocation = ''
+          setNotification?.({
+            type: 'success',
+            message: ' crerating Accommodation Successfully.',
+          });
         } else {
+          setNotification?.({
+            type: 'error',
+            message: 'Error crerating Accommodation: Accommodation has not been created.',
+          });
           throw new Error()
         }
       } catch (e) {

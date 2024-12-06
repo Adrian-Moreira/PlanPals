@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { combineDateAndTime, convertDatePairsWithMinute } from '../../lib/dateLib'
 import VoteButtons from '../Votes/VoteButtons'
 import CommentButton from '../Comments/CommentButton'
@@ -19,6 +19,8 @@ import TimePickerValue from '../Common/TimePickerValue.tsx'
 import SelectItems from '../Common/SelectItems.tsx'
 import { useFormFields } from '../../lib/hooksLib.js'
 import dayjs from 'dayjs'
+import { NotificationContext } from '../../components/Notifications/notificationContext';
+
 
 const transportTypes = ['Bus', 'Train', 'Car', 'Airplane', 'Metro', 'Tram', 'Bicycle', 'Ferry']
 
@@ -97,35 +99,68 @@ export default function TransportItem(props: TransportProps) {
   }, [props._id])
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
-  const [openEditDialog, setOpenEditDialog] = useState(false)
+  const [openEditDialog, setOpenEditDialog] = useState(false)  
+  const { setNotification } = useContext(NotificationContext);
   const handleDeleteAction = useCallback(async () => {
     try {
-      const res = await apiLib.delete(`/planner/${props.plannerId}/transportation/${props._id}`, {
+      await apiLib.delete(`/planner/${props.plannerId}/transportation/${props._id}`, {
         params: { userId: props.currentUserId },
-      })
+      });
+      setNotification?.({
+        type: 'success',
+        message: 'Transportation deleted successfully!',
+      });
     } catch {
-      onError("Error deleting: Transport mightn't be removed")
+      setNotification?.({
+        type: 'error',
+        message: 'Error deleting: Transportation may not have been removed.',
+      });
     }
-  }, [])
+  }, [props.plannerId, props._id, props.currentUserId, setNotification]);
 
   const handleEditAction = useCallback(async () => {
-    if(!timeError){
-      const res = await apiLib.patch(`/planner/${props.plannerId}/transportation/${props._id}?userId=${props.currentUserId }`, {
-        data: {
-          type: transportType,
-          details: fields.transportDetails,
-          vehicleId: fields.vehicleId,
-          departureTime: editStartDate,
-          arrivalTime: editEndDate,
-        },
-      })
-      setOpenEditDialog(false)
-      if (!res.data.success) {
-        onError("Error deleting: Transport mightn't be updated")
+    if (!timeError) {
+      try {
+        const res = await apiLib.patch(
+          `/planner/${props.plannerId}/transportation/${props._id}?userId=${props.currentUserId}`,
+          {
+            data: {
+              type: transportType,
+              details: fields.transportDetails,
+              vehicleId: fields.vehicleId,
+              departureTime: editStartDate,
+              arrivalTime: editEndDate,
+            },
+          }
+        );
+        if (res.data.success) {
+          setNotification?.({
+            type: 'success',
+            message: 'Transportation updated successfully!',
+          });
+        } else {
+          throw new Error();
+        }
+      } catch {
+        setNotification?.({
+          type: 'error',
+          message: "Error updating: Transportation may not have been updated.",
+        });
       }
+      setOpenEditDialog(false);
     }
-  }, [fields.transportDetails, fields.vehicleId, editStartDate, editEndDate, timeError, transportType])
-
+  }, [
+    fields.transportDetails,
+    fields.vehicleId,
+    editStartDate,
+    editEndDate,
+    timeError,
+    transportType,
+    props.plannerId,
+    props._id,
+    props.currentUserId,
+    setNotification,
+  ]);
   //EDIT PLANNER FORM-------------------------------------
 
   const getEditForm = useCallback(() => {

@@ -1,7 +1,7 @@
 import CreateCard from '../Common/CreateCard'
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useContext } from 'react'
 import { useFormFields } from '../../lib/hooksLib'
 import { useAtom } from 'jotai'
 import { ppUserAtom } from '../../lib/authLib'
@@ -10,6 +10,7 @@ import { onError } from '../../lib/errorLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import { PPShoppingList } from './ShoppingList'
 import { useNavigate } from 'react-router-dom'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
 
 
 export interface ItemCreateProps {
@@ -24,6 +25,8 @@ export default function ItemCreate(props: ItemCreateProps) {
   const [pUser] = useAtom(ppUserAtom)
   const [nError, setNError] = useState(false)
   const [lError, setLError] = useState(false)
+  const { setNotification } = useContext(NotificationContext); 
+
 
   const [fields, handleFieldChange] = useFormFields({
     name: '',
@@ -73,11 +76,14 @@ export default function ItemCreate(props: ItemCreateProps) {
           fields.name = ''
           fields.location = ''
           //Hacked in fix to shopping list refresh
+          setNotification?.({ type: 'success', message: 'item added successfully!' });
           nav(`/shoppingLists`)
         } else {
           throw new Error()
         }
       } catch (e) {
+        setNotification?.({ type: 'error', message: 'Erorr Creating Item. Please retry later!' });
+
         onError('Erorr Creating Item. Please retry later!')
       }
     },

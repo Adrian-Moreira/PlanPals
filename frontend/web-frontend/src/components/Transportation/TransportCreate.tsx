@@ -1,7 +1,7 @@
 import CreateCard from '../Common/CreateCard'
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,useContext  } from 'react'
 import { useFormFields } from '../../lib/hooksLib'
 import { PPPlanner } from '../Planners/Planner'
 import dayjs from 'dayjs'
@@ -17,6 +17,8 @@ import SelectItems from '../Common/SelectItems'
 import { getVehicleIcon } from './TransportItem'
 import { DraggableMarker } from '../DraggableMarker'
 import { MapContainer, TileLayer } from 'react-leaflet'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 const transportTypes = ['Bus', 'Train', 'Car', 'Airplane', 'Metro', 'Tram', 'Bicycle', 'Ferry']
 
@@ -35,6 +37,7 @@ export default function TransportCreate(props: TransportCreateProps) {
   const [endTime, setEndTime] = useState(plannerEndDate)
   const [isLoading, setIsLoading] = useState(false)
   const [pUser] = useAtom(ppUserAtom)
+  const { setNotification } = useContext(NotificationContext); 
 
   const [fromPosition, setFromPosition] = useState([51.505, -0.09]);
   const [toPosition, setToPosition] = useState([51.515, -0.1]);
@@ -137,21 +140,26 @@ export default function TransportCreate(props: TransportCreateProps) {
           },
         })
         if (res.data.success) {
-          setStartDate(plannerStartDate)
-          setEndDate(plannerEndDate)
-          setStartTime(plannerStartDate)
-          setEndTime(plannerEndDate)
-          setTimeError(false)
-          fields.vehicleId = ''
-          fields.transportDetails = ''
+          setNotification?.({ type: 'success', message: 'Transportation created successfully!' });
+          // Reset form fields
+          setStartDate(plannerStartDate);
+          setEndDate(plannerEndDate);
+          setStartTime(plannerStartDate);
+          setEndTime(plannerEndDate);
+          fields.vehicleId = '';
+          fields.transportDetails = '';
+
         } else {
-          throw new Error()
+
+          throw new Error('Failed to create transportation');
         }
       } catch (e) {
-        onError('Erorr Creating Transportation. Please retry later!')
+        setNotification?.({ type: 'error', message: 'Error creating transportation. Please retry later!' });
+      } finally {
+        setIsLoading(false);
       }
     },
-    [fields.transportDetails, fields.vehicleId, startDate, startTime, endDate, endTime, pUser.ppUser, fromPosition, toPosition],
+    [fields, startDate, startTime, endDate, endTime, fromPosition, toPosition, transportType, pUser.ppUser, setNotification],
   )
 
   const validateCreateTransportForm = useCallback(() => {

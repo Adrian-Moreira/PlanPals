@@ -57,8 +57,7 @@ export default function Planner(props: PlannerProps) {
   const { webSocket, messages, subscribe, unsubscribe } = useWebSocket()
   const [onReload, setOnReload] = useState(false)
   const nav = useNavigate()
-//const { setNotification } = useContext(NotificationContext);
-  const { setNotification } = useContext(NotificationContext); // Use context here
+  const { setNotification } = useContext(NotificationContext); 
 
   const [fields, handleFieldChange] = useFormFields({
     plannerName: '' + props.planner.name,
@@ -88,8 +87,10 @@ export default function Planner(props: PlannerProps) {
             description: fields.plannerDescription
           }
         })
+        setNotification?.({ type: 'success', message: 'Planner edited successfully!' }); 
         setOpenEditDialog(false)
       } catch {
+        setNotification?.({ type: 'error', message: "Error editing: Planner mightn't be removed" });
         onError("Error editing: Planner mightn't been edited")
       }
     }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useInsertionEffect, useState } from 'react'
+import React, { useCallback, useEffect, useInsertionEffect, useState,useContext } from 'react'
 import * as MUI from '@mui/material/'
 import * as MUIcons from '@mui/icons-material'
 import { useFormFields } from '../../lib/hooksLib'
@@ -9,6 +9,8 @@ import { useAtom } from 'jotai'
 import { PPUser, ppUserAtom } from '../../lib/authLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import { userMapAtom } from '../../lib/appLib'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 export interface ShoppingListCreateViewProps {
   handelCancel: () => void
@@ -31,6 +33,8 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
   const [userMap] = useAtom(userMapAtom)
   const [pUser] = useAtom(ppUserAtom)
   const [pError, setPError] = useState(false)
+  const { setNotification } = useContext(NotificationContext); 
+
 
   const fetchPalList = useCallback(async () => {
     try {
@@ -72,10 +76,14 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
 
       if (res.data.success) {
         props.setOnReload(true)
+        setNotification?.({ type: 'success', message: 'Shopping List created successfully!' });
+
         nav(`/shoppingList/${res.data.data._id}`)
       }
       setIsLoading(false)
     } catch (e) {
+      setNotification?.({ type: 'error', message: 'Error creating: Shopping List may have not been created' });
+
       onError(e)
     }
   }

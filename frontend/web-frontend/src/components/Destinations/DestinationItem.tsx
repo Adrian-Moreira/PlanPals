@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,useContext } from 'react'
 import { combineDateAndTime, convertDatePairs } from '../../lib/dateLib'
 import VoteButtons from '../Votes/VoteButtons'
 import CommentButton from '../Comments/CommentButton'
@@ -18,6 +18,8 @@ import TimePickerValue from '../Common/TimePickerValue'
 import { PPPlanner } from '../Planners/Planner'
 import { useFormFields } from '../../lib/hooksLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 interface WeatherInfo {
   temp: number
@@ -51,6 +53,8 @@ export default function DestinationItem(props: DestinationProps) {
   const [timeError, setTimeError] = useState(false)
   const [weather, setWeather] = useState<WeatherInfo | null>(null)
   const [pUser] = useAtom(ppUserAtom)
+  const { setNotification } = useContext(NotificationContext); 
+
   const regionName = new Intl.DisplayNames(['en'], { type: 'region' })
 
   useEffect(() => {
@@ -107,9 +111,20 @@ export default function DestinationItem(props: DestinationProps) {
       params: { userId: props.currentUserId },
     })
     if (!res.data.success) {
-      onError("Error deleting: Destination mightn't be removed")
+      
+      setNotification?.({
+        type: 'error',
+        message: 'Error deleting: Destination may not have been updated.',
+      });
+      
+    }else {
+      
+      setNotification?.({
+        type: 'success',
+        message: 'Destination updated successfully!',
+      });
     }
-  }, [])
+  }, [setNotification])
 
   const handleEditAction = useCallback(async () => {
     if(!timeError){
@@ -123,10 +138,19 @@ export default function DestinationItem(props: DestinationProps) {
       })
       setOpenEditDialog(false)
       if (!res.data.success) {
+        setNotification?.({
+        type: 'error',
+        message: 'Error deleting: Destination may not have been updated.',
+      });
         onError("Error deleting: Destination mightn't be updated")
+      }else{
+        setNotification?.({
+          type: 'success',
+          message: 'Destination updated successfully!',
+        });
       }
     }
-  }, [editStartDate, editEndDate, timeError])
+  }, [editStartDate, editEndDate, timeError,setNotification])
 
   //EDIT PLANNER FORM-------------------------------------
 

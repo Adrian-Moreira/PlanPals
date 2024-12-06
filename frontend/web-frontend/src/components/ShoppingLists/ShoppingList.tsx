@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState,useContext } from 'react'
 import { ppUser, PPUser, ppUserAtom } from '../../lib/authLib'
 import CardActionButtons from '../Common/CardActionButtons'
 import AddButton from '../Common/AddButton'
@@ -10,6 +10,8 @@ import { useAtom } from 'jotai'
 import { onError } from '../../lib/errorLib'
 import { useNavigate } from 'react-router-dom'
 import ShoppingListEditView from './ShoppingListEditView'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 export interface PPShoppingListItem {
     addedBy: PPUser
@@ -38,6 +40,8 @@ export default function ShoppingList(props: ShoppingListProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [creationDialogOpen, setCreationDialogOpen] = useState(false)
   const [pUser] = useAtom(ppUserAtom)
+  const { setNotification } = useContext(NotificationContext); 
+
   const nav = useNavigate()
 
   const handleDeleteShoppingList = useCallback(async () => {
@@ -45,13 +49,27 @@ export default function ShoppingList(props: ShoppingListProps) {
       const res = await apiLib.delete(`/shoppingList/${props.shoppingList._id}`, {
         params: { userId: pUser.ppUser?._id },
       })
+      setNotification?.({ type: 'success', message: 'Shopping List deleted successfully' });
+
       nav('/shoppingLists')
     } catch {
+      setNotification?.({ type: 'error', message: 'Error deleting: Shopping List may have not been removed' });
+
       onError("Error deleting: Shopping List may have not been removed")
     }
   }, [])
   const handleEditShoppingList = useCallback(async () => {
+    //try {
+      // To Josh : this is jay please add the logic here I added the try catch to implement error handling and notifications 
+      //}
+      setNotification?.({ type: 'success', message: 'Shopping List updated successfully' });
 
+      nav('/shoppingLists')
+    //} catch {
+      setNotification?.({ type: 'error', message: 'Error updating: Shopping List may have not been updated' });
+
+      onError("Error deleting: Shopping List may have not been removed")
+    //}
   }, [])
 
   const [userNames, setUserNames] = useState({}) 

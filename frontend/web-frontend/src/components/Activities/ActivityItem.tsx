@@ -1,6 +1,6 @@
 import * as MUI from '@mui/material'
 import * as MUIcons from '@mui/icons-material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useContext } from 'react'
 import { combineDateAndTime, convertDatePairs } from '../../lib/dateLib'
 import VoteButtons from '../Votes/VoteButtons'
 import CommentButton from '../Comments/CommentButton'
@@ -17,6 +17,8 @@ import { PPPlanner } from '../Planners/Planner'
 import dayjs from 'dayjs'
 import DatePickerValue from '../Common/DatePickerValue'
 import TimePickerValue from '../Common/TimePickerValue'
+import { NotificationContext  } from '../../components/Notifications/notificationContext';
+
 
 export interface ActivityProps {
   _id: string
@@ -35,6 +37,7 @@ export default function ActivityItem(props: ActivityProps) {
   const { startDate, endDate } = convertDatePairs(props.startDate, props.duration)
   const [pUser] = useAtom(ppUserAtom)
 
+  const { setNotification } = useContext(NotificationContext); 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [timeError, setTimeError] = useState(false)
@@ -57,9 +60,13 @@ export default function ActivityItem(props: ActivityProps) {
       params: { userId: props.currentUserId },
     })
     if (!res.data.success) {
+      setNotification?.({ type: 'error', message: 'Error deleting activity. Activity mightnot be removed' });
       onError("Error deleting: Activity mightn't be removed")
+    }else {
+      setNotification?.({ type: 'success', message: 'Activity deleted successfully!' });
+
     }
-  }, [])
+  }, [setNotification])
 
   const handleEditAction = useCallback(async () => {
     if(validateEditPlannerForm()){
@@ -74,10 +81,14 @@ export default function ActivityItem(props: ActivityProps) {
       })
       setOpenEditDialog(false)
       if (!res.data.success) {
+        setNotification?.({ type: 'error', message: 'Error updated activity. Activity mightnot be updated ' });
+
         onError("Error deleting: Activity mightn't be updated")
+      }else{
+        setNotification?.({ type: 'success', message: 'Activity updated successfully!' });
       }
     }
-  }, [fields.activityName, fields.activityLocation, fields.duration, editStartDate])
+  }, [fields.activityName, fields.activityLocation, fields.duration, editStartDate,setNotification])
 
 
  //EDIT PLANNER FORM-------------------------------------

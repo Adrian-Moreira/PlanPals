@@ -19,7 +19,7 @@
     "http-proxy": "^1.18.1",
     "http-status-codes": "^2.3.0",
     "mongodb": "^6.9.0",
-    "mongoose": "^8.7.0",
+    "mongoose": "^8.8.0",
     "planner-service": "file:",
     "react-toastify": "^10.0.6",
     "sst": "^3.2.70",
