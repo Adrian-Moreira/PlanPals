@@ -23,7 +23,7 @@ function ShoppingListDetail() {
   useEffect(() => {
     if (!shoppingListDetails._id || !onReload) return
     setTimeout(() => {
-      if (webSocket.readyState === 1) subscribe([{ type: 'shoppingList', id: shoppingListDetails._id }])
+      if (webSocket.readyState === 1) subscribe([{ type: 'planner', id: shoppingListDetails._id }])
       setReload(false)
     }, 500)
   }, [shoppingListDetails, webSocket.readyState, onReload])

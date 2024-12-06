@@ -109,14 +109,14 @@ export default function ShoppingLists(props: ShoppingListsProps) {
   useEffect(() => {
     if (!pUser.ppUser) return
     if (webSocket.readyState !== 1) return
-    subscribe([{ type: 'planners', id: pUser.ppUser._id }])
+    subscribe([{ type: 'shoppingLists', id: pUser.ppUser._id }])
   }, [pUser.ppUser, subscribe, onReload, isLoading])
 
   useEffect(() => {
     if (!pUser.ppUser) return
     const relevantEntries = Object.entries(messages).filter(
       ([, msg]) =>
-        msg.topic.type === 'planners' && msg.topic.id === pUser.ppUser!._id && msg.message.type === 'Planner',
+        msg.topic.type === 'shoppingLists' && msg.topic.id === pUser.ppUser!._id && msg.message.type === 'ShoppingList',
     )
     relevantEntries.forEach(([msgId, msg]) => {
       let shoppingList = msg.message.data

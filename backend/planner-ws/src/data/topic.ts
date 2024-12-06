@@ -1,4 +1,4 @@
-export type MessageTopicType = "planners" | "planner" | "inbox";
+export type MessageTopicType = "planners" | "planner" | "shoppingLists" | "shoppingList" | "inbox";
 export interface MessageTopic {
 	type: MessageTopicType;
 	id: string; // userId | plannerId | userId

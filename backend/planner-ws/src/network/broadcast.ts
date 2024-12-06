@@ -46,13 +46,17 @@ const isValidTopic = (topicObject: Topic, qItem: QueueItem) => {
         uid === topicObject.id
     );
     const plannerIdMatch = qItem.object.plannerId === topicObject.id;
+    const shoppingListIdMatch = qItem.object.shoppingListId === topicObject.id;
 
     const plannersTopic = topicObject.type === "planners" && userIdMatch &&
         qItem.object.type === "Planner";
+    const shoppingListsTopic = topicObject.type === "shoppingLists" && userIdMatch &&
+        qItem.object.type === "ShoppingList";
     const plannerTopic = topicObject.type === "planner" && plannerIdMatch;
+    const shoppingListTopic = topicObject.type === "shoppingList" && shoppingListIdMatch;
     const inboxTopic = topicObject.type === "inbox" && userIdMatch;
 
-    return plannersTopic || plannerTopic || inboxTopic;
+    return plannersTopic || plannerTopic || inboxTopic || shoppingListsTopic || shoppingListTopic;
 };
 
 /**

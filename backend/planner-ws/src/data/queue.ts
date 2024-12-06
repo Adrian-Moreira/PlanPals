@@ -9,6 +9,7 @@ export interface PPObject {
 	type: string; // Object collection name
 	userIds?: string[];
 	plannerId?: string;
+	shoppingListId?: string;
 }
 
 export interface QueueItem {

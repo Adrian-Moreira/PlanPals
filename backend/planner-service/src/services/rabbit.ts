@@ -29,6 +29,7 @@ interface EventMessageArgs {
   type: string
   userIds?: string[]
   plannerId?: string
+  shoppingListId?: string
   addon?: any[]
 }
 
@@ -46,6 +47,7 @@ export const publishUpdateEvent = async (req: Request, res: Response, next: Next
         type: req.body.dataType,
         userIds: req.body.userIds,
         plannerId: req.body.plannerId,
+        shoppingListId: req.body.shoppingListId,
       }),
     ),
   )
@@ -63,6 +65,7 @@ export const publishDeleteEvent = async (req: Request, res: Response, next: Next
         type: req.body.dataType,
         userIds: req.body.userIds,
         plannerId: req.body.plannerId,
+        shoppingListId: req.body.shoppingListId,
       }),
     ),
   )
