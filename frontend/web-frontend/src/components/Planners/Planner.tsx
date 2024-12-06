@@ -9,7 +9,7 @@ import DestinationCreate from '../Destinations/DestinationCreate'
 import AddButton from '../Common/AddButton'
 import TransportItems from '../Transportation/TransportItems'
 import TransportCreate from '../Transportation/TransportCreate'
-import { convertDatePairs } from '../../lib/dateLib'
+import { combineDateAndTime, convertDatePairs } from '../../lib/dateLib'
 import apiLib from '../../lib/apiLib'
 import { useAtom } from 'jotai'
 import { onError } from '../../lib/errorLib'
@@ -22,6 +22,9 @@ import { useWebSocket } from '../../lib/wsLib'
 import { NotificationContext  } from '../../components/Notifications/notificationContext';
 import AccommodationCreate from '../Accommodations/AccommodationCreate'
 import AccommodationItems from '../Accommodations/AccommodationItems'
+import DatePickerValue from '../Common/DatePickerValue'
+import TimePickerValue from '../Common/TimePickerValue'
+import dayjs from 'dayjs'
 
 export interface PPPlanner {
   _id: string
@@ -56,6 +59,11 @@ export default function Planner(props: PlannerProps) {
   const [editError, setEditError] = useState(false)
   const { webSocket, messages, subscribe, unsubscribe } = useWebSocket()
   const [onReload, setOnReload] = useState(false)
+  const [startTime, setStartTime] = useState(dayjs(props.planner.startDate))
+  const [endTime, setEndTime] = useState(dayjs(props.planner.endDate))
+  const [editStartDate, setEditStartDate] = useState(dayjs(props.planner.startDate))
+  const [editEndDate, setEditEndDate] = useState(dayjs(props.planner.endDate))
+  const [timeError, setTimeError] = useState(false)
   const nav = useNavigate()
 //const { setNotification } = useContext(NotificationContext);
   const { setNotification } = useContext(NotificationContext); // Use context here
@@ -78,14 +86,16 @@ export default function Planner(props: PlannerProps) {
   }, [props.planner._id, pUser.ppUser, nav, setNotification]);
 
   const handleEditPlanner = useCallback(async () => {
-    if(!editError){
+    if(validateEditPlannerForm()){
       try {
         console.log(fields.plannerName)
 
         const res = await apiLib.patch(`/planner/${props.planner._id}?userId=${pUser.ppUser!._id}`, {
           data: {
             name: fields.plannerName,
-            description: fields.plannerDescription
+            description: fields.plannerDescription,
+            startDate: combineDateAndTime(editStartDate, startTime).toISOString(),
+            endDate: combineDateAndTime(editEndDate, endTime).toISOString(),
           }
         })
         setOpenEditDialog(false)
@@ -93,7 +103,7 @@ export default function Planner(props: PlannerProps) {
         onError("Error editing: Planner mightn't been edited")
       }
     }
-  }, [fields.plannerName, fields.plannerDescription, editError])
+  }, [fields.plannerName, fields.plannerDescription, editError, editStartDate, editEndDate, startTime, endTime])
 
   const mkTabItems = useCallback(() => {
     const elements = [
@@ -212,6 +222,8 @@ export default function Planner(props: PlannerProps) {
           
           props.planner.name = msg.message.data.name
           props.planner.description = msg.message.data.description
+          props.planner.startDate = msg.message.data.startDate
+          props.planner.endDate = msg.message.data.endDate
 
           delete messages[msgId]
           break
@@ -246,6 +258,15 @@ export default function Planner(props: PlannerProps) {
               value={fields.plannerDescription}
               onChange={handleFieldChange}
             />
+            {timeError && (
+            <MUI.Typography color="error" variant="subtitle1">
+              Start date must be before end date.
+            </MUI.Typography>
+            )}
+            <DatePickerValue label={'From'} field={editStartDate} setField={setEditStartDate}></DatePickerValue>
+            <TimePickerValue label={'From'} field={startTime} setField={setStartTime}></TimePickerValue>
+            <DatePickerValue label={'To'} field={editEndDate} setField={setEditEndDate}></DatePickerValue>
+            <TimePickerValue label={'To'} field={endTime} setField={setEndTime}></TimePickerValue>
           </MUI.Stack>
           <MUI.Box sx={{ flexDirection: 'column' }}>
             <MUI.Stack spacing={2}>
@@ -265,12 +286,14 @@ export default function Planner(props: PlannerProps) {
   const validateEditPlannerForm = useCallback(() => {
     const isNameValid = fields.plannerName.length > 0
     setEditError(!isNameValid)
-    return isNameValid
-  }, [fields.plannerName])
+    const isTimeValid = editStartDate.isBefore(editEndDate)
+    setTimeError(!isTimeValid)
+    return isNameValid && isTimeValid
+  }, [fields.plannerName, editEndDate, editStartDate, startTime, endTime])
 
   useEffect(() => {
     validateEditPlannerForm()
-  }, [fields.plannerName])
+  }, [fields.plannerName, editStartDate, startTime, editEndDate, endTime])
 
   function getRWUsers(){
     let list = ''

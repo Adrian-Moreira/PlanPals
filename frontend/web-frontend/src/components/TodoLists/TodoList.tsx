@@ -12,9 +12,14 @@ import { useNavigate } from 'react-router-dom'
 import TodoListEditView from './TodoListEditView'
 
 export interface PPTodoListTask {
-    addedBy: PPUser
+    _id: string
+    createdAt: string
+    createdBy: string
     name: string
-    location: string
+    dueDate: string
+    isCompleted: boolean
+    todoListId: string
+    updatedAt: string
   }
 
 export interface PPTodoList {
@@ -33,6 +38,8 @@ export interface TodoListProps {
 }
 
 export default function TodoList(props: TodoListProps) {
+  const [taskList, setTaskList] = useState([])
+  var stupidList
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -74,6 +81,42 @@ export default function TodoList(props: TodoListProps) {
       return 'Unknown User'
     }
   }
+
+  const fetchTasks = useCallback(
+    async () => {
+      setIsLoading(true)
+      const tList = await Promise.all(
+        props.todoList.tasks.map(async (did) => {
+          try {
+            const res = await apiLib
+              .get(`/todoList/${props.todoList._id}/task/${did}`, {
+                params: { userId: pUser.ppUser!._id },
+              })
+              .then((res) => res)
+            return res.data.success ? res.data.data : {}
+          } catch {
+            return {}
+          }
+        }),
+      )
+      stupidList = tList
+      setIsLoading(false)
+  }, [props.todoList._id, props.todoList.createdBy._id, taskList, setTaskList])
+
+  const onLoad = useCallback(async () => {
+    try {
+      await fetchTasks()
+    } catch {
+      onError('Error fetching tasks')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    onLoad()
+  }, [onLoad])
+
 
   return isLoading ?
       <MUI.Box sx={{ display: 'flex', justifyContent: 'center', padding: 10 }}>
@@ -184,8 +227,7 @@ export default function TodoList(props: TodoListProps) {
                     todoList={props.todoList}
                 ></TaskCreate>
             </MUI.Box>
-            {props.todoList.tasks.map((task) => {
-
+            {stupidList.map((task) => {
                 const [userName, setUserName] = useState('Loading...');
 
                 useEffect(() => {

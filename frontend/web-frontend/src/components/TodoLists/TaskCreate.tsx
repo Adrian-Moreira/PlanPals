@@ -56,7 +56,7 @@ export default function TaskCreate(props: TaskCreateProps) {
         </MUI.Box>
       </MUI.Box>
     )
-  }, [fields.name, startDate, startTime])
+  }, [fields.name, startDate, startTime, nError])
 
   const handleSubmitTask = useCallback(
     async (event: any) => {
@@ -68,7 +68,8 @@ export default function TaskCreate(props: TaskCreateProps) {
             createdBy: pUser.ppUser!._id,
             name: fields.name,
             dueDate: startTime,
-            completed: false
+            isCompleted: false,
+            assignedTo: pUser.ppUser!._id
           },
         })
         if (res.data.success) {
