@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useInsertionEffect, useState,useContext } from 'react'
+import React, { useCallback, useEffect, useInsertionEffect, useState } from 'react'
 import * as MUI from '@mui/material/'
 import * as MUIcons from '@mui/icons-material'
 import { useFormFields } from '../../lib/hooksLib'
@@ -9,23 +9,21 @@ import { useAtom } from 'jotai'
 import { PPUser, ppUserAtom } from '../../lib/authLib'
 import AdaptiveDialog from '../Common/AdaptiveDialog'
 import { userMapAtom } from '../../lib/appLib'
-import { NotificationContext  } from '../../components/Notifications/notificationContext';
 
-
-export interface ShoppingListCreateViewProps {
+export interface TodoListCreateViewProps {
   handelCancel: () => void
-  hasShoppingList: boolean
+  hasTodoList: boolean
   setOnReload: React.Dispatch<React.SetStateAction<boolean>>
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function ShoppingListCreateView(props: ShoppingListCreateViewProps) {
+export default function TodoListCreateView(props: TodoListCreateViewProps) {
   const nav = useNavigate()
 
   const [fields, handleFieldChange] = useFormFields({
-    shoppingListName: '',
-    shoppingListDescription: '',
+    todoListName: '',
+    todoListDescription: '',
   })
   const [palList, setPalList] = React.useState<PPUser[]>([])
   const [selectedPals, setSelectedPals] = React.useState<PPUser[]>([])
@@ -33,8 +31,6 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
   const [userMap] = useAtom(userMapAtom)
   const [pUser] = useAtom(ppUserAtom)
   const [pError, setPError] = useState(false)
-  const { setNotification } = useContext(NotificationContext); 
-
 
   const fetchPalList = useCallback(async () => {
     try {
@@ -49,49 +45,45 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
     }
   }, [])
 
-  const validateShoppingListForm = useCallback(() => {
-    const isNameValid = fields.shoppingListName.length > 0
+  const validateTodoListForm = useCallback(() => {
+    const isNameValid = fields.todoListName.length > 0
     setPError(!isNameValid)
     return isNameValid
-  }, [fields.shoppingListName])
+  }, [fields.todoListName])
 
   useEffect(() => {
     fetchPalList();
   }, [])
 
   useEffect(() => {
-    validateShoppingListForm();
-  }, [fields.shoppingListName])
+    validateTodoListForm();
+  }, [fields.todoListName])
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
     setIsLoading(true)
     console.log(selectedPals)
     try {
-      const res = await apiLib.post('/shoppingList', {
+      const res = await apiLib.post('/todoList', {
         data: {
           createdBy: pUser.ppUser!._id,
-          name: fields.shoppingListName,
-          description: fields.shoppingListDescription,
+          name: fields.todoListName,
+          description: fields.todoListDescription,
           rwUsers: selectedPals.map((p) => p._id),
         },
       })
 
       if (res.data.success) {
         props.setOnReload(true)
-        setNotification?.({ type: 'success', message: 'Shopping List created successfully!' });
-
-        nav(`/shoppingList/${res.data.data._id}`)
+        nav(`/todoList/${res.data.data._id}`)
       }
       setIsLoading(false)
     } catch (e) {
-      setNotification?.({ type: 'error', message: 'Error creating: Shopping List may have not been created' });
-
       onError(e)
     }
   }
 
-  const renderCreateShoppingList = useCallback(() => {
+  const renderCreateTodoList = useCallback(() => {
     return (
       <MUI.Box sx={{ mt: '1em', mb: '0em' }}>
         <MUI.Box sx={{ gap: 4 }}>
@@ -100,15 +92,15 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
               required
               error={pError}
               helperText={pError && 'Name cannot be blank.'}
-              id="shoppingListName"
-              label="Shopping List Name"
-              value={fields.shoppingListName}
+              id="todoListName"
+              label="To-do List Name"
+              value={fields.todoListName}
               onChange={handleFieldChange}
             />
             <MUI.TextField
-              id="shoppingListDescription"
-              label="Shopping List Description"
-              value={fields.shoppingListDescription}
+              id="todoListDescription"
+              label="To-do List Description"
+              value={fields.todoListDescription}
               onChange={handleFieldChange}
             />
           </MUI.Stack>
@@ -149,10 +141,10 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
       </MUI.Box>
     )
   }, [
-    fields.shoppingListDescription,
-    fields.shoppingListName,
+    fields.todoListDescription,
+    fields.todoListName,
     handleSubmit,
-    props.hasShoppingList,
+    props.hasTodoList,
     props.open,
     props.setOnReload,
     palList,
@@ -163,10 +155,10 @@ export default function ShoppingListCreateView(props: ShoppingListCreateViewProp
     <AdaptiveDialog
       open={props.open}
       setOpen={props.setOpen}
-      label={'CreateNewShoppingList'}
-      title={'Creating a New Shopping List'}
-      children={renderCreateShoppingList()}
-      cancelEnable={props.hasShoppingList}
+      label={'CreateNewTodoList'}
+      title={'Creating a New To-do List'}
+      children={renderCreateTodoList()}
+      cancelEnable={props.hasTodoList}
       confirmEnable={!pError}
       confirmButtonLabel="Save and Continue"
       confirmIcon={<MUIcons.Save sx={{ mr: '0.5em' }} />}
