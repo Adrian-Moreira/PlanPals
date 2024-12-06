@@ -7,10 +7,12 @@ import 'package:provider/provider.dart';
 
 class NavigatorAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
-  
+  final bool? isHome;
+
   const NavigatorAppBar({
     super.key,
     this.title,
+    this.isHome = false,
   });
 
   @override
@@ -38,14 +40,16 @@ class NavigatorAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.blueAccent, // Custom background color
       elevation: 6, // Adds shadow to the AppBar
       shadowColor: Colors.blue.shade200, // Shadow color
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        tooltip: 'Back',
-        color: Colors.white,
-      ),
+      leading: isHome == true
+          ? Container()
+          : IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              tooltip: 'Back',
+              color: Colors.white,
+            ),
       actions: <Widget>[
         PopupMenuButton<String>(
           icon: const Icon(
@@ -54,14 +58,13 @@ class NavigatorAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           onSelected: (String result) {
             if (result == 'Logout') {
-              
               handleLogout(context);
 
               Future.delayed(const Duration(milliseconds: 100), () {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/login',
-                  (Route<dynamic> route) => false,
+                  (route) => false,
                 );
               });
             } else if (result == 'Profile') {

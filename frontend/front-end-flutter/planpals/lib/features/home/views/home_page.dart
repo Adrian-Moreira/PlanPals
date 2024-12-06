@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planpals/shared/components/navigator_bar.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -6,6 +7,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const NavigatorAppBar(title: "Home", isHome: true),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
