@@ -108,7 +108,13 @@ class CreateShoppingListFormState extends State<CreateShoppingListForm> {
 
                         viewModel.currentShoppingList = newShoppingList;
 
-                        Navigator.pushNamed(context, '/shoppingListDetails');
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ShoppingListDetailsView(
+                                shoppingList: newShoppingList),
+                          ),
+                        );
                       }
                     },
                     child: const Text('Create Shopping List'),
