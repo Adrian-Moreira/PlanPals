@@ -8,11 +8,11 @@ Before starting, ensure you have Node.js and npm installed on your system. If no
 Make sure you have a `.env.local` file in this directory.
 ```bash
 VITE_API_URL=http://localhost:8080
-VITE_OWM_DEFAULT_KEY=YOUR_KEY_HERE
+VITE_OWM_DEFAULT_KEY=YOUR_KEY_HERE  `if you dont have a key you can use our Gropups key: 076d98c57641c3b3ef4731b20c99ff1c` 
 ```
 
 ## To Start:
-1. In the `web-frontend` directory, run the following commands:
+1. In the `Planpals/frontend/web-frontend` directory, run the following commands:
    ### Step 1: Install Dependencies
    ```bash
    npm install

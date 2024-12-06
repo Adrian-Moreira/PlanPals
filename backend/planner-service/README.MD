@@ -35,7 +35,7 @@ PlanPals Express!
 1. Clone the repository:
    ```bash
    git clone https://github.com/h-kt/PlanPals.git
-   cd PlanPals/planner-service
+   cd PlanPals/backend/planner-service
    ```
 
 2. Install dependencies:
@@ -48,7 +48,7 @@ PlanPals Express!
    npm run build
    ```
 
-### Running
+### Running (if not using Docker)
 
 You'll need an instance of mongo running and supply the link with an environmental variable: `DATABASE_CONNECTIONSTRING`
 ```bash
@@ -77,7 +77,7 @@ To run the server using the built Docker image:
 
 1. Running the container:
    ```bash
-   docker compose -f docker-compose.yml up --build
+   docker compose -f docker-compose.dev.yml up --build
    ```
 
 The server will be accessible at `http://localhost:8080`.
