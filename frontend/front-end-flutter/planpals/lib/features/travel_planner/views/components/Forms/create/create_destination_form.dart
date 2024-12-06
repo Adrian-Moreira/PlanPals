@@ -62,8 +62,8 @@ class _CreateDestinationFormState extends State<CreateDestinationForm> {
               // Start Date field
               DateTimeForm(
                 initialDate: _startDate,
-                labelText: 'Departure Date',
-                placeholder: 'Set Departure Date',
+                labelText: 'Start Date',
+                placeholder: 'Set Start Date',
                 dateTimeSelected: (selectedDate) {
                   setState(() {
                     _startDate = selectedDate;
@@ -76,8 +76,8 @@ class _CreateDestinationFormState extends State<CreateDestinationForm> {
               // End Date field
               DateTimeForm(
                 initialDate: _endDate,
-                labelText: 'Arrival Date',
-                placeholder: 'Set Arrival Date',
+                labelText: 'End Date',
+                placeholder: 'Set End Date',
                 dateTimeSelected: (selectedDate) {
                   setState(() {
                     _endDate = selectedDate;

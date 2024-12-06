@@ -30,9 +30,8 @@ class PlannerService {
   // Fetch travel planners by user ID
   Future<List<Planner>> fetchPlannersByUserId(String userId) async {
     try {
-      final response = await _apiService.get('/planner?userId=$userId');
+      final response = await _apiService.get('/planner?userId=$userId&access=rw');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
-      print(jsonList);
 
       // Convert the JSON list into a List<Planner>
       return jsonList.map((json) => Planner.fromJson(json)).toList();
@@ -59,7 +58,6 @@ class PlannerService {
   Future<List<Destination>> fetchAllDestinationsByUserId(
       String plannerId, String userId) async {
     try {
-      print('Fetching all destinations for planner ID=$plannerId');
       final response = await _apiService
           .get('/planner/$plannerId/destination?userId=$userId');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
@@ -144,7 +142,6 @@ class PlannerService {
       final responseBody = jsonDecode(response.body);
       return Destination.fromJson(responseBody['data']);
     } catch (e) {
-      print('Error: $e');
       throw Exception('Failed to add destination: $e');
     }
   }
@@ -217,7 +214,6 @@ class PlannerService {
   Future<Destination> updateDestination(
       Destination destination, String userId) async {
     try {
-      print('UPDATING DESTINATION: $destination');
       final response = await _apiService.patch(
         '/planner/${destination.plannerId}/destination/${destination.destinationId}?userId=$userId',
         destination.toJson(),
@@ -247,7 +243,6 @@ class PlannerService {
   Future<Accommodation> updateAccommodation(
       Accommodation accommodation, String plannerId, String userId) async {
     try {
-      print('UPDATING ACCOMMODATION: $accommodation');
       final response = await _apiService.patch(
         '/planner/$plannerId/destination/${accommodation.destinationId}/accommodation/${accommodation.accommodationId}?userId=$userId',
         accommodation.toJson(),
@@ -256,7 +251,6 @@ class PlannerService {
       final responseBody = jsonDecode(response.body);
       return Accommodation.fromJson(responseBody['data']);
     } catch (e) {
-      print(e);
       throw Exception('Failed to update the accommodation: $e');
     }
   }
@@ -327,9 +321,17 @@ class PlannerService {
   }
 
 
-  Future<void> inviteUserToPlanner(String plannerId, String userId) async {
+  Future<Planner> inviteUserToPlanner(String plannerId, String userId) async {
     try {
-      await _apiService.post('/planner/$plannerId/invite/', {'userId': userId});
+      //  await _apiService.post('/planner/$plannerId/invite/', {'userId': userId});
+      final response = await _apiService.post(
+        '/planner/$plannerId/invite?userId=$userId',
+        {'userIds': [userId]},
+      );
+      print("INVITE RESPONSE: ${response.body}");
+
+      final responseBody = jsonDecode(response.body);
+      return Planner.fromJson(responseBody['data']);
     } catch (e) {
       throw Exception('Failed to invite user to planner');
     }

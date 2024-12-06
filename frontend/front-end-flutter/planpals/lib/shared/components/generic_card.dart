@@ -65,6 +65,7 @@ class _GenericCardState extends State<GenericCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 7),
       child: Stack(children: [
         ListTile(
           title: widget.title,
@@ -72,16 +73,16 @@ class _GenericCardState extends State<GenericCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               widget.subtitle,
-
+      
               widget.commentable == true && widget.voteable == true
-
+      
               ? Row(children: [
                 _buildVoteButtons(context, vote), // Add vote buttons
-
+      
                 const SizedBox(
                   width: 15,
                 ),
-
+      
                 // Add comment button
                 IconButton(
                     onPressed: () {
@@ -129,20 +130,17 @@ class _GenericCardState extends State<GenericCard> {
       right: 0,
       top: 0,
       child: PopupMenuButton<String>(
-        icon: const Icon(Icons.more_vert),
+        icon: const Icon(Icons.more_vert, color: Colors.black),
         onSelected: (String result) {
-          if (result == 'Edit') {
-            widget.onEdit();
-          } else if (result == 'Delete') {
-            widget.onDelete();
-          }
+          if (result == 'Edit') widget.onEdit();
+          if (result == 'Delete') widget.onDelete();
         },
         itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
           const PopupMenuItem<String>(
             value: 'Edit',
             child: Row(
               children: [
-                Icon(Icons.edit),
+                Icon(Icons.edit, color: Colors.black),
                 SizedBox(width: 10),
                 Text('Edit'),
               ],
@@ -152,7 +150,7 @@ class _GenericCardState extends State<GenericCard> {
             value: 'Delete',
             child: Row(
               children: [
-                Icon(Icons.delete),
+                Icon(Icons.delete, color: Colors.black),
                 SizedBox(width: 10),
                 Text('Delete'),
               ],
@@ -169,7 +167,7 @@ class _GenericCardState extends State<GenericCard> {
       children: [
         IconButton(
           icon: vote.upVoted
-              ? const Icon(Icons.thumb_up)
+              ? const Icon(Icons.thumb_up, color: Colors.green)
               : const Icon(Icons.thumb_up_alt_outlined),
           onPressed: () {
             _handleUpVote();
@@ -181,7 +179,7 @@ class _GenericCardState extends State<GenericCard> {
         const SizedBox(width: 10),
         IconButton(
           icon: vote.downVoted
-              ? const Icon(Icons.thumb_down)
+              ? const Icon(Icons.thumb_down, color: Colors.red)
               : const Icon(Icons.thumb_down_alt_outlined),
           onPressed: () {
             _handleDownVote();

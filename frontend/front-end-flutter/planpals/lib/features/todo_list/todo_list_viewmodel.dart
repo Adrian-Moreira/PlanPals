@@ -150,4 +150,12 @@ class TodoListViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void logout() {
+    _todoLists = [];
+    _todoTasks = [];
+    currentTodoList = null;
+    _errorMessage = null;
+    notifyListeners();
+  }
 }

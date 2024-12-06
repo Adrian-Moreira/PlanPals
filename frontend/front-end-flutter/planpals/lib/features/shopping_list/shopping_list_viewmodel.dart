@@ -125,11 +125,8 @@ class ShoppingListViewModel extends ChangeNotifier {
 
     try {
       shoppingList.items?.remove(shoppingItem);
-      print("SHOULD BESHOPPING LIST UPDATED SERVICE: ${shoppingList.toJson()}");
-      print("DELETING SHOPPING ITEM SERVICE: ${shoppingItem.toJson()}");
       currentShoppingList =
           await _shoppingListService.updateShoppingList(shoppingList);
-      print("UPDATED SHOPPING LIST SERVICE: ${currentShoppingList!.toJson()}");
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -161,5 +158,12 @@ class ShoppingListViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void logout() {
+    _errorMessage = null;
+    _shoppingLists = [];
+    currentShoppingList = null;
+    notifyListeners();
   }
 }

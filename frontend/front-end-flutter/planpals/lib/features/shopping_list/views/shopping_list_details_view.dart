@@ -5,6 +5,8 @@ import 'package:planpals/features/shopping_list/components/create_shopping_item_
 import 'package:planpals/features/shopping_list/components/shopping_item_card.dart';
 import 'package:planpals/features/shopping_list/models/shopping_list_model.dart';
 import 'package:planpals/features/shopping_list/shopping_list_viewmodel.dart';
+import 'package:planpals/shared/styles/app_styles.dart';
+import 'package:planpals/shared/styles/background.dart';
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/invite_user_dialog.dart';
 import 'package:planpals/shared/components/navigator_bar.dart';
@@ -59,9 +61,12 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const NavigatorAppBar(title: "Shopping List Details"),
-      body: _buildList(context),
+    return Background(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: const NavigatorAppBar(title: "Shopping List Details"),
+        body: _buildList(context),
+      ),
     );
   }
 
@@ -86,23 +91,29 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(
+                  height: 10,
+                ),
                 ListTile(
                   title: Text(
                     shoppingList.name,
-                    style: const TextStyle(fontSize: 30),
+                    style: TextStyles.titleLarge,
                   ),
                   trailing: IconButton(
                     onPressed: () {
                       showDialog(
                           context: context,
                           builder: (context) => InviteUserDialog(
-                              // TODO: Add invite functionality
+                                // TODO: Add invite functionality
 
-                              onInvite: _handleOnInviteUser));
+                                onInvite: _handleOnInviteUser,
+                                userIds: shoppingList.rwUsers!,
+                              ));
                     },
                     icon: const Icon(
                       Icons.group_add,
                       size: 40,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -122,9 +133,10 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                   ),
                   title: const Text(
                     'Description',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text(shoppingList.description!),
+                  subtitle: Text(shoppingList.description!,
+                      style: TextStyles.subtitleMedium),
                 ),
                 ListTile(
                   leading: Container(
@@ -142,9 +154,10 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                   ),
                   title: const Text(
                     'Members',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text('${shoppingList.rwUsers!.length} members'),
+                  subtitle: Text('${shoppingList.rwUsers!.length} members',
+                      style: TextStyles.subtitleMedium),
                 ),
                 const SizedBox(
                   height: 20,
@@ -154,6 +167,9 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                   height: 10,
                 ),
                 _buildItemList(context),
+                const SizedBox(
+                  height: 10,
+                ),
               ],
             ),
           ),
@@ -177,6 +193,7 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
       headerIcon: Icons.list_alt,
       emptyMessage: "There is no item",
       functional: functional!,
+      headerColor: Colors.white,
       onAdd: () {
         Navigator.push(
           context,

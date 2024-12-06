@@ -34,12 +34,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TodoListViewModel()),
       ],
       child: SafeArea(
+
         child: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'Travel Planner',
             theme: ThemeData(
               primarySwatch: Colors.blue,
+              
             ),
             initialRoute: '/login', // Set the initial route to login
             routes: {

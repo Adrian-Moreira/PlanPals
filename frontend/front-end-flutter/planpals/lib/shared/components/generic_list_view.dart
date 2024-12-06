@@ -11,6 +11,9 @@ class GenericListView<T> extends StatelessWidget {
   final bool scrollable;
   final TextStyle? headerStyle;
   final double? headerIconSize;
+  final Color? headerColor;
+  final bool? showHeader;
+  final bool? showEmptyMessage;
 
   const GenericListView({
     super.key,
@@ -24,33 +27,44 @@ class GenericListView<T> extends StatelessWidget {
     this.scrollable = false,
     this.headerStyle,
     this.headerIconSize, // true if the list is scrollable, false if not.
+    this.headerColor,
+    this.showHeader = true,
+    this.showEmptyMessage = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      ListTile(
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(headerIcon, size: headerIconSize ?? 35),
-            const SizedBox(width: 15),
-            Text(headerTitle,
-                style: headerStyle ??
-                    const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    )),
-          ],
-        ),
-        trailing: functional
-            ? IconButton(
-                onPressed: onAdd,
-                icon: Icon(Icons.add_circle, size: headerIconSize ?? 35,
-                ),
-              )
-            : null,
-      ),
+      showHeader == false
+          ? const SizedBox()
+          : ListTile(
+              leading: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(headerIcon,
+                      size: headerIconSize ?? 35,
+                      color: headerColor ?? Colors.black),
+                  const SizedBox(width: 15),
+                  Text(headerTitle,
+                      style: headerStyle ??
+                          TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: headerColor ?? Colors.black,
+                          )),
+                ],
+              ),
+              trailing: functional
+                  ? IconButton(
+                      onPressed: onAdd,
+                      icon: Icon(
+                        Icons.add_circle,
+                        size: headerIconSize ?? 35,
+                      ),
+                      color: headerColor ?? Colors.black,
+                    )
+                  : null,
+            ),
       buildList(context),
     ]);
   }
@@ -66,18 +80,23 @@ class GenericListView<T> extends StatelessWidget {
           itemBuilder: (context, index) {
             return itemBuilder(
               itemList[index],
-            ); 
+            );
           });
     } else {
-      return Column(
-        children: [
-          const SizedBox(height: 5),
-          Text(
-            emptyMessage,
-            style: const TextStyle(fontSize: 20),
-          ),
-        ],
-      );
+      return showEmptyMessage == false
+          ? const SizedBox()
+          : Column(
+              children: [
+                const SizedBox(height: 5),
+                Text(
+                  emptyMessage,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: headerColor ??
+                          const Color.fromARGB(255, 100, 100, 100)),
+                ),
+              ],
+            );
     }
   }
 }

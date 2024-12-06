@@ -23,7 +23,7 @@ class ShoppingItemCard extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Location: ${item.location}'),
+          Text('Location: ${item.location}',),
           Text('Added By: ${item.addedBy}'),
         ],
       ),

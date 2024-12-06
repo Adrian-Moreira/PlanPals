@@ -457,10 +457,22 @@ class PlannerViewModel extends ChangeNotifier {
 
 
   Future<void> inviteUserToPlanner(String plannerId, String userId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
     try {
-      await _plannerService.inviteUserToPlanner(plannerId, userId);
+      Planner updated = await _plannerService.inviteUserToPlanner(plannerId, userId);
+
+      _planners
+          .firstWhere((planner) => planner.plannerId == updated.plannerId)
+          .update(updated);
+
     } catch (e) {
-      throw Exception('Failed to invite user to planner');
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

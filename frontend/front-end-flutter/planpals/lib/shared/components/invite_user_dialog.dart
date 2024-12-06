@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 
 class InviteUserDialog extends StatefulWidget {
   final Function(String)? onInvite;
+  final List<String> userIds;
 
-  const InviteUserDialog({super.key, required this.onInvite});
+  const InviteUserDialog({super.key, required this.onInvite, required this.userIds});
 
   @override
   _InviteUserDialogState createState() => _InviteUserDialogState();
@@ -42,6 +43,12 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
       setState(() {
         _usernameError = 'User not found.';
       });
+    } else {
+      if (widget.userIds.contains(fetchedUser.id)) {
+        setState(() {
+          _usernameError = 'User already in group.';
+        });
+      }
     }
 
     setState(() {
@@ -95,6 +102,14 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
         ),
       ),
       actions: [
+
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+
         TextButton(
           onPressed: () async {
             if (_formKey.currentState?.validate() == true) {
@@ -114,12 +129,6 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
             }
           },
           child: const Text('Invite'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
         ),
       ],
     );

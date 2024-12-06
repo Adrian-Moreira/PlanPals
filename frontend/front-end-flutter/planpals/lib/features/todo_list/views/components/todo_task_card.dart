@@ -4,6 +4,7 @@ import 'package:planpals/features/profile/viewmodels/user_viewmodel.dart';
 import 'package:planpals/features/todo_list/models/todo_task_model.dart';
 import 'package:planpals/features/todo_list/todo_list_viewmodel.dart';
 import 'package:planpals/features/todo_list/views/components/update_todo_task_form.dart';
+import 'package:planpals/shared/utils/date_utils.dart';
 import 'package:provider/provider.dart';
 
 class TodoTaskCard extends StatefulWidget {
@@ -41,6 +42,16 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
   Future<void> _handleOnComplete() async {
     todoTask.isCompleted = !todoTask.isCompleted;
     _todoListViewModel.updateTodoTask(todoTask, user.id);
+
+    if (_todoListViewModel.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_todoListViewModel.errorMessage!)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Updated Task Successfully!')),
+      );
+    }
   }
 
   @override
@@ -58,7 +69,6 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
     bool isCompleted = widget.todoTask.isCompleted;
 
     _todoListViewModel = Provider.of<TodoListViewModel>(context, listen: false);
-    final User user = Provider.of<UserViewModel>(context, listen: false).currentUser!;
 
     return Card(
       elevation: 4,
@@ -85,26 +95,29 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
                             ),
                       ),
                       const SizedBox(height: 8),
-          
+
                       // Due Date
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                          const Icon(Icons.calendar_today,
+                              size: 16, color: Colors.grey),
                           const SizedBox(width: 8),
                           Text(
-                            'Due: ${dueDate.toLocal().toString().split(' ')[0]}',
+                            'Due: ${DateTimeFormat.formatDateTime(dueDate)}',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
                       ),
-          
+
                       const SizedBox(height: 8),
-          
+
                       // Completion Status
                       Row(
                         children: [
                           Icon(
-                            isCompleted ? Icons.check_circle : Icons.circle_outlined,
+                            isCompleted
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
                             color: isCompleted ? Colors.green : Colors.red,
                             size: 16,
                           ),
@@ -121,7 +134,7 @@ class _TodoTaskCardState extends State<TodoTaskCard> {
                     ],
                   ),
                 ),
-          
+
                 // Mark as Completed Button
                 if (!isCompleted)
                   IconButton(

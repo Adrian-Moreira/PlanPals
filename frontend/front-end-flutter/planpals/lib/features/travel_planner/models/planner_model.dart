@@ -7,8 +7,8 @@ class Planner {
   DateTime endDate;
   String name;
   String description;
-  final List<String> roUsers;
-  final List<String> rwUsers;
+  List<String> roUsers;
+  List<String> rwUsers;
   final List<String> destinations;
   final List<String> transportations;
 
@@ -77,5 +77,7 @@ class Planner {
     endDate = updatedPlanner.endDate;
     name = updatedPlanner.name;
     description = updatedPlanner.description;
+    roUsers = updatedPlanner.roUsers;
+    rwUsers = updatedPlanner.rwUsers;
   }
 }

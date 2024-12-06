@@ -23,7 +23,6 @@ class TodoListService {
     try {
       final response = await _apiService.get('/todoList?userId=$userId&access=rw');
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
-      print("TODOLIST SERVICE FETCHING BY USERID: $jsonList");
       return jsonList.map((json) => TodoList.fromJson(json)).toList();
     } catch (e) {
       throw Exception("Failed to fetch todo lists by userID=$userId: $e");
@@ -34,11 +33,9 @@ class TodoListService {
   Future<List<TodoTask>> fetchTodoTasksByTodoListId(String todoListId, String userId) async {
     try {
       final response = await _apiService.get('/todoList/$todoListId/task?userId=$userId');
-      print("FETCHING TODOTASKS BY TODOLISTID: ${response.body}");
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => TodoTask.fromJson(json)).toList();
     } catch (e) {
-      print("FETCHING TODOTASKS BY TODOLISTID: $e");
       throw Exception("Failed to fetch todo tasks by todo list ID=$todoListId: $e");
     }
   }
@@ -46,8 +43,7 @@ class TodoListService {
   Future<TodoList> addTodoList(TodoList todoList) async {
     try {
       final response = await _apiService.post('/todoList', todoList.toJson());
-      print("ADDDING TODOLIST SERVICE: ${response.body}");
-      return TodoList.fromJson(jsonDecode(response.body)['data'][0]);
+      return TodoList.fromJson(jsonDecode(response.body)['data']);
     } catch (e) {
       throw Exception("Failed to create todo list: $e");
     }
@@ -55,7 +51,6 @@ class TodoListService {
 
   Future<TodoTask> addTodoTask(TodoTask todoTask) async {
     try {
-      print("ADDDING TODOTASK SERVICE: ${todoTask.toJson()}");
       final response = await _apiService.post('/todoList/${todoTask.todoListId}/task', todoTask.toJson());
       return TodoTask.fromJson(jsonDecode(response.body)['data']);
     } catch (e) {

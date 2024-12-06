@@ -12,7 +12,6 @@ class ShoppingListService {
   Future<List<ShoppingList>> fetchAllShoppingLists() async {
     try {
       final response = await _apiService.get('/shoppingList');
-      print("SHOPPINGLIST SERVICE: $response");
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((json) => ShoppingList.fromJson(json)).toList();
     } catch (e) {
@@ -23,7 +22,6 @@ class ShoppingListService {
   Future<List<ShoppingList>> fetchShoppingListsByUserId(String userId) async {
     try {
       final response = await _apiService.get('/shoppingList?userId=$userId');
-      print("SHOPPINGLIST SERVICE: $response");
       final List<dynamic> jsonList = jsonDecode(response.body)['data'];
       return jsonList.map((json) => ShoppingList.fromJson(json)).toList();
     } catch (e) {
@@ -33,7 +31,6 @@ class ShoppingListService {
 
   Future<ShoppingList> addShoppingList(ShoppingList shoppingList) async {
     try {
-      print("ADDING SHOPPING LIST SERVICE: $shoppingList");
       final response = await _apiService.post('/shoppingList', shoppingList.toJson());
       return ShoppingList.fromJson(jsonDecode(response.body)['data']);
     } catch (e) {

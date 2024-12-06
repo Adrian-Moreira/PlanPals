@@ -9,6 +9,8 @@ import 'package:planpals/features/todo_list/views/components/todo_task_card.dart
 import 'package:planpals/shared/components/generic_list_view.dart';
 import 'package:planpals/shared/components/invite_user_dialog.dart';
 import 'package:planpals/shared/components/navigator_bar.dart';
+import 'package:planpals/shared/styles/app_styles.dart';
+import 'package:planpals/shared/styles/background.dart';
 import 'package:provider/provider.dart';
 
 class TodoListDetailsView extends StatefulWidget {
@@ -47,9 +49,12 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: NavigatorAppBar(title: todoList.name),
-      body: _buildPage(context),
+    return Background(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: const NavigatorAppBar(title: "Todo List Details"),
+        body: _buildPage(context),
+      ),
     );
   }
 
@@ -74,21 +79,27 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(
+                  height: 10,
+                ),
                 ListTile(
                   title: Text(
                     todoList.name,
-                    style: const TextStyle(fontSize: 30),
+                    style: TextStyles.titleLarge,
                   ),
                   trailing: IconButton(
                     onPressed: () {
                       showDialog(
                           context: context,
-                          builder: (context) =>
-                              InviteUserDialog(onInvite: _handleOnInviteUser));
+                          builder: (context) => InviteUserDialog(
+                                onInvite: _handleOnInviteUser,
+                                userIds: todoList.rwUsers,
+                              ));
                     },
                     icon: const Icon(
                       Icons.group_add,
                       size: 40,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -108,9 +119,10 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                   ),
                   title: const Text(
                     'Description',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text(todoList.description!),
+                  subtitle: Text(todoList.description!,
+                      style: TextStyles.subtitleMedium),
                 ),
                 ListTile(
                   leading: Container(
@@ -128,9 +140,10 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                   ),
                   title: const Text(
                     'Members',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text('${todoList.rwUsers.length} members'),
+                  subtitle: Text('${todoList.rwUsers.length} members',
+                      style: TextStyles.subtitleMedium),
                 ),
                 const SizedBox(
                   height: 20,
@@ -140,6 +153,9 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                   height: 10,
                 ),
                 _buildTaskList(context),
+                const SizedBox(
+                  height: 10,
+                ),
               ],
             ),
           ),
@@ -153,8 +169,24 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
 
     List<TodoTask> tasks = Provider.of<TodoListViewModel>(context).todoTasks;
 
-    var functional = todoList.rwUsers.contains(user.id);
+    List<TodoTask> completedTasks =
+        tasks.where((task) => task.isCompleted).toList();
+    List<TodoTask> uncompletedTasks =
+        tasks.where((task) => !task.isCompleted).toList();
 
+    completedTasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    uncompletedTasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+
+    return Column(
+      children: [
+        _buildUncompletedTaskList(uncompletedTasks,
+            uncompletedTasks.isEmpty && completedTasks.isEmpty),
+        _buildCompletedTaskList(completedTasks),
+      ],
+    );
+  }
+
+  Widget _buildUncompletedTaskList(List<TodoTask> tasks, bool showMessage) {
     return GenericListView(
       itemList: tasks,
       itemBuilder: (task) => TodoTaskCard(
@@ -173,6 +205,33 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
           ),
         );
       },
+      headerColor: Colors.white,
+      showEmptyMessage: showMessage,
+    );
+  }
+
+  Widget _buildCompletedTaskList(List<TodoTask> tasks) {
+    return GenericListView(
+      itemList: tasks,
+      itemBuilder: (task) => TodoTaskCard(
+        todoTask: task,
+        // functional: functional,
+      ),
+      headerTitle: "Tasks",
+      headerIcon: Icons.list_alt,
+      functional: functional,
+      onAdd: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateTodoTaskForm(todoList: todoList),
+          ),
+        );
+      },
+      headerColor: Colors.white,
+      showHeader: false,
+      emptyMessage: "There is no task",
+      showEmptyMessage: false,
     );
   }
 }
