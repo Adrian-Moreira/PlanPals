@@ -94,7 +94,6 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                 const SizedBox(
                   height: 10,
                 ),
-
                 ListTile(
                   title: Text(
                     shoppingList.name,
@@ -105,9 +104,11 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                       showDialog(
                           context: context,
                           builder: (context) => InviteUserDialog(
-                              // TODO: Add invite functionality
+                                // TODO: Add invite functionality
 
-                              onInvite: _handleOnInviteUser));
+                                onInvite: _handleOnInviteUser,
+                                userIds: shoppingList.rwUsers!,
+                              ));
                     },
                     icon: const Icon(
                       Icons.group_add,
@@ -134,7 +135,8 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                     'Description',
                     style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text(shoppingList.description!, style: TextStyles.subtitleMedium),
+                  subtitle: Text(shoppingList.description!,
+                      style: TextStyles.subtitleMedium),
                 ),
                 ListTile(
                   leading: Container(
@@ -154,7 +156,8 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                     'Members',
                     style: TextStyles.titleSmall,
                   ),
-                  subtitle: Text('${shoppingList.rwUsers!.length} members', style: TextStyles.subtitleMedium),
+                  subtitle: Text('${shoppingList.rwUsers!.length} members',
+                      style: TextStyles.subtitleMedium),
                 ),
                 const SizedBox(
                   height: 20,
@@ -164,7 +167,6 @@ class _ShoppingListDetailsViewState extends State<ShoppingListDetailsView> {
                   height: 10,
                 ),
                 _buildItemList(context),
-
                 const SizedBox(
                   height: 10,
                 ),

@@ -91,8 +91,10 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
                     onPressed: () {
                       showDialog(
                           context: context,
-                          builder: (context) =>
-                              InviteUserDialog(onInvite: _handleOnInviteUser));
+                          builder: (context) => InviteUserDialog(
+                                onInvite: _handleOnInviteUser,
+                                userIds: todoList.rwUsers,
+                              ));
                     },
                     icon: const Icon(
                       Icons.group_add,
@@ -177,7 +179,8 @@ class _TodoListDetailsViewState extends State<TodoListDetailsView> {
 
     return Column(
       children: [
-        _buildUncompletedTaskList(uncompletedTasks, uncompletedTasks.isEmpty && completedTasks.isEmpty),
+        _buildUncompletedTaskList(uncompletedTasks,
+            uncompletedTasks.isEmpty && completedTasks.isEmpty),
         _buildCompletedTaskList(completedTasks),
       ],
     );

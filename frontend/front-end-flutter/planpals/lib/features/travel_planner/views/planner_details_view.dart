@@ -93,11 +93,9 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       const SizedBox(
                         height: 10,
                       ),
-
                       ListTile(
                         title: Text(
                           widget.travelPlanner.name,
@@ -105,14 +103,16 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         ),
                         subtitle: Text(
                             '${DateTimeFormat.formatDate(widget.travelPlanner.startDate)} - ${DateTimeFormat.formatDate(widget.travelPlanner.endDate)}',
-                            style: const TextStyle(fontSize: 18, color: Color.fromARGB(200, 255, 255, 255))),
+                            style: const TextStyle(
+                                fontSize: 18,
+                                color: Color.fromARGB(200, 255, 255, 255))),
                         trailing: IconButton(
                           onPressed: () {
                             showDialog(
                                 context: context,
                                 builder: (context) => InviteUserDialog(
-                                    // TODO: Add invite functionality
-                                    onInvite: _handleOnInviteUser
+                                      onInvite: _handleOnInviteUser,
+                                      userIds: widget.travelPlanner.rwUsers,
                                     ));
                           },
                           icon: const Icon(
@@ -127,7 +127,8 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                           padding: const EdgeInsets.all(
                               10), // Padding around the icon
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 223, 223, 223), // Background color
+                            color: const Color.fromARGB(
+                                255, 223, 223, 223), // Background color
                             borderRadius:
                                 BorderRadius.circular(8), // Rounded corners
                           ),
@@ -140,7 +141,8 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                           'Description',
                           style: TextStyles.titleSmall,
                         ),
-                        subtitle: Text(widget.travelPlanner.description, style: TextStyles.subtitleMedium),
+                        subtitle: Text(widget.travelPlanner.description,
+                            style: TextStyles.subtitleMedium),
                       ),
                       ListTile(
                         leading: Container(
@@ -164,8 +166,10 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${destinations.length} Destinations', style: TextStyles.subtitleSmall),
-                              Text('${transportations.length} Transportations', style: TextStyles.subtitleSmall),
+                              Text('${destinations.length} Destinations',
+                                  style: TextStyles.subtitleSmall),
+                              Text('${transportations.length} Transportations',
+                                  style: TextStyles.subtitleSmall),
                             ]),
                       ),
                       ListTile(
@@ -190,14 +194,12 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                                '${planner.rwUsers.length} Members', style: TextStyles.subtitleMedium),
+                            Text('${planner.rwUsers.length} Members',
+                                style: TextStyles.subtitleMedium),
                           ],
                         ),
                       ),
-                      
                       _buildDestinationList(destinations),
-
                       const SizedBox(
                         height: 20,
                       ),
@@ -205,16 +207,7 @@ class _PlannerDetailsViewState extends State<PlannerDetailsView> {
                       const SizedBox(
                         height: 10,
                       ),
-                      
                       _buildTransportationList(transportations),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      const Divider(height: 1),
-                      const SizedBox(
-                        height: 10,
-                      ),
                       const SizedBox(
                         height: 20,
                       ),
