@@ -79,9 +79,9 @@ function ResponsiveAppBar({
         case 'Shopping Lists':
           handleShoppingLists()
           break
-        case 'To-do Lists':
-          handleTodoLists()
-          break
+        // case 'To-do Lists':
+        //   handleTodoLists()
+        //   break
         case 'About':
           handleAbout()
           break
