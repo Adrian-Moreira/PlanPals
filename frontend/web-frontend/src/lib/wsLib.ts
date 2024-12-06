@@ -13,7 +13,7 @@ export const wsMessages = atom<Record<string, WebSocketMessage>>({})
 // planners:${userId} for list of planners
 // planner:${plannerId} for a specific planner
 // inbox:${userId} for a user's inbox (Not yet implemented)
-export type TopicType = 'planners' | 'planner' | 'shoppingLists' | 'shoppingList' | 'inbox'
+export type TopicType = 'planners' | 'planner' | 'inbox'
 
 export interface MessageTopic {
   type: TopicType
