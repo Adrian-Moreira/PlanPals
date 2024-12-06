@@ -162,4 +162,11 @@ class ShoppingListViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void logout() {
+    _errorMessage = null;
+    _shoppingLists = [];
+    currentShoppingList = null;
+    notifyListeners();
+  }
 }
